@@ -1,0 +1,81 @@
+.teams-table {
+  margin: 40px 40px; /* Отступы по краям */
+  padding: 20px; /* Внутренние отступы */
+  background-color: #ffffff; /* Цвет фона таблицы */
+  border: 2px solid #1D334A; /* Цвет и стиль границы */
+  border-radius: 8px; /* Закругление углов */
+}
+
+table {
+  width: 100%; /* Ширина таблицы */
+  border-collapse: collapse; /* Убираем промежутки между ячейками */
+  margin-top: 20px; /* Отступ сверху */
+}
+
+th, td {
+  padding: 12px 20px; /* Отступы в ячейках */
+  text-align: left; /* Выравнивание текста в ячейках */
+  font-size: 16px; /* Размер шрифта */
+  color: #0E294B; /* Цвет текста */
+  border-bottom: 1px solid #ddd; /* Граница снизу для ячеек */
+  transition: background-color 0.5s ease, color 0.5s ease; /* Плавный переход для фона и цвета текста */
+}
+
+th {
+  background-color: #1D334A; /* Цвет фона для заголовков */
+  color: #F8F8FF; /* Цвет текста заголовков */
+  font-size: 18px; /* Размер шрифта заголовков */
+}
+
+tr:hover {
+  background-color: #FFD700; /* Жёлтый фон при наведении на строку */
+  transition: background-color 0.5s ease; /* Плавный переход для фона */
+}
+
+td {
+  background-color: #fff; /* Белый фон для ячеек */
+  transition: background-color 0.5s ease; /* Плавный переход для фона */
+}
+
+.team-row:hover td {
+  background-color: #FFD700; /* Жёлтый фон при наведении на строку команды */
+  color: #000000; /* Белый цвет текста при наведении */
+}
+
+ul {
+  padding-left: 20px; /* Отступ слева для списка */
+  list-style-type: none; /* Убираем маркеры у списка */
+  margin-top: 5px; /* Отступ сверху */
+}
+
+li {
+  font-size: 16px; /* Размер шрифта для элементов списка */
+  color: #555; /* Цвет текста элементов списка */
+  margin-bottom: 5px; /* Отступ снизу для элементов списка */
+  border-bottom: 2px solid #1D334A;
+  transition: background-color 0.5s ease; /* Плавный переход для фона */
+}
+
+li:hover {
+  background-color: #FFD700;
+}
+
+.team-divider {
+  border-top: 3px solid #1D334A; /* Полужирная темно-синяя линия для разделения команд */
+  margin: 10px 0; /* Отступ сверху и снизу */
+  transition: border-top 0.5s ease; /* Плавный переход для границы */
+}
+
+.team-divider + tr {
+  border-top: 1px solid #1D334A; /* Тонкая синяя линия для разделения участников */
+}
+
+.project-row:hover td {
+  background-color: #FFD700; /* Жёлтый фон при наведении на строку проекта */
+  color: #000000; /* Чёрный цвет текста при наведении */
+}
+
+.project-divider {
+  border-top: 3px solid #1D334A; /* Полужирная темно-синяя линия для разделения проектов */
+  margin: 10px 0; /* Отступ сверху и снизу */
+}

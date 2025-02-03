@@ -1,0 +1,68 @@
+.modalRegForm {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .modalContent {
+    background-color: #fefefe;
+    margin: 15% auto;
+    padding: 40px;
+    border: 1px solid #888;
+    border-radius: 8px;
+    position: relative;
+  }
+  
+  .modalInput {
+    width: 100%;
+    margin: 8px 0;
+    height: 30px;
+    border: 2px solid #ccc;
+    border-radius: 5px;
+    font-size: 16px;
+    font-family: 'Roboto', sans-serif;
+    transition: border-color 0.3s ease;
+  }
+  
+  .modalButtonReg, .modalButtonClear {
+    margin-top: 20px;
+    padding: 10px 15px;
+    font-family: 'Roboto', sans-serif;
+    font-size: 16px;
+    border: 2px solid black;
+    border-radius: 5px;
+    cursor: pointer;
+    background: white;
+    color: black;
+    transition: background-color 0.3s ease, opacity 0.3s ease;
+  }
+  
+  .modalButtonClear {
+    float: right;
+  }
+  
+  .modalButtonReg:hover, .modalButtonClear:hover,
+  .exitButton:hover, .Button:hover {
+    background-color: black;
+    color: white;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    border-color: black;
+  }
+  
+  .exitButton {
+    background: none;
+    border: none;
+    font-size: 40px;
+    color: black;
+    cursor: pointer;
+    position: absolute;
+    top: 10px;
+    right: 15px;
+  }
+  

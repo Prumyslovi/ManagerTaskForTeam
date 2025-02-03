@@ -1,0 +1,16 @@
+.authButtons {
+    display: flex;
+    gap: 10px;
+  }
+  
+  .profileIcon, .authIcon {
+    color: #F8F8FF;
+    margin-left: 10px;
+    transition: transform 0.2s;
+  }
+  
+  .profileIcon:hover, .authIcon:hover {
+    transform: scale(1.2);
+    color: #d8a903;
+  }
+  
