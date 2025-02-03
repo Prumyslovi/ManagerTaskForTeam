@@ -1,0 +1,22 @@
+.programSection {
+  position: relative;
+  margin: 40px 40px;
+  padding: 20px;
+  background-color: #ffffff;
+  border: 2px solid #1D334A;
+  border-radius: 8px;
+}
+
+.programSection h2,
+.programSection h3 {
+  color: #1D334A;
+}
+
+.programSection p {
+  font-size: 16px;
+  line-height: 1.5;
+  margin-bottom: 15px;
+  color: #555;
+  border-bottom: 4px solid #1D334A;
+  padding-bottom: 10px;
+}

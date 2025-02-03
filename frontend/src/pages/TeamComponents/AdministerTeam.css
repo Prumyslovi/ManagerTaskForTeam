@@ -1,0 +1,139 @@
+.administer-team {
+  margin: 40px 40px;
+  padding: 20px;
+  background-color: #ffffff; /* Цвет фона системы */
+  border: 2px solid #ddd;
+  border-radius: 8px;
+}
+
+.admin-title {
+  color: #1D334A; /* Цвет заголовка */
+  font-size: 24px; /* Размер шрифта заголовка */
+}
+
+.admin-list {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+
+.admin-list-item {
+  margin: 10px 0;
+  cursor: pointer;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  background-color: #ffffff; /* Белый фон для списка */
+  transition: background-color 0.3s;
+}
+
+.admin-list-item:hover {
+  background-color: #ffffff; /* Фон при наведении */
+}
+
+.member-info {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.member-name {
+  flex: 1;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.member-role {
+  min-width: 150px;
+}
+
+.team-member {
+  display: flex;
+  align-items: center;
+  justify-content: space-between; /* Распределяет элементы по краям */
+  margin: 5px 0;
+  position: relative; /* Для того чтобы использовать абсолютное позиционирование на внутренних элементах */
+}
+
+.team-member span {
+  color: black;
+  flex-shrink: 0; /* Не сжимаем */
+  white-space: nowrap; /* Не переносим текст */
+  text-overflow: ellipsis; /* Троеточие для длинного текста */
+  max-width: 150px; /* Ограничиваем максимальную ширину */
+}
+
+.team-member select {
+  position: absolute; /* Абсолютно позиционируем select */
+  left: 50%; /* Размещаем по центру */
+  transform: translateX(-50%); /* Центрируем по горизонтали */
+  margin-bottom: 5px; /* Отступ снизу */
+  max-width: 150px; /* Ограничение ширины */
+  min-width: 120px; /* Минимальная ширина */
+}
+
+.team-member button {
+  color: black;
+  flex-shrink: 0; /* Не сжимаем */
+  max-width: 50px; /* Ограничиваем максимальную ширину */
+  text-align: center;
+  margin-bottom: 5px; /* Отступ снизу */
+}
+
+.modalInput {
+  width: 100%;
+  margin: 8px 0;
+  height: 30px;
+  background-color: #ffffff;
+  border: 2px solid #ccc;
+  border-radius: 5px;
+  font-size: 16px;
+  transition: border-color 0.3s ease;
+}
+
+.Button {
+  padding: 10px 15px;
+  font-size: 16px;
+  border: 2px solid black;
+  border-radius: 5px;
+  background: #ffffff;
+  color: black;
+  cursor: pointer;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.Button:hover {
+  background-color: black; /* Черный фон при наведении */
+  color: white; /* Белый цвет текста при наведении */
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); /* Тень при наведении */
+}
+
+.add-member-container {
+  display: flex;
+  margin-top: 10px;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.add-member-container input,
+.add-member-container select {
+  margin-right: 10px;
+  flex: 1; /* Ширина элемента заполняет доступное пространство */
+}
+
+.list {
+  padding: 10px 15px;
+  font-size: 16px;
+  border: 2px solid black;
+  border-radius: 2px;
+  background: #ffffff;
+  color: black;
+  cursor: pointer;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.remove-button {
+  margin-left: 10px;
+}

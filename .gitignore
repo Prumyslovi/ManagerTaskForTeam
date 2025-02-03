@@ -1,0 +1,16 @@
+bin/
+obj/
+.vs/
+.vscode/
+Debug/
+*.dll
+*.exe
+*.pdb
+*.bin
+*.cache
+*.log
+node_modules/
+runtimes/
+*.json
+.idea/
+*.suo
