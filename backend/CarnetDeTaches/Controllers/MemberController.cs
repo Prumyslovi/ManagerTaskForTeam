@@ -40,7 +40,6 @@ namespace CarnetDeTaches.Controllers
                 return BadRequest("Некорректные данные");
             }
 
-            // Попытка аутентификации пользователя
             var member = _memberRepository.GetMember(request.Login, request.Password);
             if (member == null)
                 return NotFound();
@@ -53,7 +52,7 @@ namespace CarnetDeTaches.Controllers
         }
 
         [HttpPost("GetProfile")]
-        public async Task<ActionResult<Member>> GetProfile([FromBody] Guid profileId) // Nullable Guid
+        public async Task<ActionResult<Member>> GetProfile([FromBody] Guid profileId)
         {
             Console.WriteLine($"Получен запрос с profileId: {profileId}");
 
@@ -73,7 +72,7 @@ namespace CarnetDeTaches.Controllers
                     return NotFound($"Профиль с ID {profileId} не найден.");
                 }
 
-                Console.WriteLine($"Запрос успешно обработан. Участник: {member.MemberName}");
+                Console.WriteLine($"Запрос успешно обработан. Участник: {member.FirstName} {member.LastName}");
                 return Ok(member);
             }
             catch (Exception ex)
@@ -93,25 +92,22 @@ namespace CarnetDeTaches.Controllers
         [HttpPut("UpdateMember")]
         public async Task<ActionResult> UpdateMember([FromBody] UpdateMemberRequest updateRequest)
         {
-
-            // Получаем текущего пользователя из базы данных
             var existingMember = _memberRepository.GetProfile(updateRequest.MemberId);
             if (existingMember == null)
             {
                 return NotFound("Пользователь не найден.");
             }
-
-            // Обновляем поля (логин и имя), если они переданы
+            
             if (!string.IsNullOrEmpty(updateRequest.Username))
                 existingMember.Login = updateRequest.Username;
 
             if (!string.IsNullOrEmpty(updateRequest.FirstName))
-                existingMember.MemberName = updateRequest.FirstName;
+                existingMember.FirstName = updateRequest.FirstName;
+            if (!string.IsNullOrEmpty(updateRequest.LastName))
+                existingMember.LastName = updateRequest.LastName;
 
-            // Если переданы старый и новый пароли, обновляем пароль
             if (!string.IsNullOrEmpty(updateRequest.OldPassword) && !string.IsNullOrEmpty(updateRequest.NewPassword))
             {
-                // Обновление пароля происходит в репозитории
                 var updateResult = await _memberRepository.UpdateMember(existingMember, updateRequest.OldPassword, updateRequest.NewPassword);
                 if (updateResult == null)
                 {
@@ -127,7 +123,7 @@ namespace CarnetDeTaches.Controllers
                 await _memberRepository.UpdateMember(existingMember, null, null);
             }
 
-            return NoContent();  // Возвращаем NoContent, что означает успешное обновление
+            return NoContent();
         }
 
         [HttpDelete("DeleteMember/{id}")]

@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations.Schema;
+
 namespace CarnetDeTaches.Model
 {
     [Table("MemberRole")]
@@ -14,6 +15,6 @@ namespace CarnetDeTaches.Model
         [Column("RoleId")]
         public Guid RoleId { get; set; }
         [Column("IsDeleted")]
-        public Boolean IsDeleted { get; set; }
+        public bool IsDeleted { get; set; }
     }
 }

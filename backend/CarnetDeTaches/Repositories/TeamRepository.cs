@@ -79,7 +79,8 @@ namespace CarnetDeTaches.Repositories
                 return new MemberWithRole
                 {
                     Id = member.MemberId,
-                    Name = member?.MemberName, // Имя пользователя
+                    FirstName = member?.FirstName, // Имя пользователя
+                    LastName = member?.LastName, // Имя пользователя
                     Role = role?.RoleName    // Название роли
                 };
             }).ToList();

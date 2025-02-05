@@ -7,14 +7,16 @@ namespace CarnetDeTaches.Model
     {
         [Column("TaskId")]
         public Guid TaskId { get; set; }
+
         [Column("TaskName")]
         public string TaskName { get; set; }
+
         [Column("Description")]
         public string Description { get; set; }
-        [Column("TeamId")]
-        public Guid TeamId { get; set; }
+
         [Column("ProjectId")]
         public Guid ProjectId { get; set; }
+
         [Column("MemberId")]
         public Guid MemberId { get; set; }
 
@@ -22,9 +24,14 @@ namespace CarnetDeTaches.Model
         public string Status { get; set; }
         [Column("CreatedAt")]
         public DateTime CreatedAt { get; set; }
-        [Column("DeadLine")]
-        public DateTime DeadLine { get; set; }
+
+        [Column("StartDate")]
+        public DateTime StartDate { get; set; }
+
+        [Column("EndDate")]
+        public DateTime EndDate { get; set; }
+
         [Column("IsDeleted")]
-        public Boolean IsDeleted { get; set; }
+        public bool IsDeleted { get; set; }
     }
 }

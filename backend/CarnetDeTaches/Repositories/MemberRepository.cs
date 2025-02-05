@@ -71,8 +71,10 @@ namespace CarnetDeTaches.Repositories
             if (!string.IsNullOrEmpty(member.Login))
                 existingMember.Login = member.Login;
 
-            if (!string.IsNullOrEmpty(member.MemberName))
-                existingMember.MemberName = member.MemberName;
+            if (!string.IsNullOrEmpty(member.FirstName))
+                existingMember.FirstName = member.FirstName;
+            if (!string.IsNullOrEmpty(member.LastName))
+                existingMember.LastName = member.LastName;
 
             // Если был передан новый пароль, хешируем его
             if (!string.IsNullOrEmpty(newPassword))

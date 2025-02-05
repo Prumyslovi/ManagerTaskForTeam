@@ -2,17 +2,17 @@
 
 namespace CarnetDeTaches.Model
 {
-    [Table("Role")]
-    public class Role
+    [Table("RolePermission")]
+    public class RolePermission
     {
+        [Column("RolePermissionId")]
+        public Guid RolePermissionId { get; set; }
+
         [Column("RoleId")]
         public Guid RoleId { get; set; }
 
-        [Column("RoleName")]
-        public string RoleName { get; set; }
-
-        [Column("RolePriority")]
-        public byte RolePriority { get; set; }
+        [Column("PermissionId")]
+        public Guid PermissionId { get; set; }
 
         [Column("IsDeleted")]
         public bool IsDeleted { get; set; }

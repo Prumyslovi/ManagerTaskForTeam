@@ -11,5 +11,7 @@ namespace CarnetDeTaches.Model
         public string ProjectId { get; set; }
         [Column("TaskId")]
         public Guid TaskId { get; set; }
+        [Column("IsDeleted")]
+        public Boolean IsDeleted { get; set; }
     }
 }

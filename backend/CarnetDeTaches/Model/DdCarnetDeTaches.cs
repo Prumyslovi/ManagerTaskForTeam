@@ -9,14 +9,18 @@ namespace CarnetDeTaches.Model
             : base(options)
         {
         }
+        public DbSet<ActivityLog> ActivityLogs { get; set; }
         public DbSet<Member> Members { get; set; }
-        public DbSet<Session> Sessions { get; set; }
         public DbSet<MemberRole> MemberRoles { get; set; }
         public DbSet<Team> Teams { get; set; }
+        public DbSet<Permission> Permissions { get; set; }
         public DbSet<Project> Projects { get; set; }
         public DbSet<ProjectTask> ProjectTasks { get; set; }
         public DbSet<Role> Roles { get; set; }
+        public DbSet<RolePermission> RolePermissions { get; set; }
         public DbSet<Task> Tasks { get; set; }
+        public DbSet<TaskComment> TaskComments { get; set; }
+        public DbSet<TaskDependency> TaskDependencys { get; set; }
 
     }
 }
