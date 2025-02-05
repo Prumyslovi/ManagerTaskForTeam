@@ -161,7 +161,7 @@ const AdministerTeam = () => {
               const isCurrentUser = member.id === localStorage.getItem('memberId');
               return (
                 <li key={member.id} className="team-member">
-                  <span>{member.name}</span>
+                  <span>{member.firstName + " " + member.lastName}</span>
                   <select
                     value={role} 
                     onChange={(e) => handleRoleChange(selectedTeam.teamId, member.id, e.target.value)}

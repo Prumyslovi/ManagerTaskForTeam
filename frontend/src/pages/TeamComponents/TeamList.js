@@ -116,7 +116,7 @@ const TeamList = ({ memberId }) => {
                       <table>
                         <thead>
                           <tr>
-                            <th>Имя</th>
+                            <th>Участник</th>
                             <th>Роль</th>
                           </tr>
                         </thead>
@@ -130,7 +130,7 @@ const TeamList = ({ memberId }) => {
                                     member.memberId === memberId ? '#d3f8d3' : 'transparent',
                                 }}
                               >
-                                <td>{member.name}</td>
+                                <td>{member.firstName + " " + member.lastName}</td>
                                 <td>{member.role}</td>
                               </tr>
                             ))

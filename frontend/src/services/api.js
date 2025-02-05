@@ -104,6 +104,7 @@ export const fetchTeamMembers = async (teamId) => {
     return response.data;
   } catch (error) {
     console.error('Ошибка при загрузке участников команды:', error);
+    console.log(error);
     throw error;
   }
 };
