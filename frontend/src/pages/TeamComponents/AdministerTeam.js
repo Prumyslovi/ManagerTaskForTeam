@@ -5,7 +5,7 @@ import '../styles/Modal.css';
 import '../styles/AuthButtons.css';
 import '../styles/PasswordToggle.css';
 import '../styles/Spinner.css';
-import { fetchUserTeams, fetchTeamMembers, updateMemberRole, removeTeam } from '../../services/api';
+import { fetchUserTeams, updateMemberRole, removeTeam, getUsersWithRoles } from '../../services/api';
 import { FaTrashAlt } from 'react-icons/fa';
 
 const AdministerTeam = () => {
@@ -15,8 +15,8 @@ const AdministerTeam = () => {
   const [errorMessage, setErrorMessage] = useState('');
   const [currentUserRole, setCurrentUserRole] = useState(null);
   const [activeMemberId, setActiveMemberId] = useState(null);
+  const [availableRoles, setAvailableRoles] = useState([]);
 
-  // Новое состояние для модального окна
   const [isConfirmDeleteVisible, setIsConfirmDeleteVisible] = useState(false);
   const [memberToDelete, setMemberToDelete] = useState(null);
   const [deleteConfirmationMessage, setDeleteConfirmationMessage] = useState('');
@@ -40,17 +40,21 @@ const AdministerTeam = () => {
     }
   };
 
-  const loadTeamMembers = async (teamId) => {
+  const loadTeamMembersWithRoles = async (teamId) => {
     if (!teamId) {
       setErrorMessage('Невалидный идентификатор команды.');
       return;
     }
     try {
-      const members = await fetchTeamMembers(teamId);
-      const member = members.find(member => member.id === activeMemberId);
-      const activeMembers = members.filter((member) => !member.isDeleted);
-      setTeamMembers(activeMembers);
-      setCurrentUserRole(member.role);
+      const membersWithRoles = await getUsersWithRoles(teamId);
+      const activeMember = membersWithRoles.find(member => member.memberId === activeMemberId);
+
+      setTeamMembers(membersWithRoles);
+      setCurrentUserRole(activeMember?.roleName || 'Участник');
+
+      // Получаем список всех уникальных ролей из данных участников
+      const uniqueRoles = [...new Set(membersWithRoles.map(member => member.roleName))];
+      setAvailableRoles(uniqueRoles);
     } catch (error) {
       setErrorMessage('Ошибка при загрузке участников команды.');
     }
@@ -65,7 +69,7 @@ const AdministerTeam = () => {
       await updateMemberRole(teamId, memberId, newRole);
       setTeamMembers((prev) =>
         prev.map((member) =>
-          member.id === memberId ? { ...member, role: newRole } : member
+          member.memberId === memberId ? { ...member, roleName: newRole } : member
         )
       );
     } catch (error) {
@@ -73,12 +77,10 @@ const AdministerTeam = () => {
     }
   };
 
-  // Обработчик для отображения модального окна подтверждения удаления
   const handleShowConfirmDelete = (memberId) => {
     setMemberToDelete(memberId);
-    const memberToDeleteObj = teamMembers.find(member => member.id === memberId);
+    const memberToDeleteObj = teamMembers.find(member => member.memberId === memberId);
 
-    // Проверка: если это активный пользователь и он создатель
     if (memberId === activeMemberId && currentUserRole === 'Создатель') {
       setDeleteConfirmationMessage("Вы точно хотите удалить команду? Это затронет всех участников и все имеющиеся процессы");
     } else if (memberId === activeMemberId) {
@@ -92,20 +94,16 @@ const AdministerTeam = () => {
     setIsConfirmDeleteVisible(true);
   };
 
-  // Подтверждение удаления участника
   const handleDeleteMember = async () => {
     const currentTeamId = selectedTeam.teamId;
     try {
       if (currentUserRole === 'Создатель' && memberToDelete === activeMemberId) {
-        // Если создатель удаляет себя, нужно удалить всю команду
-        await removeTeam(currentTeamId); // Удаляем всю команду
-        // Удаляем всю команду из списка
+        await removeTeam(currentTeamId);
         setTeamMembers([]);
       } else {
-        // Удаляем только участника
-        await removeTeam(currentTeamId, memberToDelete); // Удаляем только участника
+        await removeTeam(currentTeamId, memberToDelete);
         setTeamMembers((prev) =>
-          prev.filter((member) => member.id !== memberToDelete)
+          prev.filter((member) => member.memberId !== memberToDelete)
         );
       }
       setIsConfirmDeleteVisible(false);
@@ -115,7 +113,6 @@ const AdministerTeam = () => {
     }
   };
 
-  // Отмена удаления
   const handleCancelDelete = () => {
     setIsConfirmDeleteVisible(false);
     setMemberToDelete(null);
@@ -128,8 +125,19 @@ const AdministerTeam = () => {
     }
 
     setSelectedTeam(team);
-    setTeamMembers([]); 
-    loadTeamMembers(team.teamId); 
+    setTeamMembers([]);
+    loadTeamMembersWithRoles(team.teamId);
+  };
+
+  // Сортировка участников по ролям
+  const sortMembersByRole = (members) => {
+    const rolePriority = {
+      'Создатель': 1,
+      'Администратор': 2,
+      'Менеджер': 3,
+      'Участник': 4,
+    };
+    return [...members].sort((a, b) => (rolePriority[a.roleName] || 5) - (rolePriority[b.roleName] || 5));
   };
 
   return (
@@ -156,26 +164,28 @@ const AdministerTeam = () => {
           <h4>Состав участников команды "{selectedTeam.teamName}"</h4>
           <ul className="members-list">
             {teamMembers.length === 0 && <li>Нет участников в команде.</li>}
-            {teamMembers.map((member) => {
-              const role = member.role || 'Участник'; 
-              const isCurrentUser = member.id === localStorage.getItem('memberId');
+            {sortMembersByRole(teamMembers).map((member) => {
+              const role = member.roleName || 'Участник'; 
+              const isCurrentUser = member.memberId === localStorage.getItem('memberId');
               return (
-                <li key={member.id} className="team-member">
+                <li key={member.memberId} className="team-member">
                   <span>{member.firstName + " " + member.lastName}</span>
                   <select
                     value={role} 
-                    onChange={(e) => handleRoleChange(selectedTeam.teamId, member.id, e.target.value)}
+                    onChange={(e) => handleRoleChange(selectedTeam.teamId, member.memberId, e.target.value)}
                     className="list"
                     disabled={currentUserRole !== 'Создатель'} 
                   >
-                    <option value="Участник">Участник</option>
-                    <option value="Создатель">Создатель</option>
-                    <option value="Менеджер">Менеджер</option>
+                    {availableRoles.map((roleOption) => (
+                      <option key={roleOption} value={roleOption}>
+                        {roleOption}
+                      </option>
+                    ))}
                   </select>
                   <button
                     className="Button"
-                    onClick={() => handleShowConfirmDelete(member.id)}
-                    disabled={(currentUserRole === 'Менеджер')} 
+                    onClick={() => handleShowConfirmDelete(member.memberId)}
+                    disabled={currentUserRole === 'Менеджер'} 
                   >
                     <FaTrashAlt />
                   </button>
@@ -188,7 +198,6 @@ const AdministerTeam = () => {
 
       {errorMessage && <div className="restricted-content">{errorMessage}</div>}
 
-      {/* Модальное окно подтверждения удаления */}
       {isConfirmDeleteVisible && (
         <div className="modalRegForm">
           <div className="modalContent">

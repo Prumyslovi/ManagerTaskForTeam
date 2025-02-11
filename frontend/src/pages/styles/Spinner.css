@@ -1,8 +1,10 @@
 .spinner {
-    margin: 0 20px; /* Отступ между кнопками и индикатором */
-    margin-top: 35px;
-    color: #1D334A; /* Цвет индикатора */
-    animation: spin 1s linear infinite; /* Ваша анимация вращения */
+    position: absolute;
+    left: 40%;
+    transform: translateX(-50%);
+    font-size: 1.5rem;
+    color: #000000;
+    animation: spin 1s linear infinite;
 }
 
 @keyframes spin {

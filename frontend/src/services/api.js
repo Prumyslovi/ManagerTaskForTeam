@@ -221,3 +221,38 @@ export const fetchTasks = async (projectId) => {
     throw error;
   }
 };
+
+export const getUsersWithRoles = async (teamId) => {
+  try {
+    const response = await axios.get(`${API_URL}/MemberRole/GetUsersWithRoles/${teamId}`);
+    return response.data; // [{ memberId, firstName, lastName, roleId, roleName }]
+  } catch (error) {
+    console.error("Ошибка при получении списка участников и их ролей:", error);
+    throw error;
+  }
+};
+
+export const updateTask = async (taskId, updatedTaskData) => {
+  try {
+    const response = await axios.put(`${API_URL}/Task/UpdateTask/${taskId}`, updatedTaskData);
+    return response.data;
+  } catch (error) {
+    console.error('Error updating task:', error);
+    throw error;
+  }
+};
+
+export const createTask = async (taskData) => {
+  const response = await fetch(`/api/tasks`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(taskData),
+  });
+
+  if (!response.ok) {
+    throw new Error('Ошибка при создании задачи');
+  }
+
+  return response.json();
+};
+

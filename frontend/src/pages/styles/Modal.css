@@ -17,6 +17,7 @@
     border: 1px solid #888;
     border-radius: 8px;
     position: relative;
+    width: 330px;
   }
   
   .modalInput {
@@ -65,4 +66,12 @@
     top: 10px;
     right: 15px;
   }
+
+  .button-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
   

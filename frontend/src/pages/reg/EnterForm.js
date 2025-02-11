@@ -33,7 +33,7 @@ const EnterForm = ({ visible, onVisibilityChange, onLogin }) => {
                 setIsLoading(false);
                 return;
             }
-            
+
             // Сохраняем ID пользователя в localStorage
             localStorage.setItem('memberId', member.memberId);
 

@@ -57,7 +57,7 @@ const ProjectList = ({ memberId }) => {
       />
       {selectedProject && (
         // <KanbanBoard projectId={selectedProject} onDragEnd={onDragEnd} setData={setData} />
-        <KanbanBoard projectId={selectedProject} setData={setData} />
+        <KanbanBoard projectId={selectedProject} setData={setData} teamId={selectedProject.teamId} />
       )}
     </div>
   );

@@ -6,7 +6,7 @@ const ProjectTable = ({ projects, onRowClick, selectedProject }) => (
       <thead>
         <tr>
           <th>Проект</th>
-          <th>Менеджер</th>
+          <th>Описание</th>
         </tr>
       </thead>
       <tbody>
@@ -17,7 +17,7 @@ const ProjectTable = ({ projects, onRowClick, selectedProject }) => (
             className={`project-row ${selectedProject === project.id ? 'selected' : ''}`}
           >
             <td>{project.projectName}</td>
-            <td>{project.projectId}</td>
+            <td>{project.description}</td>
           </tr>
         ))}
       </tbody>

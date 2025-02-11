@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React from 'react';
+import { useSelector, useDispatch } from 'react-redux';
 import { FiBell } from 'react-icons/fi';
 import { AiOutlineTeam, AiOutlineProject, AiOutlineUser, AiOutlineLogin, AiOutlineUserAdd, AiOutlineDown } from 'react-icons/ai';
-import './styles/Navbar.css'; 
+import './styles/Navbar.css';
 import './styles/ProgramSection.css';
 import './styles/Message.css';
 import RegistrationForm from './reg/RegistrationForm';
@@ -14,32 +15,37 @@ import ProjectList from './ProjectComponents/ProjectList';
 import ProjectManagement from './ProjectComponents/ProjectManagment';
 
 const Home = () => {
-    const [isVisibleRegistrationForm, setIsVisibleRegistrationForm] = useState(false);
-    const [isVisibleEnterForm, setIsVisibleEnterForm] = useState(false);
-    const [isLoggedIn, setIsLoggedIn] = useState(false);
-    const [activeContent, setActiveContent] = useState('home');
-    const [restrictedContent, setRestrictedContent] = useState('');
-    const [userId, setUserId] = useState(null);
+    const dispatch = useDispatch();
 
-    const handleLogin = (id) => {
-        setIsLoggedIn(true);
-        setUserId(id);
+    // Используем useSelector для получения состояния из Redux
+    const {
+        isLoggedIn,
+        userId,
+        firstName,
+        lastName,
+        activeContent,
+        restrictedContent,
+        isVisibleRegistrationForm,
+        isVisibleEnterForm,
+    } = useSelector(state => state);
+
+    // Логика для входа пользователя
+    const handleLogin = (id, firstName, lastName) => {
+        dispatch({ type: 'auth/login', payload: { userId: id, firstName: firstName, lastName: lastName } });
     };
 
-    const toggleVisibility = (form) => {
-        if (form === 'registration') {
-            setIsVisibleRegistrationForm((prev) => !prev);
-        } else if (form === 'enter') {
-            setIsVisibleEnterForm((prev) => !prev);
-        }
+    // Тогглинг видимости форм
+    const toggleVisibility = (formType) => {
+        dispatch({ type: 'toggleVisibility', payload: formType });
     };
 
+    // Обработка клика на элемент меню
     const handleMenuItemClick = (item) => {
         if (!isLoggedIn && ['teamsList', 'createTeam', 'projectsList', 'createProject'].includes(item)) {
-            setRestrictedContent(item);
-            setActiveContent('restricted');
+            dispatch({ type: 'setRestrictedContent', payload: item });
+            dispatch({ type: 'setActiveContent', payload: 'restricted' });
         } else {
-            setActiveContent(item);
+            dispatch({ type: 'setActiveContent', payload: item });
         }
     };
 
@@ -94,19 +100,19 @@ const Home = () => {
                             <AiOutlineUser
                                 size={24}
                                 className="icon"
-                                onClick={() => setActiveContent('Profile')}
+                                onClick={() => dispatch({ type: 'setActiveContent', payload: 'Profile' })}
                             />
                         ) : (
                             <>
                                 <AiOutlineLogin
                                     size={24}
                                     className="icon"
-                                    onClick={() => toggleVisibility('enter')}
+                                    onClick={() => toggleVisibility('isVisibleEnterForm')}
                                 />
                                 <AiOutlineUserAdd
                                     size={24}
                                     className="icon"
-                                    onClick={() => toggleVisibility('registration')}
+                                    onClick={() => toggleVisibility('isVisibleRegistrationForm')}
                                 />
                             </>
                         )}
@@ -128,16 +134,15 @@ const Home = () => {
 
                 {activeContent === 'teamsList' && <TeamList memberId={userId} />}
                 {activeContent === 'createTeam' && <TeamManagement memberId={userId} />}
-                {activeContent === 'projectsList' && <ProjectList memberId={userId}/>}
+                {activeContent === 'projectsList' && <ProjectList memberId={userId} />}
                 {activeContent === 'createProject' && <ProjectManagement />}
-                
 
                 {activeContent === 'restricted' && (
                     <div className="restricted-content">
                         {restrictedContent === 'teamsList' || restrictedContent === 'createTeam' ? (
                             <p>Для просмотра информации о командах необходимо войти в систему.</p>
                         ) : (
-                            <p>Для просмотра проектов необходимо войти в систему.</p>
+                            <p>Для просмотра информации о проектах необходимо войти в систему.</p>
                         )}
                     </div>
                 )}
@@ -146,17 +151,15 @@ const Home = () => {
 
                 {isVisibleEnterForm && (
                     <EnterForm
-                        id="EnterForm"
                         visible={isVisibleEnterForm}
-                        onVisibilityChange={setIsVisibleEnterForm}
-                        onLogin={handleLogin} 
+                        onVisibilityChange={() => toggleVisibility('isVisibleEnterForm')}
+                        onLogin={handleLogin}
                     />
                 )}
                 {isVisibleRegistrationForm && (
                     <RegistrationForm
-                        id="RegistrationForm"
                         visible={isVisibleRegistrationForm}
-                        onVisibilityChange={setIsVisibleRegistrationForm}
+                        onVisibilityChange={() => toggleVisibility('Registration')}
                         onLogin={handleLogin}
                     />
                 )}

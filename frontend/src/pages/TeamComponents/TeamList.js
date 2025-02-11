@@ -38,7 +38,7 @@ const TeamList = ({ memberId }) => {
         const members = await fetchTeamMembers(teamId);
         setTeamMembers((prev) => ({
           ...prev,
-          [teamId]: members,
+          [teamId]: sortMembersByRole(members),
         }));
       } catch (err) {
         setError('Не удалось загрузить участников. Попробуйте позже.');
@@ -52,6 +52,17 @@ const TeamList = ({ memberId }) => {
       ...prev,
       [teamId]: !prev[teamId],
     }));
+  };
+
+  // Сортировка участников по ролям
+  const sortMembersByRole = (members) => {
+    const rolePriority = {
+      'Создатель': 1,
+      'Администратор': 2,
+      'Менеджер': 3,
+      'Участник': 4,
+    };
+    return [...members].sort((a, b) => (rolePriority[a.role] || 5) - (rolePriority[b.role] || 5));
   };
 
   // Если данные загружаются или произошла ошибка

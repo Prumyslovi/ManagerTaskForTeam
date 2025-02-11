@@ -19,7 +19,17 @@
     transition: border-color 0.3s ease;
   }
   
-  .saveButton, .delButton {
+  .container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    max-width: 100%;
+    margin: 20px auto;
+    position: relative;
+  }
+  
+  .saveButton, .delButton, .editButton {
     padding: 10px 15px;
     font-family: 'Roboto', sans-serif;
     font-size: 16px;
@@ -29,20 +39,24 @@
     background: white;
     color: black;
     transition: background-color 0.3s ease, color 0.3s ease;
+    flex-grow: 1;
+    text-align: center;
+    max-width: auto;
   }
   
   .saveButton {
-    margin-top: 20px;
+    margin-right: auto;
+  }
+  
+  .editButton {
+    margin: 0 15px;
   }
   
   .delButton {
-    position: absolute;
-    right: 20px;
-    top: 83%;
-    margin-top: 20px;
+    margin-left: auto;
   }
   
-  .saveButton:hover, .delButton:hover {
+  .saveButton:hover, .delButton:hover, .editButton:hover {
     background-color: black;
     color: white;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
