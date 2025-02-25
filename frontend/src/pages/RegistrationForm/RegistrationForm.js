@@ -79,7 +79,6 @@ const RegistrationForm = ({ visible, onLogin }) => {
 
             setSuccess('Регистрация прошла успешно!');
             
-            // Обновление данных в Redux
             dispatch(setFirstName(formData.firstName));
             dispatch(setLastName(formData.lastName));
             
@@ -116,7 +115,7 @@ const RegistrationForm = ({ visible, onLogin }) => {
                 <button className="exitButton" type="button" onClick={() => dispatch(toggleVisibility('isVisibleRegistrationForm'))}>
                     &times;
                 </button>
-                {error && <p className="error">{error}</p>}
+                {error && <p className="restricted-content">{error}</p>}
                 {success && <p className="success">{success}</p>}
                 {loading && <p className="loading-text">Загрузка...</p>}
 

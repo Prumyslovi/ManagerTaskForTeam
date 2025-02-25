@@ -3,6 +3,7 @@ import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 import { fetchTasks, updateTask, fetchProfile, createTask } from '../../services/api';
 import * as XLSX from 'xlsx';
 import './ProjectList.css';
+import '../styles/Kanban.css';
 import AddTaskModal from './AddTaskModal';
 import EditTaskModal from './EditTaskModal';
 
@@ -10,7 +11,7 @@ const KanbanBoard = ({ projectId, setData, teamId }) => {
     const [newCardData, setNewCardData] = useState({
         title: '',
         description: '',
-        deadline: '',
+        endDate: '',
         assignee: ''
     });
     const [currentLaneId, setCurrentLaneId] = useState(null);
@@ -29,6 +30,7 @@ const KanbanBoard = ({ projectId, setData, teamId }) => {
         setSelectedCard(card);
         setIsEditModalOpen(true);
     };
+    
     const closeEditModal = () => setIsEditModalOpen(false);
 
     const formatDateTime = (dateString) => {
@@ -60,14 +62,14 @@ const KanbanBoard = ({ projectId, setData, teamId }) => {
                 taskName: newTask.title,
                 description: newTask.description,
                 projectId: projectId,
-                memberId: null, // Если планируется выбор ответственного, подставьте значение
+                memberId: null,
                 status: 'В планах',
                 endDate: newTask.deadline,
-                createdAt: new Date().toISOString(),
+                startDate: new Date().toISOString(),
                 isDeleted: false,
             };
 
-            const createdTask = await createTask(taskData); // Запрос к API
+            const createdTask = await createTask(taskData);
             const newTaskWithId = { ...newTask, id: createdTask.taskId };
 
             setBoardData((prevData) => {
@@ -125,7 +127,6 @@ const KanbanBoard = ({ projectId, setData, teamId }) => {
                 projectId: projectId,
                 memberId: draggedCard.memberId,
                 status: draggedCard.status,
-                createdAt: draggedCard.createdAt || new Date().toISOString(),
                 startDate: draggedCard.startDate || new Date().toISOString(),
                 endDate: draggedCard.endDate,
                 isDeleted: false,
@@ -151,7 +152,7 @@ const KanbanBoard = ({ projectId, setData, teamId }) => {
             data.forEach((row, index) => {
                 if (index === 0) return;
 
-                const [status, taskTitle, description, deadline, assignee] = row;
+                const [status, taskTitle, description, endDate, assignee] = row;
 
                 if (!lanes[status]) {
                     lanes[status] = {
@@ -165,7 +166,7 @@ const KanbanBoard = ({ projectId, setData, teamId }) => {
                     id: `Card${Date.now()}`,
                     title: taskTitle,
                     description,
-                    deadline,
+                    endDate,
                     assignee
                 });
             });
@@ -321,9 +322,13 @@ const KanbanBoard = ({ projectId, setData, teamId }) => {
                 onVisibilityChange={setIsAddModalOpen}
                 onTaskAdd={handleAddTask}
                 teamId={teamId}
+                projectId={projectId}
             />}
             {isEditModalOpen && selectedCard && (
-                <EditTaskModal card={selectedCard} onClose={closeEditModal} />
+                <EditTaskModal 
+                card={selectedCard} 
+                onClose={closeEditModal}
+                projectId={projectId} />
             )}
         </div>
     );

@@ -5,6 +5,7 @@ import '../styles/Modal.css';
 import '../styles/AuthButtons.css';
 import '../styles/PasswordToggle.css';
 import '../styles/Spinner.css';
+import '../styles/Message.css';
 
 const EnterForm = ({ visible, onVisibilityChange, onLogin }) => {
     const [errorMessage, setErrorMessage] = useState('');
@@ -34,14 +35,13 @@ const EnterForm = ({ visible, onVisibilityChange, onLogin }) => {
                 return;
             }
 
-            // Сохраняем ID пользователя в localStorage
             localStorage.setItem('memberId', member.memberId);
 
             onLogin(member.memberId);
             clearForm();
-            onVisibilityChange(false); // Скрываем форму
+            onVisibilityChange(false);
         } catch (error) {
-            setErrorMessage('Ошибка при попытке входа. Пожалуйста, попробуйте позже.');
+            setErrorMessage('Ошибка при попытке входа. Пожалуйста, проверьте логин и пароль.');
         } finally {
             setIsLoading(false);
         }
@@ -88,7 +88,7 @@ const EnterForm = ({ visible, onVisibilityChange, onLogin }) => {
                         </button>
                     </div>
                 </div>
-                {errorMessage && <div className="error-message">{errorMessage}</div>}
+                {errorMessage && <div className="restricted-content">{errorMessage}</div>}
                 <div className="button-wrapper">
                     <button type="submit" className="modalButtonReg" disabled={isLoading}>
                         Войти

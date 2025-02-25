@@ -1,7 +1,5 @@
 .spinner {
-    position: absolute;
-    left: 40%;
-    transform: translateX(-50%);
+    margin-top: 20px;
     font-size: 1.5rem;
     color: #000000;
     animation: spin 1s linear infinite;

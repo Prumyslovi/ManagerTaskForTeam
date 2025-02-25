@@ -5,8 +5,8 @@ import { AiOutlineTeam, AiOutlineProject, AiOutlineUser, AiOutlineLogin, AiOutli
 import './styles/Navbar.css';
 import './styles/ProgramSection.css';
 import './styles/Message.css';
-import RegistrationForm from './reg/RegistrationForm';
-import EnterForm from './reg/EnterForm';
+import RegistrationForm from './RegistrationForm/RegistrationForm';
+import EnterForm from './RegistrationForm/EnterForm';
 import { programInfo, howToStartInfo } from './data';
 import Profile from './Profile/Profile';
 import TeamList from './TeamComponents/TeamList';
@@ -112,7 +112,7 @@ const Home = () => {
                                 <AiOutlineUserAdd
                                     size={24}
                                     className="icon"
-                                    onClick={() => toggleVisibility('isVisibleRegistrationForm')}
+                                    onClick={() => toggleVisibility('isVisibleRegistrationForm')}Регистрация
                                 />
                             </>
                         )}

@@ -3,12 +3,12 @@
     font-size: 28px;
     margin-bottom: 20px;
   }
-  
+
   .LabelType {
     font-size: 16px;
     color: #1D334A;
   }
-  
+
   .InputType {
     width: 100%;
     margin: 8px 0;
@@ -18,7 +18,7 @@
     font-size: 16px;
     transition: border-color 0.3s ease;
   }
-  
+
   .container {
     display: flex;
     justify-content: space-between;
@@ -28,8 +28,10 @@
     margin: 20px auto;
     position: relative;
   }
-  
-  .saveButton, .delButton, .editButton {
+
+  .saveButton,
+  .delButton,
+  .editButton {
     padding: 10px 15px;
     font-family: 'Roboto', sans-serif;
     font-size: 16px;
@@ -43,22 +45,23 @@
     text-align: center;
     max-width: auto;
   }
-  
+
   .saveButton {
     margin-right: auto;
   }
-  
+
   .editButton {
     margin: 0 15px;
   }
-  
+
   .delButton {
     margin-left: auto;
   }
-  
-  .saveButton:hover, .delButton:hover, .editButton:hover {
+
+  .saveButton:hover,
+  .delButton:hover,
+  .editButton:hover {
     background-color: black;
     color: white;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
   }
-  

@@ -8,6 +8,7 @@ const ProjectList = ({ memberId }) => {
   const [projects, setProjects] = useState([]);
   const [selectedProject, setSelectedProject] = useState(null);
   const [data, setData] = useState({ lanes: {} });
+  const selectedProjectData = projects.find(p => p.projectId === selectedProject);
 
   useEffect(() => {
     const loadProjects = async () => {
@@ -55,9 +56,12 @@ const ProjectList = ({ memberId }) => {
         onRowClick={handleRowClick}
         selectedProject={selectedProject}
       />
-      {selectedProject && (
-        // <KanbanBoard projectId={selectedProject} onDragEnd={onDragEnd} setData={setData} />
-        <KanbanBoard projectId={selectedProject} setData={setData} teamId={selectedProject.teamId} />
+      {selectedProject && selectedProjectData && (
+        <KanbanBoard
+          projectId={selectedProject}
+          setData={setData}
+          teamId={selectedProjectData.teamId}
+        />
       )}
     </div>
   );

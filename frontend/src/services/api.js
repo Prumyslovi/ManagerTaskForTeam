@@ -15,19 +15,19 @@ export const addMember = async (memberData) => {
 export const fetchMember = async (login, password) => {
   try {
     const response = await axios.post(
-      `${API_URL}/Member/GetMember`, // URL API
+      `${API_URL}/Member/GetMember`,
       { 
-        Login: login, // Тело запроса, ключи должны совпадать с полями модели в ASP.NET
+        Login: login,
         Password: password
       }, 
       {
-        headers: { 'Content-Type': 'application/json' } // Указываем Content-Type
+        headers: { 'Content-Type': 'application/json' }
       }
     );
-    return response.data; // Возвращаем данные из ответа
+    return response.data;
   } catch (error) {
     console.error('Ошибка при выполнении запроса:', error.response || error);
-    throw error; // Повторно выбрасываем ошибку для дальнейшей обработки
+    throw error;
   }
 }
 
@@ -37,31 +37,31 @@ export const fetchProfile = async (memberId) => {
     console.log('ID участника перед запросом:', memberId);
 
     const response = await axios.post(
-      `${API_URL}/Member/GetProfile`, // URL для получения данных
-      memberId,  // Отправляем только GUID, без обертки в объект
+      `${API_URL}/Member/GetProfile`,
+      memberId,
       {
         headers: {
-          'Content-Type': 'application/json',  // Указываем Content-Type
+          'Content-Type': 'application/json',
         },
       }
     );
 
     console.log('Ответ от сервера:', response.data);
-    return response.data;  // Возвращаем данные из ответа
+    return response.data;
   } catch (error) {
     console.error('Ошибка при выполнении запроса:', error.response || error);
-    throw error;  // Пробрасываем ошибку для дальнейшей обработки
+    throw error;
   }
 };
 
 export const updateProfile = async (updatedData) => {
   try {
     const response = await fetch(`${API_URL}/Member/UpdateMember`, {
-      method: 'PUT',  // Используем PUT для обновления данных
+      method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify(updatedData),  // Отправляем обновленные данные
+      body: JSON.stringify(updatedData),
     });
 
     if (!response.ok) {
@@ -69,17 +69,17 @@ export const updateProfile = async (updatedData) => {
     }
 
     const result = await response.json();
-    return result;  // Возвращаем результат, если обновление прошло успешно
+    return result;
   } catch (error) {
     console.error('Ошибка при обновлении профиля:', error);
-    throw error;  // Бросаем ошибку, чтобы обработать её в компоненте
+    throw error;
   }
 };
 
 export const fetchUserTeams = async (memberId) => {
   try {
       const response = await axios.get(`${API_URL}/MemberRole/GetUserTeams/${memberId}`, {
-        method: 'PUT',  // Используем PUT для обновления данных
+        method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
         },
@@ -111,7 +111,7 @@ export const fetchTeamMembers = async (teamId) => {
 
 export const createTeam = async (teamData) => {
   const response = await axios.post(`${API_URL}/Team/AddTeam`, teamData);
-  return response.data; // Возвращаем данные созданной команды
+  return response.data;
 };
 
 export const updateMemberRole = async (teamId, memberId, newRole) => {
@@ -151,7 +151,7 @@ export const removeTeam = async (teamId, memberId, isTeamDelete = false) => {
       data: {
         TeamId: teamId,
         MemberId: memberId,
-        IsTeamDelete: isTeamDelete, // Новый флаг для удаления всей команды
+        IsTeamDelete: isTeamDelete,
       }
     });
     return response.data;
@@ -182,20 +182,20 @@ export const joinTeam = async (inviteCode, userId) => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        inviteCode: inviteCode, // код приглашения
-        userId: userId, // ID пользователя
+        inviteCode: inviteCode,
+        userId: userId,
       }),
     });
 
     if (!response.ok) {
-      const errorData = await response.json();  // Читаем ответ как JSON
+      const errorData = await response.json();
       throw new Error(errorData.message || 'Не удалось присоединиться к команде');
     }
 
-    return await response.json(); // Возвращаем успешный ответ API
+    return await response.json();
   } catch (error) {
     console.error('Ошибка при присоединении к команде:', error);
-    throw error; // В случае ошибки выбрасываем исключение
+    throw error;
   }
 };
 
@@ -225,7 +225,7 @@ export const fetchTasks = async (projectId) => {
 export const getUsersWithRoles = async (teamId) => {
   try {
     const response = await axios.get(`${API_URL}/MemberRole/GetUsersWithRoles/${teamId}`);
-    return response.data; // [{ memberId, firstName, lastName, roleId, roleName }]
+    return response.data;
   } catch (error) {
     console.error("Ошибка при получении списка участников и их ролей:", error);
     throw error;
@@ -234,25 +234,25 @@ export const getUsersWithRoles = async (teamId) => {
 
 export const updateTask = async (taskId, updatedTaskData) => {
   try {
+    console.log(updatedTaskData);
     const response = await axios.put(`${API_URL}/Task/UpdateTask/${taskId}`, updatedTaskData);
     return response.data;
   } catch (error) {
-    console.error('Error updating task:', error);
+    console.error('Ошибка при изменении задачи:', error);
     throw error;
   }
 };
 
 export const createTask = async (taskData) => {
-  const response = await fetch(`/api/tasks`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(taskData),
-  });
-
-  if (!response.ok) {
-    throw new Error('Ошибка при создании задачи');
+  try {
+    const response = await axios.post(`${API_URL}/Task/AddTask/`, taskData, {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Ошибка при добавлении задачи:', error);
+    throw error;
   }
-
-  return response.json();
 };
-
