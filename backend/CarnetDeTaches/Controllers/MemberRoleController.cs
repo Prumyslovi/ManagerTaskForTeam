@@ -134,6 +134,34 @@ namespace CarnetDeTaches.Controllers
                 return StatusCode(500, "Внутренняя ошибка сервера: " + ex.Message);
             }
         }
+        [HttpGet("GetUsersWithRoles/{teamId}")]
+        public async Task<IActionResult> GetUsersWithRoles(string teamId)
+        {
+            try
+            {
+                Console.WriteLine($"Запрос на получение участников и их ролей по ID команды: {teamId}");
 
+                if (string.IsNullOrWhiteSpace(teamId) || !Guid.TryParse(teamId, out var parsedGuid))
+                {
+                    Console.WriteLine("Некорректный формат GUID.");
+                    return BadRequest("Некорректный формат GUID.");
+                }
+
+                var membersWithRoles = await _memberRoleRepository.GetUsersWithRolesAsync(parsedGuid);
+
+                if (!membersWithRoles.Any())
+                {
+                    Console.WriteLine("Участники команды не найдены.");
+                    return NotFound("Участники не найдены для указанной команды.");
+                }
+
+                return Ok(membersWithRoles);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Ошибка в контроллере: {ex.Message}\n{ex.StackTrace}");
+                return StatusCode(500, "Внутренняя ошибка сервера: " + ex.Message);
+            }
+        }
     }
 }

@@ -33,9 +33,18 @@ namespace CarnetDeTaches.Repositories
 
         public CarnetDeTaches.Model.Task UpdateTask(CarnetDeTaches.Model.Task task)
         {
-            _context.Tasks.Update(task);
-            _context.SaveChanges();
-            return task;
+            try
+            {
+                _context.Tasks.Update(task);
+                _context.SaveChanges();
+                return task;
+            }
+            catch (DbUpdateException ex)
+            {
+                Console.WriteLine($"Ошибка обновления: {ex.InnerException?.Message}");
+                throw;
+            }
+
         }
 
         public CarnetDeTaches.Model.Task DeleteTask(Guid taskId)

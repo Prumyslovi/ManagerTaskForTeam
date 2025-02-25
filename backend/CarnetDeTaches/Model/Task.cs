@@ -22,8 +22,6 @@ namespace CarnetDeTaches.Model
 
         [Column("Status")]
         public string Status { get; set; }
-        [Column("CreatedAt")]
-        public DateTime CreatedAt { get; set; }
 
         [Column("StartDate")]
         public DateTime StartDate { get; set; }

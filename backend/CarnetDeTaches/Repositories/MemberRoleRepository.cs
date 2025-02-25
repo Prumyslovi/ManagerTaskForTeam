@@ -94,6 +94,7 @@ namespace CarnetDeTaches.Repositories
             }
             return false;
         }
+
         public MemberRole RemoveMember(Guid teamId, Guid memberId)
         {
             var memberRole = _context.MemberRoles.FirstOrDefault(mr => mr.TeamId == teamId && mr.MemberId == memberId);
@@ -127,6 +128,43 @@ namespace CarnetDeTaches.Repositories
                 .ToListAsync();
 
             return teams;
+        }
+
+        public async Task<List<MemberWithRoleDto>> GetUsersWithRolesAsync(Guid teamId)
+        {
+            if (_context == null) throw new InvalidOperationException("Контекст базы данных не инициализирован.");
+            if (_context.MemberRoles == null) throw new InvalidOperationException("Таблица MemberRoles отсутствует в контексте базы данных.");
+
+            var membersWithRoles = await _context.MemberRoles
+                .Where(mr => mr.TeamId == teamId && mr.TeamId != Guid.Empty && mr.IsDeleted == false)
+                .Join(
+                    _context.Members,
+                    mr => mr.MemberId,
+                    m => m.MemberId,
+                    (mr, m) => new MemberWithRoleDto
+                    {
+                        MemberId = m.MemberId,
+                        FirstName = m.FirstName,
+                        LastName = m.LastName,
+                        RoleId = mr.RoleId
+                    }
+                )
+                .Join(
+                    _context.Roles,
+                    mr => mr.RoleId,
+                    r => r.RoleId,
+                    (mr, r) => new MemberWithRoleDto
+                    {
+                        MemberId = mr.MemberId,
+                        FirstName = mr.FirstName,
+                        LastName = mr.LastName,
+                        RoleId = mr.RoleId,
+                        RoleName = r.RoleName
+                    }
+                )
+                .ToListAsync();
+
+            return membersWithRoles;
         }
     }
 }

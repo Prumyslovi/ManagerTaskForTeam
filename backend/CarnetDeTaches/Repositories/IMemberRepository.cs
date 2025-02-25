@@ -14,6 +14,6 @@ namespace CarnetDeTaches.Repositories
         Member GetProfile(Guid profileId);
         Task<Member> AddMember(Member member);
         Task<Member> UpdateMember(Member member, string oldPassword, string newPassword);
-        Member DeleteMember(Guid memberId);
+        Task<Member> DeleteMember(Guid memberId);
     }
 }
