@@ -1,0 +1,28 @@
+.filterButton {
+    background: none;
+    border: none;
+    cursor: pointer;
+    margin: 0 5px;
+    font-size: 20px;
+}
+
+.filterIcon {
+    color: black;
+    transition: color 0.3s ease;
+}
+
+.filterButton:hover .filterIcon {
+    color: #1D334A;
+}
+
+.filterPanel {
+    position: absolute;
+    top: 40px;
+    left: 10px;
+    background: white;
+    border: 1px solid #000000;
+    border-radius: 5px;
+    padding: 10px;
+    z-index: 1000;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}

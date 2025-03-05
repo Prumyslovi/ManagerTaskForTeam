@@ -32,18 +32,19 @@
   .saveButton,
   .delButton,
   .editButton {
+    width: 100%;
+    font-size: 14px;
+    background-color: #ffffff;
+    color: #000000;
+    border: 2px solid #1D334A;
+    border-radius: 8px;
     padding: 10px 15px;
-    font-family: 'Roboto', sans-serif;
-    font-size: 16px;
-    border: 2px solid black;
-    border-radius: 5px;
     cursor: pointer;
-    background: white;
-    color: black;
-    transition: background-color 0.3s ease, color 0.3s ease;
-    flex-grow: 1;
-    text-align: center;
-    max-width: auto;
+    font-size: 16px;
+    margin: 10px 0;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+    display: flex;
+    justify-content: center;
   }
 
   .saveButton {
@@ -64,4 +65,19 @@
     background-color: black;
     color: white;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  }
+
+  .scaleSelect {
+    padding: 10px 25px 10px 15px;
+    font-family: 'Roboto', sans-serif;
+    font-size: 16px;
+    border: 2px solid black;
+    border-radius: 5px;
+    background: white;
+    color: black;
+    transition: background-color 0.3s ease, color 0.3s ease;
+    cursor: pointer;
+    width: auto;
+    margin: 0 5px;
+    margin-top: 5px;
   }

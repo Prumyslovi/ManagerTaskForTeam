@@ -1,13 +1,18 @@
 import React, { useState, useEffect } from "react";
 import ProjectTable from './ProjectTable';
 import KanbanBoard from './KanbanBoard';
+import ImportExport from "./ImportExport";
+import GanttChart from './GanttChart';
 import { fetchProjects } from "../../services/api";
-import './ProjectList.css';
+import '../styles/ProjectList.css';
+import '../styles/TypicalItems.css';
 
 const ProjectList = ({ memberId }) => {
   const [projects, setProjects] = useState([]);
   const [selectedProject, setSelectedProject] = useState(null);
   const [data, setData] = useState({ lanes: {} });
+  const [viewType, setViewType] = useState("kanban");
+
   const selectedProjectData = projects.find(p => p.projectId === selectedProject);
 
   useEffect(() => {
@@ -21,33 +26,15 @@ const ProjectList = ({ memberId }) => {
     };
 
     loadProjects();
-  }, []);
+  }, [memberId]);
 
   const handleRowClick = (projectId) => {
     setSelectedProject(selectedProject === projectId ? null : projectId);
   };
 
-  // const onDragEnd = (result) => {
-  //   if (!result.destination) return;
-
-  //   const { source, destination } = result;
-  //   const sourceLane = data.lanes[source.droppableId];
-  //   const destLane = data.lanes[destination.droppableId];
-  //   const newLanes = { ...data.lanes };
-
-  //   if (source.droppableId !== destination.droppableId) {
-  //     const [removed] = newLanes[source.droppableId].cards.splice(source.index, 1);
-  //     newLanes[destination.droppableId].cards.splice(destination.index, 0, removed);
-  //   } else {
-  //     const [removed] = newLanes[source.droppableId].cards.splice(source.index, 1);
-  //     newLanes[source.droppableId].cards.splice(destination.index, 0, removed);
-  //   }
-
-  //   setData({
-  //     ...data,
-  //     lanes: newLanes
-  //   });
-  // };
+  const handleViewTypeChange = (e) => {
+    setViewType(e.target.value);
+  };
 
   return (
     <div className="teams-table">
@@ -57,11 +44,29 @@ const ProjectList = ({ memberId }) => {
         selectedProject={selectedProject}
       />
       {selectedProject && selectedProjectData && (
-        <KanbanBoard
-          projectId={selectedProject}
-          setData={setData}
-          teamId={selectedProjectData.teamId}
-        />
+        <div>
+          <select 
+            value={viewType} 
+            onChange={handleViewTypeChange}
+            className="scaleSelect"
+          >
+            <option value="kanban">Канбан</option>
+            <option value="gantt">Гантта</option>
+          </select>
+          {viewType === "kanban" ? (
+            <KanbanBoard
+              projectId={selectedProject}
+              setData={setData}
+              teamId={selectedProjectData.teamId}
+            />
+          ) : (
+            <GanttChart
+              key={selectedProject}
+              projectId={selectedProject}
+              teamId={selectedProjectData.teamId}
+            />
+          )}
+        </div>
       )}
     </div>
   );

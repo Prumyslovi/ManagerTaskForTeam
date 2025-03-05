@@ -1,11 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 import { fetchTasks, updateTask, fetchProfile, createTask } from '../../services/api';
-import * as XLSX from 'xlsx';
-import './ProjectList.css';
+import '../styles/ProjectList.css';
 import '../styles/Kanban.css';
 import AddTaskModal from './AddTaskModal';
-import EditTaskModal from './EditTaskModal';
+import TaskModal from './TaskEditModal';
+import ImportExport from './ImportExport';
 
 const KanbanBoard = ({ projectId, setData, teamId }) => {
     const [newCardData, setNewCardData] = useState({
@@ -136,71 +136,6 @@ const KanbanBoard = ({ projectId, setData, teamId }) => {
         }
     };
 
-    const handleImportFromExcel = (e) => {
-        const file = e.target.files[0];
-        if (!file) return;
-
-        const reader = new FileReader();
-        reader.onload = (event) => {
-            const binaryString = event.target.result;
-            const wb = XLSX.read(binaryString, { type: 'binary' });
-
-            const ws = wb.Sheets[wb.SheetNames[0]];
-            const data = XLSX.utils.sheet_to_json(ws, { header: 1 });
-
-            const lanes = {};
-            data.forEach((row, index) => {
-                if (index === 0) return;
-
-                const [status, taskTitle, description, endDate, assignee] = row;
-
-                if (!lanes[status]) {
-                    lanes[status] = {
-                        id: `lane-${status}`,
-                        title: status,
-                        cards: []
-                    };
-                }
-
-                lanes[status].cards.push({
-                    id: `Card${Date.now()}`,
-                    title: taskTitle,
-                    description,
-                    endDate,
-                    assignee
-                });
-            });
-
-            setData((prev) => ({
-                ...prev,
-                lanes
-            }));
-        };
-        reader.readAsBinaryString(file);
-    };
-
-    const handleExportToExcel = () => {
-        const worksheetData = [];
-        worksheetData.push(['Статус', 'Название задачи', 'Описание', 'Срок выполнения', 'Ответственный']);
-
-        Object.values(boardData.lanes).forEach((lane) => {  // Используем boardData вместо data
-            lane.cards.forEach((card) => {
-                worksheetData.push([
-                    lane.title,
-                    card.title,
-                    card.description,
-                    card.endDate,
-                    getUserNameById(card.assignee)
-                ]);
-            });
-        });
-
-        const ws = XLSX.utils.aoa_to_sheet(worksheetData);
-        const wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, ws, 'KanbanBoard');
-        XLSX.writeFile(wb, 'kanban-board.xlsx');
-    };
-
     const statusOrder = ['В планах', 'В процессе', 'Выполнено', 'Провалено'];
 
     useEffect(() => {
@@ -265,19 +200,7 @@ const KanbanBoard = ({ projectId, setData, teamId }) => {
 
     return (
         <div>
-            <button className="add-task-button" onClick={() => document.getElementById('import-file-input').click()}>
-                Импорт
-            </button>
-            <input
-                type="file"
-                accept=".xlsx, .xls"
-                onChange={handleImportFromExcel}
-                style={{ display: 'none' }}
-                id="import-file-input"
-            />
-            <button className="add-task-button" onClick={handleExportToExcel}>
-                Экспорт
-            </button>
+            <ImportExport data={boardData} setData={setBoardData} projectId={projectId} type="kanban" />
             <button className="add-task-button" onClick={openAddModal}>
                 Добавить задачу
             </button>
@@ -325,8 +248,9 @@ const KanbanBoard = ({ projectId, setData, teamId }) => {
                 projectId={projectId}
             />}
             {isEditModalOpen && selectedCard && (
-                <EditTaskModal 
-                card={selectedCard} 
+                <TaskModal
+                task={selectedCard} 
+                teamId={teamId}
                 onClose={closeEditModal}
                 projectId={projectId} />
             )}

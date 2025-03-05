@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import './ProjectList.css';
+import '../styles/ProjectList.css';
 
 const ProjectManagement = () => {
     const [activeTab, setActiveTab] = useState('create'); // Переключатель вкладок
