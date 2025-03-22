@@ -1,0 +1,236 @@
+* {
+  box-sizing: border-box; /* Учитываем padding и border в ширине */
+}
+
+.editor-container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 20px;
+  width: 1000px; /* Базовая ширина */
+  max-width: 1200px; /* Максимальная ширина */
+  margin: 0 auto;
+  position: relative;
+}
+
+.toolbar-wrapper {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+
+.toolbar {
+  display: flex;
+  gap: 8px;
+  padding: 10px;
+  background-color: #ffffff;
+  border: 1px solid #1D334A;
+  border-radius: 8px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  width: 100%; /* Растягиваем на всю ширину родителя */
+  max-width: 1200px; /* Ограничиваем максимум */
+  white-space: nowrap;
+}
+
+.toolbar-select {
+  padding: 5px;
+  font-size: 16px;
+  border: 1px solid #1D334A;
+  border-radius: 4px;
+  background-color: #ffffff;
+  color: #1D334A;
+}
+
+.toolbar-button {
+  padding: 5px 10px;
+  font-size: 16px;
+  border: 2px solid #1D334A;
+  border-radius: 8px;
+  background-color: #ffffff;
+  color: #1D334A;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.3s ease;
+  min-width: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.toolbar-button:hover {
+  background-color: #1D334A;
+  color: #F8F8FF;
+  transform: translateY(-3px);
+}
+
+.toolbar-input {
+  padding: 5px;
+  font-size: 16px;
+  border: 1px solid #1D334A;
+  border-radius: 4px;
+  width: 40px;
+  text-align: center;
+  background-color: #ffffff;
+  color: #1D334A;
+}
+
+.title-input {
+  padding: 10px;
+  font-size: 18px;
+  border: 1px solid #1D334A;
+  border-radius: 4px;
+  background-color: #ffffff;
+  color: #1D334A;
+  width: 100%; /* Растягиваем на всю ширину родителя */
+  max-width: 1200px; /* Ограничиваем максимум */
+}
+
+.editor {
+  min-height: 500px;
+  padding: 15px;
+  border: 1px solid #1D334A;
+  border-radius: 8px;
+  background-color: #ffffff;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  outline: none;
+  font-size: 16px;
+  color: #333;
+  width: 100%; /* Растягиваем на всю ширину родителя */
+  max-width: 1200px; /* Ограничиваем максимум */
+}
+
+.editor ul,
+.editor ol,
+.editor li {
+  text-decoration: none !important;
+  border-bottom: none !important;
+}
+
+.editor p:hover {
+  background-color: transparent !important;
+}
+
+.context-menu {
+  position: absolute;
+  background-color: #ffffff;
+  border: 1px solid #1D334A;
+  border-radius: 4px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  padding: 5px;
+}
+
+.context-menu-button {
+  display: block;
+  width: 100%;
+  padding: 5px 10px;
+  font-size: 16px;
+  border: none;
+  background-color: #ffffff;
+  color: #1D334A;
+  text-align: left;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.context-menu-button:hover {
+  background-color: #1D334A;
+  color: #F8F8FF;
+}
+
+.document-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 20px;
+  width: 100%;
+}
+
+.document-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 20px;
+  width: 100%;
+}
+
+.document-item {
+  display: flex;
+  flex-direction: column;
+  padding: 15px;
+  border: 1px solid #1D334A;
+  border-radius: 8px;
+  background-color: #ffffff;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  cursor: pointer;
+  height: 150px;
+}
+
+.document-item:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+.document-content {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100%;
+}
+
+.document-title {
+  font-size: 16px;
+  color: #1D334A;
+  font-weight: bold;
+}
+
+.document-action-button {
+  padding: 5px 10px;
+  font-size: 16px;
+  border: 2px solid #1D334A;
+  border-radius: 8px;
+  background-color: #ffffff;
+  color: #1D334A;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+.document-action-button:hover {
+  background-color: #1D334A;
+  color: #F8F8FF;
+  transform: translateY(-3px);
+}
+
+.create-document-button {
+  padding: 5px 10px;
+  font-size: 16px;
+  border: 2px solid #1D334A;
+  border-radius: 8px;
+  background-color: #ffffff;
+  color: #1D334A;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.3s ease;
+  align-self: flex-start;
+}
+
+.create-document-button:hover {
+  background-color: #1D334A;
+  color: #F8F8FF;
+  transform: translateY(-3px);
+}
+
+.exit-button {
+  position: fixed;
+  top: 10px;
+  right: 10px;
+  background: none;
+  border: none;
+  font-size: 24px;
+  color: #1D334A;
+  cursor: pointer;
+  transition: color 0.3s ease;
+  z-index: 1001;
+}
+
+.exit-button:hover {
+  background-color: black;
+  color: #F8F8FF;
+}

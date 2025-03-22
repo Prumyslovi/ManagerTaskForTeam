@@ -38,7 +38,6 @@ namespace CarnetDeTaches.Repositories
             return role?.RoleId ?? Guid.Empty;
         }
 
-        // Метод для обновления роли участника
         public MemberRole UpdateMemberRole(Guid teamId, Guid memberId, Guid roleId)
         {
             var memberRole = _context.MemberRoles
@@ -46,7 +45,7 @@ namespace CarnetDeTaches.Repositories
 
             if (memberRole == null)
             {
-                return null; // Если участник не найден
+                return null;
             }
 
             memberRole.RoleId = roleId;
@@ -63,20 +62,19 @@ namespace CarnetDeTaches.Repositories
 
             if (memberRole == null)
             {
-                return false; // Если запись не найдена
+                return false;
             }
 
-            // Логически удаляем участника
             memberRole.IsDeleted = true;
 
             try
             {
-                _context.SaveChanges(); // Сохраняем изменения
+                _context.SaveChanges();
                 return true;
             }
             catch (Exception)
             {
-                return false; // Ошибка при сохранении изменений
+                return false;
             }
         }
 
@@ -87,7 +85,7 @@ namespace CarnetDeTaches.Repositories
             {
                 foreach (var memberRole in memberRoles)
                 {
-                    memberRole.IsDeleted = true; // Устанавливаем IsDeleted в true для всех ролей
+                    memberRole.IsDeleted = true;
                 }
                 _context.SaveChanges();
                 return true;

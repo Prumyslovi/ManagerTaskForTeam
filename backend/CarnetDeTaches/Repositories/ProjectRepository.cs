@@ -62,11 +62,11 @@ namespace CarnetDeTaches.Repositories
         public IEnumerable<Team> GetTeamsByUserId(Guid userId)
         {
             return _context.MemberRoles
-                .Where(t => t.MemberId == userId && !t.IsDeleted) // Получаем роли участника
-                .Join(_context.Teams, // Выполняем соединение с таблицей команд
-                      memberRole => memberRole.TeamId, // Соединяем по TeamId
+                .Where(t => t.MemberId == userId && !t.IsDeleted)
+                .Join(_context.Teams,
+                      memberRole => memberRole.TeamId,
                       team => team.TeamId,
-                      (memberRole, team) => team) // Возвращаем команду
+                      (memberRole, team) => team)
                 .ToList();
         }
 

@@ -50,7 +50,6 @@ namespace CarnetDeTaches.Controllers
                     return BadRequest("Роль не указана.");
                 }
 
-                // Получаем ID роли по наименованию из репозитория
                 var roleId = _memberRoleRepository.GetRoleIdByName(roleName);
 
                 if (roleId == Guid.Empty)

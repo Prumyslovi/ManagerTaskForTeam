@@ -2,71 +2,137 @@
 using CarnetDeTaches.Repositories;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using System.Threading.Tasks;
 
 namespace CarnetDeTaches.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class TaskController : ControllerBase
+    public class TeamController : ControllerBase
     {
-        private readonly ITaskRepository _taskRepository;
+        private readonly ITeamRepository _teamRepository;
 
-        public TaskController([FromServices] ITaskRepository taskRepository)
+        public TeamController([FromServices] ITeamRepository teamRepository)
         {
-            _taskRepository = taskRepository;
+            _teamRepository = teamRepository;
         }
 
-        [HttpGet("GetAllTasks")]
-        public ActionResult<CarnetDeTaches.Model.Task> GetAllTasks()
+        [HttpGet("GetAllTeam")]
+        public ActionResult<Team> GetAllTeams()
         {
-            var session = _taskRepository.GetAllTasks();
-            return Ok(session);
+            var team = _teamRepository.GetAllTeams();
+            return Ok(team);
         }
 
-        [HttpGet("GetTask/{id}")]
-        public ActionResult<CarnetDeTaches.Model.Task> GetTask([FromRoute] Guid id)
+        [HttpGet("GetTeam/{id}")]
+        public ActionResult<Team> GetTeam([FromRoute] Guid id)
         {
-            var task = _taskRepository.GetTask(id);
-            if (task == null)
+            var team = _teamRepository.GetTeam(id);
+            if (team == null)
                 return NotFound();
 
-            return Ok(task);
+            return Ok(team);
         }
 
-        [HttpPost("AddTask")]
-        public ActionResult<CarnetDeTaches.Model.Task> AddTask([FromBody] CarnetDeTaches.Model.Task task)
+        [HttpPost("AddTeam")]
+        public ActionResult<Team> AddTeam([FromBody] Team team)
         {
-            var createdProject = _taskRepository.AddTask(task);
-            return CreatedAtAction(nameof(GetTask), new { id = createdProject.TaskId }, createdProject);
+            var createdProject = _teamRepository.AddTeam(team);
+            return CreatedAtAction(nameof(GetTeam), new { id = createdProject.TeamId }, createdProject);
         }
 
-        [HttpPut("UpdateTask/{id}")]
-        public ActionResult<CarnetDeTaches.Model.Task> UpdateTask([FromRoute] Guid id, [FromBody] CarnetDeTaches.Model.Task task)
+        [HttpPut("UpdateTeam/{id}")]
+        public ActionResult<Team> UpdateTeam([FromRoute] Guid id, [FromBody] Team team)
         {
-            if (id != task.TaskId)
+            if (id != team.TeamId)
                 return BadRequest();
 
-            _taskRepository.UpdateTask(task);
+            _teamRepository.UpdateTeam(team);
             return NoContent();
         }
 
-        [HttpDelete("DeleteTask/{id}")]
-        public ActionResult<CarnetDeTaches.Model.Task> DeleteTask([FromRoute] Guid id)
+        [HttpDelete("DeleteTeam/{id}")]
+        public ActionResult<Team> DeleteTeam([FromRoute] Guid id)
         {
-            var task = _taskRepository.DeleteTask(id);
-            if (task == null)
+            var team = _teamRepository.DeleteTeam(id);
+            if (team == null)
                 return NotFound();
 
-            return Ok(task);
+            return Ok(team);
+        }
+        [HttpGet("GetTeamMembers/{teamId}")]
+        public async Task<IActionResult> GetTeamMembers(Guid teamId)
+        {
+            try
+            {
+                var members = await _teamRepository.GetTeamMembersAsync(teamId);
+                if (members == null || !members.Any())
+                {
+                    return NotFound("Участники не найдены.");
+                }
+
+                return Ok(members);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Ошибка при получении участников: " + ex.Message);
+            }
         }
 
-        [HttpGet("GetTasksForProject/{projectId}")]
-        public ActionResult GetTasksForProject(Guid projectId)
+        [HttpPut("UpdateMemberRole")]
+        public async Task<IActionResult> UpdateMemberRole(Guid teamId, Guid memberId, Guid roleId, Guid updaterId)
         {
-            // Получаем задачи для указанного проекта
-            var tasks = _taskRepository.GetTasksByProjectId(projectId);
+            try
+            {
+                var success = await _teamRepository.UpdateMemberRoleAsync(teamId, memberId, roleId, updaterId);
+                if (!success)
+                    return NotFound("Участник или роль не найдены.");
 
-            return Ok(tasks);
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Ошибка при обновлении роли участника: " + ex.Message);
+            }
+        }
+
+        [HttpDelete("SoftDeleteMember")]
+        public async Task<IActionResult> SoftDeleteMember(Guid teamId, Guid memberId, Guid removerId)
+        {
+            try
+            {
+                var success = await _teamRepository.SoftDeleteMemberAsync(teamId, memberId, removerId);
+                if (!success)
+                    return NotFound("Участник не найден или у вас недостаточно прав.");
+
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Ошибка при удалении участника: " + ex.Message);
+            }
+        }
+
+        [HttpPost("JoinTeam")]
+        public ActionResult JoinTeam([FromBody] JoinTeamRequest request)
+        {
+            var team = _teamRepository.GetTeamByInviteCode(request.InviteCode);
+            if (team == null)
+            {
+                return NotFound(new { message = "Команда с таким кодом не найдена." });
+            }
+
+            Guid memberId = new Guid(request.UserId.ToString());
+            if (_teamRepository.IsUserAlreadyInTeam(team.TeamId, memberId))
+            {
+                return BadRequest(new { message = "Вы уже состоите в этой команде." });
+            }
+
+            // Добавление пользователя в команду
+            _teamRepository.AddMemberToTeam(team.TeamId, memberId);
+
+            return Ok(new { success = true, teamName = team.TeamName });
         }
     }
 }

@@ -16,7 +16,6 @@ const AdministerTeam = () => {
   const [currentUserRole, setCurrentUserRole] = useState(null);
   const [activeMemberId, setActiveMemberId] = useState(null);
   const [availableRoles, setAvailableRoles] = useState([]);
-
   const [isConfirmDeleteVisible, setIsConfirmDeleteVisible] = useState(false);
   const [memberToDelete, setMemberToDelete] = useState(null);
   const [deleteConfirmationMessage, setDeleteConfirmationMessage] = useState('');
@@ -51,8 +50,6 @@ const AdministerTeam = () => {
 
       setTeamMembers(membersWithRoles);
       setCurrentUserRole(activeMember?.roleName || 'Участник');
-
-      // Получаем список всех уникальных ролей из данных участников
       const uniqueRoles = [...new Set(membersWithRoles.map(member => member.roleName))];
       setAvailableRoles(uniqueRoles);
     } catch (error) {
@@ -129,7 +126,6 @@ const AdministerTeam = () => {
     loadTeamMembersWithRoles(team.teamId);
   };
 
-  // Сортировка участников по ролям
   const sortMembersByRole = (members) => {
     const rolePriority = {
       'Создатель': 1,

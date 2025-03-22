@@ -109,6 +109,26 @@ export const fetchTeamMembers = async (teamId) => {
   }
 };
 
+export const fetchTeam = async (teamId) => {
+  try {
+    console.log('Отправка запроса на сервер для получения команды...');
+    console.log('ID команды перед запросом:', teamId);
+
+    const response = await axios.get(`${API_URL}/Team/GetTeam/${teamId}`, {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
+    console.log('Ответ от сервера:', response.data);
+    return response.data;
+  } catch (error) {
+    console.error('Ошибка при выполнении запроса команды:', error.response || error);
+    console.log(error);
+    throw error;
+  }
+};
+
 export const createTeam = async (teamData) => {
   const response = await axios.post(`${API_URL}/Team/AddTeam`, teamData);
   return response.data;
@@ -255,4 +275,111 @@ export const createTask = async (taskData) => {
     console.error('Ошибка при добавлении задачи:', error);
     throw error;
   }
+};
+
+export const fetchDocuments = async (teamId) => {
+  try {
+    console.log('Отправка запроса на сервер для получения документов...');
+    console.log('ID команды перед запросом:', teamId);
+
+    const response = await axios.get(`${API_URL}/Documents/GetAllDocuments/${teamId}`, {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
+    console.log('Ответ от сервера:', response.data);
+    return response.data;
+  } catch (error) {
+    console.error('Ошибка при выполнении запроса документов:', error.response || error);
+    throw error;
+  }
+};
+
+// Получение содержимого документа
+export const fetchDocumentContent = async (documentId) => {
+  try {
+    console.log('Отправка запроса на сервер для получения содержимого документа...');
+    console.log('ID документа перед запросом:', documentId);
+
+    const response = await axios.get(`${API_URL}/Documents/GetDocumentContent/${documentId}`, {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
+    console.log('Ответ от сервера:', response.data);
+    return response.data;
+  } catch (error) {
+    console.error('Ошибка при выполнении запроса содержимого документа:', error.response || error);
+    throw error;
+  }
+};
+
+// Создание нового документа
+export const createDocument = async (documentData) => {
+  try {
+    console.log('Отправка запроса на сервер для создания документа...');
+    console.log('Данные документа перед запросом:', documentData);
+
+    const response = await axios.post(`${API_URL}/Documents/AddDocument`, documentData, {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
+    console.log('Ответ от сервера:', response.data);
+    return response.data;
+  } catch (error) {
+    console.error('Ошибка при добавлении документа:', error.response || error);
+    throw error;
+  }
+};
+
+// Обновление документа
+export const updateDocument = async (documentId, documentData) => {
+  try {
+    console.log('Отправка запроса на сервер для обновления документа...');
+    console.log('ID документа перед запросом:', documentId);
+    console.log('Данные документа перед запросом:', documentData);
+
+    const response = await axios.put(`${API_URL}/Documents/UpdateDocument/${documentId}`, documentData, {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
+    console.log('Ответ от сервера:', response.data);
+    return response.data;
+  } catch (error) {
+    console.error('Ошибка при изменении документа:', error.response || error);
+    throw error;
+  }
+};
+
+// Получение изменений документа
+export const fetchDocumentChanges = async (documentId) => {
+  try {
+    console.log('Отправка запроса на сервер для получения изменений документа...');
+    console.log('ID документа перед запросом:', documentId);
+
+    const response = await axios.get(`${API_URL}/Documents/GetChanges/${documentId}`, {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
+    console.log('Ответ от сервера:', response.data);
+    return response.data;
+  } catch (error) {
+    console.error('Ошибка при выполнении запроса изменений документа:', error.response || error);
+    throw error;
+  }
+};
+
+export const fetchAllDocuments = async (teamId) => {
+  const response = await fetch(`http://localhost:5062/api/documents/GetAllDocuments/${teamId}`, {
+    credentials: 'include',
+  });
+  return response.json();
 };

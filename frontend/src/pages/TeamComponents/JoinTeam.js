@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 import { joinTeam } from '../../services/api';
 
-const JoinTeam = ({ memberId }) => {
+const JoinTeam = () => {
   const [inviteCode, setInviteCode] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
+  const memberId = localStorage.getItem('memberId');
 
   const handleJoinTeam = async () => {
     if (!inviteCode) {
@@ -14,18 +15,16 @@ const JoinTeam = ({ memberId }) => {
     }
   
     console.log("inviteCode:", inviteCode);
-    console.log("userId:", memberId.memberId); // Извлекаем строку из объекта
+    console.log("userId:", memberId);
   
     try {
-      // Отправляем запрос с правильными данными
-      const response = await joinTeam(inviteCode, memberId.memberId); // Используем только строку memberId
+      const response = await joinTeam(inviteCode, memberId);
   
       if (response.success) {
         setSuccessMessage(`Вы успешно присоединились к команде "${response.teamName}"!`);
         setErrorMessage('');
       }
     } catch (error) {
-      // Обрабатываем ошибку, если пришло сообщение о том, что пользователь уже в команде
       setErrorMessage(error.message || 'Ошибка при подключении к серверу. Попробуйте снова.');
       setSuccessMessage('');
     }

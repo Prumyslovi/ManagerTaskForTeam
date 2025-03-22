@@ -1,28 +1,27 @@
-import React, { useState } from 'react';
-import CreateTeam from './CreateTeam'; // Импорт компонента
-import AdministerTeam from './AdministerTeam'; // Импорт компонента
-import JoinTeam from './JoinTeam'; // Импорт компонента
-import './TeamManagement.css'; // Импортируем стили
+import React from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
+import CreateTeam from './CreateTeam';
+import AdministerTeam from './AdministerTeam';
+import JoinTeam from './JoinTeam';
+import './TeamManagement.css';
 
-const TeamManagement = (memberId) => {
-  const [selectedOption, setSelectedOption] = useState('create');
+const TeamManagement = () => {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const defaultTeamId = 'b9c35b72-a484-4465-a999-7a1b19a2c181';
 
   return (
     <div className="team-management programSection">
       <h2 className="admin-title">Управление командой</h2>
-
-      {/* Меню выбора */}
       <div className="menu">
-        <button onClick={() => setSelectedOption('create')} className="Button">Создать команду</button>
-        <button onClick={() => setSelectedOption('admin')} className="Button">Администрировать</button>
-        <button onClick={() => setSelectedOption('join')} className="Button">Вступить в команду</button>
+        <button onClick={() => navigate(`/team/${defaultTeamId}/manage/create`)} className="Button">Создать команду</button>
+        <button onClick={() => navigate(`/team/${defaultTeamId}/manage/administer`)} className="Button">Администрировать</button>
+        <button onClick={() => navigate(`/team/${defaultTeamId}/manage/join`)} className="Button">Вступить в команду</button>
       </div>
-
-      {/* Выбор функционала */}
       <div className="content">
-        {selectedOption === 'create' && <CreateTeam />}
-        {selectedOption === 'admin' && <AdministerTeam />}
-        {selectedOption === 'join' && <JoinTeam memberId={memberId}/>}
+        {location.pathname === `/team/${defaultTeamId}/manage/create` && <CreateTeam />}
+        {location.pathname === `/team/${defaultTeamId}/manage/administer` && <AdministerTeam />}
+        {location.pathname === `/team/${defaultTeamId}/manage/join` && <JoinTeam />}
       </div>
     </div>
   );

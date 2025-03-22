@@ -1,12 +1,12 @@
-import React from 'react';
-import { useSelector, useDispatch } from 'react-redux';
+import React, { useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { FiBell } from 'react-icons/fi';
 import { AiOutlineTeam, AiOutlineProject, AiOutlineUser, AiOutlineLogin, AiOutlineUserAdd, AiOutlineDown } from 'react-icons/ai';
-import './styles/Navbar.css';
+import './styles/Navbar.css'; 
 import './styles/ProgramSection.css';
 import './styles/Message.css';
-import RegistrationForm from './RegistrationForm/RegistrationForm';
-import EnterForm from './RegistrationForm/EnterForm';
+import RegistrationForm from './reg/RegistrationForm';
+import EnterForm from './reg/EnterForm';
 import { programInfo, howToStartInfo } from './data';
 import Profile from './Profile/Profile';
 import TeamList from './TeamComponents/TeamList';
@@ -15,37 +15,52 @@ import ProjectList from './ProjectComponents/ProjectList';
 import ProjectManagement from './ProjectComponents/ProjectManagment';
 
 const Home = () => {
-    const dispatch = useDispatch();
+    const [isVisibleRegistrationForm, setIsVisibleRegistrationForm] = useState(false);
+    const [isVisibleEnterForm, setIsVisibleEnterForm] = useState(false);
+    const [isLoggedIn, setIsLoggedIn] = useState(!!localStorage.getItem('memberId'));
+    const [restrictedContent, setRestrictedContent] = useState('');
+    const [userId, setUserId] = useState(localStorage.getItem('memberId') || null);
+    const navigate = useNavigate();
+    const location = useLocation();
+    const defaultTeamId = 'b9c35b72-a484-4465-a999-7a1b19a2c181';
+    const defaultProjectId = 'proj123';
 
-    // Используем useSelector для получения состояния из Redux
-    const {
-        isLoggedIn,
-        userId,
-        firstName,
-        lastName,
-        activeContent,
-        restrictedContent,
-        isVisibleRegistrationForm,
-        isVisibleEnterForm,
-    } = useSelector(state => state);
-
-    // Логика для входа пользователя
-    const handleLogin = (id, firstName, lastName) => {
-        dispatch({ type: 'auth/login', payload: { userId: id, firstName: firstName, lastName: lastName } });
+    const handleLogin = (id) => {
+        setIsLoggedIn(true);
+        setUserId(id);
+        localStorage.setItem('memberId', id);
     };
 
-    // Тогглинг видимости форм
-    const toggleVisibility = (formType) => {
-        dispatch({ type: 'toggleVisibility', payload: formType });
+    const toggleVisibility = (form) => {
+        if (form === 'registration') {
+            setIsVisibleRegistrationForm((prev) => !prev);
+        } else if (form === 'enter') {
+            setIsVisibleEnterForm((prev) => !prev);
+        }
     };
 
-    // Обработка клика на элемент меню
     const handleMenuItemClick = (item) => {
         if (!isLoggedIn && ['teamsList', 'createTeam', 'projectsList', 'createProject'].includes(item)) {
-            dispatch({ type: 'setRestrictedContent', payload: item });
-            dispatch({ type: 'setActiveContent', payload: 'restricted' });
+            setRestrictedContent(item);
+            navigate('/restricted');
         } else {
-            dispatch({ type: 'setActiveContent', payload: item });
+            if (item === 'home') {
+                navigate('/');
+            } else if (item === 'program') {
+                navigate('/program');
+            } else if (item === 'howToStart') {
+                navigate('/howToStart');
+            } else if (item === 'teamsList') {
+                navigate('/teams');
+            } else if (item === 'createTeam') {
+                navigate(`/team/${defaultTeamId}/manage`);
+            } else if (item === 'projectsList') {
+                navigate(`/team/${defaultTeamId}/projects`);
+            } else if (item === 'createProject') {
+                navigate(`/team/${defaultTeamId}/projects/${defaultProjectId}/manage`);
+            } else if (item === 'Profile') {
+                navigate('/profile');
+            }
         }
     };
 
@@ -64,6 +79,22 @@ const Home = () => {
                 <p>{item.description}</p>
             </div>
         ));
+
+    const getActiveContent = () => {
+        const path = location.pathname;
+        if (path === '/') return 'home';
+        if (path === '/program') return 'program';
+        if (path === '/howToStart') return 'howToStart';
+        if (path === '/teams') return 'teamsList';
+        if (path === `/team/${defaultTeamId}/manage`) return 'createTeam';
+        if (path === `/team/${defaultTeamId}/projects`) return 'projectsList';
+        if (path === `/team/${defaultTeamId}/projects/${defaultProjectId}/manage`) return 'createProject';
+        if (path === '/profile') return 'Profile';
+        if (path === '/restricted') return 'restricted';
+        return 'home';
+    };
+
+    const activeContent = getActiveContent();
 
     return (
         <div>
@@ -100,19 +131,19 @@ const Home = () => {
                             <AiOutlineUser
                                 size={24}
                                 className="icon"
-                                onClick={() => dispatch({ type: 'setActiveContent', payload: 'Profile' })}
+                                onClick={() => handleMenuItemClick('Profile')}
                             />
                         ) : (
                             <>
                                 <AiOutlineLogin
                                     size={24}
                                     className="icon"
-                                    onClick={() => toggleVisibility('isVisibleEnterForm')}
+                                    onClick={() => toggleVisibility('enter')}
                                 />
                                 <AiOutlineUserAdd
                                     size={24}
                                     className="icon"
-                                    onClick={() => toggleVisibility('isVisibleRegistrationForm')}Регистрация
+                                    onClick={() => toggleVisibility('registration')}
                                 />
                             </>
                         )}
@@ -134,15 +165,15 @@ const Home = () => {
 
                 {activeContent === 'teamsList' && <TeamList memberId={userId} />}
                 {activeContent === 'createTeam' && <TeamManagement memberId={userId} />}
-                {activeContent === 'projectsList' && <ProjectList memberId={userId} />}
+                {activeContent === 'projectsList' && <ProjectList memberId={userId}/>}
                 {activeContent === 'createProject' && <ProjectManagement />}
-
+                
                 {activeContent === 'restricted' && (
                     <div className="restricted-content">
                         {restrictedContent === 'teamsList' || restrictedContent === 'createTeam' ? (
                             <p>Для просмотра информации о командах необходимо войти в систему.</p>
                         ) : (
-                            <p>Для просмотра информации о проектах необходимо войти в систему.</p>
+                            <p>Для просмотра проектов необходимо войти в систему.</p>
                         )}
                     </div>
                 )}
@@ -151,15 +182,17 @@ const Home = () => {
 
                 {isVisibleEnterForm && (
                     <EnterForm
+                        id="EnterForm"
                         visible={isVisibleEnterForm}
-                        onVisibilityChange={() => toggleVisibility('isVisibleEnterForm')}
-                        onLogin={handleLogin}
+                        onVisibilityChange={setIsVisibleEnterForm}
+                        onLogin={handleLogin} 
                     />
                 )}
                 {isVisibleRegistrationForm && (
                     <RegistrationForm
+                        id="RegistrationForm"
                         visible={isVisibleRegistrationForm}
-                        onVisibilityChange={() => toggleVisibility('Registration')}
+                        onVisibilityChange={setIsVisibleRegistrationForm}
                         onLogin={handleLogin}
                     />
                 )}

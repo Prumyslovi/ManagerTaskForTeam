@@ -1,14 +1,14 @@
 import React, { useState } from 'react';
 import '../styles/Modal.css';
-import { getAllTeams, createTeam } from '../../services/api'; // Импортируем функции для API
+import { getAllTeams, createTeam } from '../../services/api';
 
-const CreateTeam = ({ creatorId }) => {
+const CreateTeam = () => {
   const [teamName, setTeamName] = useState('');
   const [teamDescription, setTeamDescription] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
+  const creatorId = localStorage.getItem('memberId');
 
-  // Функция для генерации случайной ссылки из 6 символов
   const generateRandomLink = () => {
     const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
     let randomLink = '';
@@ -18,23 +18,21 @@ const CreateTeam = ({ creatorId }) => {
     return randomLink;
   };
 
-  // Функция для проверки уникальности ссылки
   const checkUniqueLink = async (link) => {
     try {
-      const teams = await getAllTeams(); // Получаем все команды
-      return !teams.some(team => team.teamLink === link); // Проверяем, есть ли уже такая ссылка
+      const teams = await getAllTeams();
+      return !teams.some(team => team.teamLink === link);
     } catch (error) {
       console.error('Ошибка при проверке уникальности ссылки:', error);
-      return false; // Если ошибка, считаем, что ссылка уникальна
+      return false;
     }
   };
 
-  // Функция для генерации уникальной ссылки
   const generateUniqueLink = async () => {
     let link = generateRandomLink();
     let isUnique = await checkUniqueLink(link);
     while (!isUnique) {
-      link = generateRandomLink(); // Генерируем новую ссылку, если текущая не уникальна
+      link = generateRandomLink();
       isUnique = await checkUniqueLink(link);
     }
     return link;
@@ -47,15 +45,15 @@ const CreateTeam = ({ creatorId }) => {
       return;
     }
 
-    const teamLink = await generateUniqueLink(); // Генерируем уникальную ссылку
+    const teamLink = await generateUniqueLink();
 
     const newTeam = {
       teamName,
       description: teamDescription,
-      createdAt: new Date().toISOString(), // Указываем текущую дату
-      creatorId, // ID создателя команды
-      isDeleted: false, // По умолчанию команда не удалена
-      teamLink, // Генерация уникальной ссылки
+      createdAt: new Date().toISOString(),
+      creatorId,
+      isDeleted: false,
+      teamLink,
     };
 
     try {

@@ -15,7 +15,6 @@ namespace CarnetDeTaches.Controllers
             _taskDependencyRepository = taskDependencyRepository;
         }
 
-        // Получить все зависимости для задачи
         [HttpGet("GetDependenciesByTaskId/{taskId}")]
         public ActionResult<IEnumerable<TaskDependency>> GetDependenciesByTaskId([FromRoute] Guid taskId)
         {
@@ -23,7 +22,6 @@ namespace CarnetDeTaches.Controllers
             return Ok(dependencies);
         }
 
-        // Добавить зависимость между задачами
         [HttpPost("AddDependency")]
         public async Task<ActionResult<TaskDependency>> AddDependency([FromBody] TaskDependency taskDependency)
         {
@@ -31,7 +29,6 @@ namespace CarnetDeTaches.Controllers
             return Ok(createdDependency);
         }
 
-        // "Удалить" зависимость (нефизическое удаление)
         [HttpPut("DeleteDependency/{id}")]
         public ActionResult DeleteDependency([FromRoute] Guid id)
         {
@@ -39,7 +36,6 @@ namespace CarnetDeTaches.Controllers
             if (dependency == null)
                 return NotFound();
 
-            // Устанавливаем IsDeleted в true (нефизическое удаление)
             dependency.IsDeleted = true;
             _taskDependencyRepository.UpdateDependency(dependency);
 

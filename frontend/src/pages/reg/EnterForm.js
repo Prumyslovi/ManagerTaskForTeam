@@ -62,7 +62,7 @@ const EnterForm = ({ visible, onVisibilityChange, onLogin }) => {
                     type="button"
                     onClick={() => onVisibilityChange(false)}
                 >
-                    &times;
+                    ×
                 </button>
                 <div>
                     <label htmlFor="login">Логин:</label>

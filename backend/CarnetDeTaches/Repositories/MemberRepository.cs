@@ -110,7 +110,7 @@ namespace CarnetDeTaches.Repositories
             }
 
             Console.WriteLine($"Логин: {login}");
-            Console.WriteLine($"Хеш паролья: {HashPassword(password)}");
+            Console.WriteLine($"Хеш пароля: {HashPassword(password)}");
             Console.WriteLine($"Введенный пароль: {password}");
             Console.WriteLine($"Хеш пароля в базе: {res.PasswordHash}");
 

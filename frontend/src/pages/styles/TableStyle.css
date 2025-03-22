@@ -28,32 +28,32 @@ th {
 }
 
 tr:hover {
-  background-color: #FFD700; /* Жёлтый фон при наведении на строку */
-  transition: background-color 0.5s ease; /* Плавный переход для фона */
+  background-color: #FFD700;
+  transition: background-color 0.5s ease;
 }
 
 td {
-  background-color: #fff; /* Белый фон для ячеек */
-  transition: background-color 0.5s ease; /* Плавный переход для фона */
+  background-color: #fff;
+  transition: background-color 0.5s ease;
 }
 
 .team-row:hover td {
-  background-color: #FFD700; /* Жёлтый фон при наведении на строку команды */
-  color: #000000; /* Белый цвет текста при наведении */
+  background-color: #FFD700;
+  color: #000000;
 }
 
 ul {
-  padding-left: 20px; /* Отступ слева для списка */
-  list-style-type: none; /* Убираем маркеры у списка */
-  margin-top: 5px; /* Отступ сверху */
+  padding-left: 20px;
+  list-style-type: none;
+  margin-top: 5px;
 }
 
 li {
-  font-size: 16px; /* Размер шрифта для элементов списка */
-  color: #555; /* Цвет текста элементов списка */
-  margin-bottom: 5px; /* Отступ снизу для элементов списка */
+  font-size: 16px;
+  color: #555;
+  margin-bottom: 5px;
   border-bottom: 2px solid #1D334A;
-  transition: background-color 0.5s ease; /* Плавный переход для фона */
+  transition: background-color 0.5s ease;
 }
 
 li:hover {
@@ -61,21 +61,45 @@ li:hover {
 }
 
 .team-divider {
-  border-top: 3px solid #1D334A; /* Полужирная темно-синяя линия для разделения команд */
-  margin: 10px 0; /* Отступ сверху и снизу */
-  transition: border-top 0.5s ease; /* Плавный переход для границы */
+  border-top: 3px solid #1D334A;
+  margin: 10px 0;
+  transition: border-top 0.5s ease;
 }
 
 .team-divider + tr {
-  border-top: 1px solid #1D334A; /* Тонкая синяя линия для разделения участников */
+  border-top: 1px solid #1D334A;
 }
 
 .project-row:hover td {
-  background-color: #FFD700; /* Жёлтый фон при наведении на строку проекта */
-  color: #000000; /* Чёрный цвет текста при наведении */
+  background-color: #FFD700;
+  color: #000000;
 }
 
 .project-divider {
-  border-top: 3px solid #1D334A; /* Полужирная темно-синяя линия для разделения проектов */
-  margin: 10px 0; /* Отступ сверху и снизу */
+  border-top: 3px solid #1D334A;
+  margin: 10px 0;
+}
+
+.team-section {
+  margin-bottom: 20px;
+}
+
+.team-header {
+  font-size: 1.2em;
+  padding: 5px;
+  background-color: #1D334A;
+  color: #fff;
+  border-radius: 4px;
+}
+
+.team-projects {
+  padding-top: 10px;
+}
+
+.teams-table .document-list {
+  padding: 10px;
+}
+
+.teams-table .document-item {
+  margin: 5px 0;
 }

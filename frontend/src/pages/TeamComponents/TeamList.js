@@ -1,16 +1,17 @@
 import React, { useEffect, useState } from 'react';
 import { fetchUserTeams, fetchTeamMembers } from '../../services/api';
-import '../styles/TableStyle.css'; // Стили для таблицы
+import '../styles/TableStyle.css';
+import DocumentList from '../Documents/DocumentList';
 
-const TeamList = ({ memberId }) => {
+const TeamList = () => {
   const [teams, setTeams] = useState([]);
   const [selectedTeam, setSelectedTeam] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [teamMembers, setTeamMembers] = useState({}); // Храним участников для каждой команды
-  const [expandedDescriptions, setExpandedDescriptions] = useState({}); // Управление раскрытием описания
+  const [teamMembers, setTeamMembers] = useState({});
+  const [expandedDescriptions, setExpandedDescriptions] = useState({});
+  const memberId = localStorage.getItem('memberId');
 
-  // Загрузка команд при изменении memberId
   useEffect(() => {
     const loadTeams = async () => {
       try {
@@ -29,7 +30,6 @@ const TeamList = ({ memberId }) => {
     }
   }, [memberId]);
 
-  // Обработчик клика на строку команды
   const handleRowClick = async (teamId) => {
     setSelectedTeam(selectedTeam === teamId ? null : teamId);
 
@@ -46,7 +46,6 @@ const TeamList = ({ memberId }) => {
     }
   };
 
-  // Обработчик для раскрытия описания
   const toggleDescription = (teamId) => {
     setExpandedDescriptions((prev) => ({
       ...prev,
@@ -54,7 +53,6 @@ const TeamList = ({ memberId }) => {
     }));
   };
 
-  // Сортировка участников по ролям
   const sortMembersByRole = (members) => {
     const rolePriority = {
       'Создатель': 1,
@@ -65,7 +63,6 @@ const TeamList = ({ memberId }) => {
     return [...members].sort((a, b) => (rolePriority[a.role] || 5) - (rolePriority[b.role] || 5));
   };
 
-  // Если данные загружаются или произошла ошибка
   if (loading) return <p>Загрузка...</p>;
   if (error) return <p className="error">{error}</p>;
 
@@ -157,6 +154,12 @@ const TeamList = ({ memberId }) => {
                   <tr>
                     <td colSpan="2">
                       <p>Дата создания: {new Date(team.createdAt).toLocaleDateString()}</p>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td colSpan="2">
+                      <h4>Документы:</h4>
+                      <DocumentList teamId={team.teamId} />
                     </td>
                   </tr>
                 </>

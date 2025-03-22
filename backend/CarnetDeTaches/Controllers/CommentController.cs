@@ -15,7 +15,6 @@ namespace CarnetDeTaches.Controllers
             _commentRepository = commentRepository;
         }
 
-        // Получить все комментарии задачи
         [HttpGet("GetCommentsByTaskId/{taskId}")]
         public ActionResult<IEnumerable<Comment>> GetCommentsByTaskId([FromRoute] Guid taskId)
         {
@@ -23,7 +22,6 @@ namespace CarnetDeTaches.Controllers
             return Ok(comments);
         }
 
-        // Добавить комментарий к задаче
         [HttpPost("AddComment")]
         public async Task<ActionResult<Comment>> AddComment([FromBody] Comment comment)
         {
@@ -31,7 +29,6 @@ namespace CarnetDeTaches.Controllers
             return Ok(createdComment);
         }
 
-        // Обновить комментарий
         [HttpPut("UpdateComment")]
         public async Task<ActionResult> UpdateComment([FromBody] Comment comment)
         {
@@ -41,7 +38,6 @@ namespace CarnetDeTaches.Controllers
             return Ok(updatedComment);
         }
 
-        // "Удалить" комментарий (нефизическое удаление)
         [HttpPut("DeleteComment/{id}")]
         public ActionResult DeleteComment([FromRoute] Guid id)
         {
@@ -49,7 +45,6 @@ namespace CarnetDeTaches.Controllers
             if (comment == null)
                 return NotFound();
 
-            // Устанавливаем IsDeleted в true (нефизическое удаление)
             comment.IsDeleted = true;
             _commentRepository.UpdateComment(comment);
 

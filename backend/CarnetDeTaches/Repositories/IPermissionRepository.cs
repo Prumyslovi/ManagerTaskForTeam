@@ -7,10 +7,10 @@ namespace CarnetDeTaches.Repositories
 {
     public interface IPermissionRepository
     {
-        IEnumerable<Permission> GetAllPermissions(); // Получить все разрешения
-        Task<Permission> GetPermission(Guid permissionId); // Сделать метод асинхронным
-        Task<Permission> AddPermission(Permission permission); // Добавить новое разрешение
-        Task<Permission> UpdatePermission(Permission permission); // Обновить разрешение
-        Task<Permission> DeletePermission(Guid permissionId); // "Удалить" разрешение (обновить IsDeleted)
+        IEnumerable<Permission> GetAllPermissions();
+        Task<Permission> GetPermission(Guid permissionId);
+        Task<Permission> AddPermission(Permission permission);
+        Task<Permission> UpdatePermission(Permission permission);
+        Task<Permission> DeletePermission(Guid permissionId);
     }
 }

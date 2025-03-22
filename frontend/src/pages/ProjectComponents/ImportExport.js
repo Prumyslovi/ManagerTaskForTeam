@@ -11,9 +11,7 @@ const ImportExport = ({ data, setData, projectId, type = "kanban" }) => {
             "Статус",
             "Дата начала",
             "Дата окончания",
-            "Ответственный",
-            "Прогресс",
-            "Зависимости"
+            "Ответственный"
         ];
         worksheetData.push(headers);
 
@@ -25,19 +23,15 @@ const ImportExport = ({ data, setData, projectId, type = "kanban" }) => {
                         card.title || "",
                         card.description || "",
                         lane.title || "",
-                        "", // Дата начала не используется в Kanban
-                        card.endDate || "",
-                        card.assignee || "",
-                        "", // Прогресс не используется в Kanban
-                        ""  // Зависимости не используются в Kanban
+                        formatDate(card.startDate) || "",
+                        formatDate(card.endDate) || "",
+                        card.assignee || ""
                     ]);
                 });
             });
         } else if (type === "gantt") {
             const tasks = data.tasks || [];
-            const links = data.links || [];
             tasks.forEach(task => {
-                const taskLinks = links.filter(link => link.source === task.id).map(link => link.target).join(", ") || "";
                 worksheetData.push([
                     task.id || "",
                     task.text || "",
@@ -45,9 +39,7 @@ const ImportExport = ({ data, setData, projectId, type = "kanban" }) => {
                     task.status || "",
                     formatDate(task.start) || "",
                     formatDate(task.end) || "",
-                    task.memberId || "",
-                    task.progress !== undefined ? `${(task.progress * 100).toFixed(2)}%` : "",
-                    taskLinks
+                    task.memberId || ""
                 ]);
             });
         }
@@ -94,7 +86,8 @@ const ImportExport = ({ data, setData, projectId, type = "kanban" }) => {
                         id: item["ID"] || `Card${Date.now()}`,
                         title: item["Название"] || "",
                         description: item["Описание"] || "",
-                        endDate: item["Дата окончания"] || "",
+                        startDate: parseDate(item["Дата начала"]) || new Date().toISOString(),
+                        endDate: parseDate(item["Дата окончания"]) || new Date().toISOString(),
                         assignee: item["Ответственный"] || ""
                     });
                 });
@@ -109,26 +102,9 @@ const ImportExport = ({ data, setData, projectId, type = "kanban" }) => {
                     endDate: parseDate(item["Дата окончания"]) || new Date().toISOString(),
                     status: item["Статус"] || "",
                     memberId: item["Ответственный"] || "",
-                    isDeleted: false,
-                    progress: item["Прогресс"] ? parseFloat(item["Прогресс"].replace("%", "")) / 100 : 0
+                    isDeleted: false
                 }));
-                const links = [];
-                importedData.forEach(item => {
-                    if (item["Зависимости"]) {
-                        const deps = item["Зависимости"].split(",").map(dep => dep.trim());
-                        deps.forEach(dep => {
-                            if (tasks.some(task => task.id === dep)) {
-                                links.push({
-                                    id: `${item["ID"]}_${dep}`,
-                                    source: item["ID"],
-                                    target: dep,
-                                    type: "e2e"
-                                });
-                            }
-                        });
-                    }
-                });
-                setData({ tasks, links });
+                setData({ tasks, links: [] });
             }
         };
         reader.readAsBinaryString(file);

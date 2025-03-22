@@ -10,6 +10,8 @@ namespace CarnetDeTaches.Model
         {
         }
         public DbSet<ActivityLog> ActivityLogs { get; set; }
+        public DbSet<Document> Documents { get; set; }
+        public DbSet<DocumentChange> DocumentChanges { get; set; }
         public DbSet<Member> Members { get; set; }
         public DbSet<MemberRole> MemberRoles { get; set; }
         public DbSet<Team> Teams { get; set; }

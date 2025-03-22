@@ -1,6 +1,4 @@
 import React, { useState } from 'react';
-import { useDispatch } from 'react-redux';
-import { setFirstName, setLastName, toggleVisibility } from '../../services/actions';
 import { addMember } from '../../services/api';
 import { v4 as uuidv4 } from 'uuid';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
@@ -9,13 +7,11 @@ import '../styles/AuthButtons.css';
 import '../styles/PasswordToggle.css';
 import '../styles/Spinner.css';
 
-const RegistrationForm = ({ visible, onLogin }) => {
+const RegistrationForm = ({ visible, onVisibilityChange, onLogin }) => {
     const [error, setError] = useState(null);
     const [success, setSuccess] = useState(null);
     const [loading, setLoading] = useState(false);
     
-    const dispatch = useDispatch();
-
     const [formData, setFormData] = useState({
         firstName: '',
         lastName: '',
@@ -78,14 +74,9 @@ const RegistrationForm = ({ visible, onLogin }) => {
             await addMember(memberData);
 
             setSuccess('Регистрация прошла успешно!');
-            
-            dispatch(setFirstName(formData.firstName));
-            dispatch(setLastName(formData.lastName));
-            
-            dispatch(toggleVisibility('isVisibleRegistrationForm'));
-
             clearForm();
-            onLogin();
+            onLogin(memberData.MemberId);
+            onVisibilityChange(false);
         } catch (err) {
             setError('Ошибка при регистрации. Пожалуйста, попробуйте снова.');
             console.error(err);
@@ -112,8 +103,12 @@ const RegistrationForm = ({ visible, onLogin }) => {
         <div className='modalRegForm'>
             <form className='modalContent' onSubmit={handleSubmit}>
                 <h2 align='center'>Регистрация</h2>
-                <button className="exitButton" type="button" onClick={() => dispatch(toggleVisibility('isVisibleRegistrationForm'))}>
-                    &times;
+                <button 
+                    className="exitButton" 
+                    type="button" 
+                    onClick={() => onVisibilityChange(false)}
+                >
+                    ×
                 </button>
                 {error && <p className="restricted-content">{error}</p>}
                 {success && <p className="success">{success}</p>}

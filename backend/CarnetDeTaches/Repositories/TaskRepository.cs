@@ -60,7 +60,7 @@ namespace CarnetDeTaches.Repositories
         public IEnumerable<CarnetDeTaches.Model.Task> GetTasksByProjectId(Guid projectId)
         {
             return _context.Tasks
-                .Where(t => t.ProjectId == projectId && !t.IsDeleted)  // Задачи, не удаленные
+                .Where(t => t.ProjectId == projectId && !t.IsDeleted)
                 .ToList();
         }
 

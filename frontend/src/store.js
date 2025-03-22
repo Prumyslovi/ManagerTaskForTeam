@@ -7,6 +7,10 @@ const initialState = {
     isLoading: false,
     errorMessage: '',
     showPassword: false,
+    success: null,
+    loading: false,
+    error: null,
+    showPasswordReplay: false,
   },
   content: {
     activeContent: 'home',
@@ -21,11 +25,19 @@ const authReducer = (state = initialState.auth, action) => {
     case 'LOGOUT':
       return { ...state, isLoggedIn: false, memberId: null };
     case 'SET_LOADING':
-      return { ...state, isLoading: action.payload };
+      return { ...state, loading: action.payload };
     case 'SET_ERROR':
-      return { ...state, errorMessage: action.payload };
+      return { ...state, error: action.payload };
+    case 'SET_SUCCESS':
+      return { ...state, success: action.payload };
     case 'TOGGLE_PASSWORD':
       return { ...state, showPassword: !state.showPassword };
+    case 'TOGGLE_PASSWORD_REPLAY':
+      return { ...state, showPasswordReplay: !state.showPasswordReplay };
+    case 'SET_SHOW_PASSWORD':
+      return { ...state, showPassword: action.payload };
+    case 'SET_SHOW_PASSWORD_REPLAY':
+      return { ...state, showPasswordReplay: action.payload };
     default:
       return state;
   }

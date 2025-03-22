@@ -70,7 +70,11 @@ const KanbanBoard = ({ projectId, setData, teamId }) => {
             };
 
             const createdTask = await createTask(taskData);
-            const newTaskWithId = { ...newTask, id: createdTask.taskId };
+            const newTaskWithId = { 
+                ...newTask, 
+                id: createdTask.taskId, 
+                startDate: taskData.startDate 
+            };
 
             setBoardData((prevData) => {
                 const updatedLane = { ...prevData.lanes['lane-planned'] };
@@ -154,6 +158,7 @@ const KanbanBoard = ({ projectId, setData, teamId }) => {
                         id: task.taskId,
                         title: task.taskName,
                         description: task.description,
+                        startDate: task.startDate, // Добавляем startDate
                         endDate: task.endDate,
                         assignee: task.memberId,
                         status: task.status
