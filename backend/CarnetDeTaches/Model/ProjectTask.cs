@@ -8,10 +8,14 @@ namespace CarnetDeTaches.Model
         [Column("ProjectTaskId")]
         public Guid ProjectTaskId { get; set; }
         [Column("ProjectId")]
-        public string ProjectId { get; set; }
+        [ForeignKey("Project")]
+        public Guid ProjectId { get; set; }
         [Column("TaskId")]
+        [ForeignKey("Team")]
         public Guid TaskId { get; set; }
         [Column("IsDeleted")]
         public Boolean IsDeleted { get; set; }
+        public Team Team { get; set; }
+        public Project Project { get; set; }
     }
 }

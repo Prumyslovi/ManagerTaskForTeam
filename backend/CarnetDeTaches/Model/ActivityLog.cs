@@ -9,9 +9,11 @@ namespace CarnetDeTaches.Model
         public Guid ActivityLogId { get; set; }
 
         [Column("TaskId")]
+        [ForeignKey("Task")]
         public Guid TaskId { get; set; }
 
         [Column("MemberId")]
+        [ForeignKey("Member")]
         public Guid MemberId { get; set; }
 
         [Column("ActionType")]
@@ -22,5 +24,7 @@ namespace CarnetDeTaches.Model
 
         [Column("IsDeleted")]
         public bool IsDeleted { get; set; }
+        public Task Task { get; set; }
+        public Member Member { get; set; }
     }
 }

@@ -9,9 +9,13 @@ namespace CarnetDeTaches.Hubs
             await Clients.OthersInGroup(documentId.ToString()).SendAsync("ReceiveUpdate", documentId, content, memberId);
         }
 
-        public async Task JoinDocument(Guid documentId)
+        public async Task JoinDocument(string documentId)
         {
-            await Groups.AddToGroupAsync(Context.ConnectionId, documentId.ToString());
+            if (string.IsNullOrEmpty(documentId))
+            {
+                throw new HubException("Document ID cannot be null or empty.");
+            }
+            await Groups.AddToGroupAsync(Context.ConnectionId, documentId);
         }
 
         public async Task LeaveDocument(Guid documentId)

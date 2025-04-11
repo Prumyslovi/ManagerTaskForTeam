@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { fetchUserTeams, fetchTeamMembers } from '../../services/api';
+import { fetchTeamMembers, fetchUserTeams } from '../../services/teamApi';
+import { FaSpinner } from 'react-icons/fa';
 import '../styles/TableStyle.css';
+import '../styles/Spinner.css';
 import DocumentList from '../Documents/DocumentList';
 
 const TeamList = () => {
@@ -63,7 +65,7 @@ const TeamList = () => {
     return [...members].sort((a, b) => (rolePriority[a.role] || 5) - (rolePriority[b.role] || 5));
   };
 
-  if (loading) return <p>Загрузка...</p>;
+  if (loading) return <div><FaSpinner className="spinner" /></div>;
   if (error) return <p className="error">{error}</p>;
 
   return (

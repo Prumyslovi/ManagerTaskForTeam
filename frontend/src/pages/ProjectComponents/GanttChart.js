@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef, useMemo } from "react";
-import { fetchTasks, updateTask } from "../../services/api";
+import { fetchTasksForProject, updateTask } from "../../services/taskApi";
 import { Gantt, Willow } from "wx-react-gantt";
 import "wx-react-gantt/dist/gantt.css";
 import "../styles/GanttChart.css";
@@ -71,7 +71,7 @@ const GanttChart = ({ projectId, teamId, currentUserId }) => {
     const loadData = async () => {
         try {
             setIsLoading(true);
-            const tasksData = await fetchTasks(projectId);
+            const tasksData = await fetchTasksForProject(projectId);
             const formattedTasks = tasksData.map(task => {
                 const start = task.startDate ? new Date(task.startDate) : new Date();
                 const end = task.endDate ? new Date(task.endDate) : new Date(start.getTime() + 86400000);

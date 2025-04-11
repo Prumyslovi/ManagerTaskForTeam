@@ -1,16 +1,13 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { fetchDocumentContent, updateDocument } from '../../services/api';
-import { HubConnectionBuilder } from '@microsoft/signalr';
+import { fetchDocumentContent, updateDocument } from '../../services/documentApi';
+import { HubConnectionBuilder, HubConnectionState } from '@microsoft/signalr';
 import Toolbar from './Toolbar';
 import './DocumentStyle.css';
 import '../styles/Message.css';
 import '../styles/Spinner.css';
-import { FaSpinner, FaTimes } from 'react-icons/fa';
+import { FaSpinner } from 'react-icons/fa';
 
-const DocumentEditor = () => {
-  const { teamId, documentId } = useParams();
-  const navigate = useNavigate();
+const DocumentEditor = ({ teamId, documentId, onClose }) => {
   const [content, setContent] = useState('');
   const [title, setTitle] = useState('');
   const [fontFamily, setFontFamily] = useState('Arial');
@@ -35,9 +32,13 @@ const DocumentEditor = () => {
       try {
         await connection.start();
         console.log('Connected to SignalR');
-        await connection.invoke('JoinDocument', documentId);
+        if (connection.state === HubConnectionState.Connected) {
+          await connection.invoke('JoinDocument', documentId);
+        } else {
+          console.error('Cannot invoke JoinDocument: Connection is not in Connected state');
+        }
       } catch (err) {
-        console.error('SignalR Connection Error: ', err);
+        console.error('SignalR Connection Error:', err);
       }
     };
 
@@ -45,19 +46,24 @@ const DocumentEditor = () => {
     startConnection();
 
     if (documentId) {
+      console.log('Загрузка содержимого документа с ID:', documentId);
       fetchDocumentContent(documentId)
         .then((data) => {
-          setContent(data.content);
+          console.log('Полученные данные документа:', data);
+          setContent(data.content || '');
           setTitle(data.title || '');
           if (editorRef.current) {
-            editorRef.current.innerHTML = data.content;
+            editorRef.current.innerHTML = data.content || '';
           }
         })
         .catch((err) => {
-          setMessage({ type: 'error', text: 'Ошибка при загрузке документа.' });
-          console.error(err);
+          console.error('Детали ошибки при загрузке документа:', err.response || err);
+          setMessage({ type: 'error', text: `Ошибка при загрузке документа: ${err.response?.status || 'Неизвестная ошибка'}. Проверьте ID документа или сервер.` });
         })
         .finally(() => setIsLoading(false));
+    } else {
+      setMessage({ type: 'error', text: 'ID документа не указан.' });
+      setIsLoading(false);
     }
 
     const updateToolbar = () => {
@@ -78,9 +84,11 @@ const DocumentEditor = () => {
     return () => {
       document.removeEventListener('selectionchange', updateToolbar);
       if (connectionRef.current) {
-        connectionRef.current.invoke('LeaveDocument', documentId)
-          .catch((err) => console.error('Error leaving document:', err))
-          .finally(() => connectionRef.current.stop());
+        if (connectionRef.current.state === HubConnectionState.Connected) {
+          connectionRef.current.invoke('LeaveDocument', documentId)
+            .catch((err) => console.error('Error leaving document:', err));
+        }
+        connectionRef.current.stop();
       }
     };
   }, [documentId]);
@@ -96,20 +104,16 @@ const DocumentEditor = () => {
     updateDocument(documentId, payload)
       .then(() => {
         setMessage({ type: 'success', text: 'Документ успешно обновлен!' });
-        if (connectionRef.current && connectionRef.current.state === 'Connected') {
+        if (connectionRef.current && connectionRef.current.state === HubConnectionState.Connected) {
           connectionRef.current.invoke('ReceiveUpdate', documentId, payload.content, payload.memberId);
         }
-        setTimeout(() => navigate('/'), 1500); // Возвращаемся на главную
+        setTimeout(() => onClose(), 1500);
       })
       .catch((err) => {
         setMessage({ type: 'error', text: 'Ошибка при обновлении документа.' });
-        console.error(err);
+        console.error('Ошибка при обновлении документа:', err);
       })
       .finally(() => setIsLoading(false));
-  };
-
-  const handleExitWithoutSaving = () => {
-    navigate('/'); // Возвращаемся на главную
   };
 
   const applyStyle = (style, value) => {
@@ -194,8 +198,8 @@ const DocumentEditor = () => {
           {message.text}
         </div>
       )}
-      <button onClick={handleExitWithoutSaving} className="exit-button">
-        <FaTimes />
+      <button onClick={onClose} className="exit-button">
+        ✕
       </button>
       <div className="toolbar-wrapper">
         <Toolbar

@@ -3,7 +3,8 @@ import { FaSpinner } from 'react-icons/fa';
 import '../styles/Modal.css';
 import '../styles/Message.css';
 import '../styles/Spinner.css';
-import { fetchTeamMembers, createTask } from '../../services/api';
+import { fetchTeamMembers } from '../../services/teamApi';
+import { createTask } from '../../services/taskApi';
 
 const AddTaskModal = ({ visible, onVisibilityChange, onTaskAdd, teamId, projectId }) => {
   const [isLoading, setIsLoading] = useState(false);

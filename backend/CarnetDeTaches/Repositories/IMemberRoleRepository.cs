@@ -1,6 +1,7 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using CarnetDeTaches.Model;
+﻿using CarnetDeTaches.Model;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace CarnetDeTaches.Repositories
 {
@@ -9,12 +10,12 @@ namespace CarnetDeTaches.Repositories
         IEnumerable<MemberRole> GetAllMemberRoles();
         MemberRole GetMemberRole(Guid memberRoleId);
         MemberRole AddMemberRole(MemberRole memberRole);
-        public MemberRole UpdateMemberRole(Guid teamId, Guid memberId, Guid roleId);
-        public bool DeleteMember(Guid teamId, Guid memberId);
+        MemberRole UpdateMemberRole(Guid teamId, Guid memberId, Guid roleId);
+        bool DeleteMember(Guid teamId, Guid memberId);
         Task<List<Team>> GetUserTeamsAsync(Guid memberId);
         Task<List<MemberWithRoleDto>> GetUsersWithRolesAsync(Guid teamId);
-        public Guid GetRoleIdByName(string roleName);
-        public MemberRole RemoveMember(Guid teamId, Guid memberId);
-        public bool RemoveAllTeamMembers(Guid teamId);
+        Guid GetRoleIdByName(string roleName);
+        Task<bool> UpdateMemberRoleAsync(Guid teamId, Guid memberId, Guid newRoleId, Guid updaterId);
+        Task<bool> SoftDeleteMemberAsync(Guid teamId, Guid memberId, Guid removerId);
     }
 }

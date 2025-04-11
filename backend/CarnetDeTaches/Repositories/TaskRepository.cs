@@ -63,12 +63,6 @@ namespace CarnetDeTaches.Repositories
                 .Where(t => t.ProjectId == projectId && !t.IsDeleted)
                 .ToList();
         }
-
-        public CarnetDeTaches.Model.Task GetTaskById(Guid taskId)
-        {
-            return _context.Tasks
-                .FirstOrDefault(t => t.TaskId == taskId && !t.IsDeleted);
-        }
     }
 
 }

@@ -1,6 +1,7 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using CarnetDeTaches.Model;
+﻿using CarnetDeTaches.Model;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace CarnetDeTaches.Repositories
 {
@@ -12,12 +13,10 @@ namespace CarnetDeTaches.Repositories
         Team UpdateTeam(Team team);
         Team DeleteTeam(Guid teamId);
         Task<List<MemberWithRole>> GetTeamMembersAsync(Guid teamId);
-        Task<bool> UpdateMemberRoleAsync(Guid teamId, Guid memberId, Guid newRoleId, Guid updaterId);
-        Task<bool> SoftDeleteMemberAsync(Guid teamId, Guid memberId, Guid removerId);
-        public Team GetTeamByInviteCode(string inviteCode);
-        public bool IsUserAlreadyInTeam(Guid teamId, Guid userId);
-        public void AddMemberToTeam(Guid teamId, Guid userId);
-
-
+        Task<List<Team>> GetUserTeamsAsync(Guid memberId);
+        bool RemoveAllTeamMembers(Guid teamId);
+        Team GetTeamByInviteCode(string inviteCode);
+        bool IsUserAlreadyInTeam(Guid teamId, Guid memberId);
+        void AddMemberToTeam(Guid teamId, Guid memberId);
     }
 }

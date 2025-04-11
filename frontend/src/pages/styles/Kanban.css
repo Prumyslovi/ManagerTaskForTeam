@@ -1,7 +1,7 @@
 .kanban-board {
     display: flex;
-    gap: 20px;
-    padding: 20px;
+    gap: 15px;
+    padding: 15px;
     background-color: #ffffff;
 }
 
@@ -9,93 +9,138 @@
     background-color: #F8F8FF;
     border: 1px solid #1D334A;
     border-radius: 8px;
-    padding: 15px;
-    width: 300px;
+    padding: 10px;
+    width: 280px;
     min-height: 200px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-  }
-  
-  .lane button {
-    margin-left: auto;
-    margin-right: auto;
-  }
-  
-  .lane h3 {
-    margin-top: 0;
-    font-size: 20px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.lane h3 {
+    margin: 0 0 10px;
+    font-size: 16px;
     color: #1D334A;
-    text-align: center;
-    border-bottom: 2px solid #1D334A;
-    padding-bottom: 5px;
-  }
+    text-align: left;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #1D334A;
+}
 
 .card {
-    background-color: white;
+    background-color: #ffffff;
     border: 1px solid #1D334A;
     border-radius: 4px;
     padding: 10px;
-    margin-bottom: 10px;
-    box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.1);
-    font-size: 16px;
+    margin-bottom: 8px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+    font-size: 14px;
     color: #333;
     cursor: pointer;
+    position: relative;
 }
 
-.card:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+.card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
 }
 
 .card h4 {
-    font-size: 18px;
-    color: #1D334A;
-    margin: 0 0 7px;
-    font-weight: bold;
-}
-
-.card h5 {
-    font-size: 18px;
-    color: #000000;
-    margin: 0 0 3px;
-    font-weight: normal;
-}
-
-.card h5:first-of-type {
-    font-weight: bold;
-    color: #1D334A;
-}
-
-.card span {
-    font-size: 16px;
+    font-size: 15px;
     color: #1D334A;
     margin: 0 0 5px;
-    font-weight: bold;
+    font-weight: 600;
+    flex-grow: 1;
 }
 
-.card:hover,
-.lane:hover {
+.card p {
+    font-size: 13px;
+    color: #000000;
+    margin: 5px 0;
+    line-height: 1.4;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+.card:hover {
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
     transform: scale(1.02);
-    transition: all 0.3s ease;
 }
 
-.add-task-button {
+.card .priority-tag {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 12px;
+    margin-top: 5px;
+}
+
+.kanban-actions {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 10px;
     width: 100%;
+}
+
+.add-task-button,
+.add-column-button,
+.import-export-button {
+    flex: 1;
     font-size: 14px;
     background-color: #ffffff;
     color: #000000;
-    border: 2px solid #1D334A;
+    border: 2px solid #1d334a;
     border-radius: 8px;
-    padding: 10px 15px;
+    padding: 8px 12px;
     cursor: pointer;
-    font-size: 16px;
-    margin: 10px 0;
-    transition: background-color 0.3s ease, transform 0.3s ease;
-    display: flex;
-    justify-content: center;
+    transition: background-color 0.3s ease;
 }
 
-.add-task-button:hover {
+.filter-button {
+    font-size: 14px;
+    background-color: #ffffff;
+    color: #000000;
+    border: 2px solid #1d334a;
+    border-radius: 8px;
+    padding: 8px 12px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    position: relative;
+}
+
+.add-task-button:hover,
+.add-column-button:hover,
+.import-export-button:hover,
+.filter-button:hover {
     background-color: #000000;
     color: #ffffff;
+}
+
+.filter-modal {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background-color: #F8F8FF;
+    border: 1px solid #1D334A;
+    border-radius: 8px;
+    padding: 15px;
+    z-index: 1000;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    width: 250px;
+}
+
+.filter-modal select {
+    display: block;
+    margin-bottom: 10px;
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #1D334A;
+    border-radius: 4px;
+    background-color: #ffffff;
+    color: #333;
+    font-size: 14px;
+}
+
+.filter-modal select:focus {
+    outline: none;
+    border-color: #000000;
 }

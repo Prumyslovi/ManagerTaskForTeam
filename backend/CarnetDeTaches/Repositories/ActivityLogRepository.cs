@@ -19,13 +19,19 @@ namespace CarnetDeTaches.Repositories
         public IEnumerable<ActivityLog> GetAllActivityLogs()
         {
             Console.WriteLine("Получаем все записи активности.");
-            return _context.ActivityLogs.Where(a => !a.IsDeleted).ToList();
+            return _context.ActivityLogs
+                .Include(a => a.Member)
+                .Include(a => a.Task)
+                .Where(a => !a.IsDeleted).ToList();
         }
 
         public async Task<ActivityLog> GetActivityLog(Guid activityLogId)
         {
             Console.WriteLine($"Ищем запись активности с ID: {activityLogId}");
-            var activityLog = await _context.ActivityLogs.FirstOrDefaultAsync(a => a.ActivityLogId == activityLogId && !a.IsDeleted);
+            var activityLog = await _context.ActivityLogs
+                .Include(a => a.Member)
+                .Include(a => a.Task)
+                .FirstOrDefaultAsync(a => a.ActivityLogId == activityLogId && !a.IsDeleted);
 
             if (activityLog == null)
             {

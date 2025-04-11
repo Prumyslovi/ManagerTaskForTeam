@@ -22,8 +22,7 @@ namespace CarnetDeTaches.Controllers
         [HttpGet("GetAllDocuments/{teamId}")]
         public ActionResult GetAllDocuments(Guid teamId)
         {
-            var documents = _documentRepository.GetAllDocuments(teamId)
-                .Select(d => new { d.DocumentId, d.Title, d.CreatedAt, d.UpdatedAt });
+            var documents = _documentRepository.GetAllDocuments(teamId);
             return Ok(documents);
         }
 
@@ -40,7 +39,7 @@ namespace CarnetDeTaches.Controllers
         {
             if (dto.CreatedBy == Guid.Empty)
             {
-                return BadRequest("CreatedBy cannot be empty.");
+                return BadRequest("CreatedBy не может быть пустым");
             }
 
             var document = new Document

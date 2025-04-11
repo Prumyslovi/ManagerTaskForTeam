@@ -23,6 +23,7 @@ namespace CarnetDeTaches.Model
         public DbSet<Task> Tasks { get; set; }
         public DbSet<Comment> Comments { get; set; }
         public DbSet<TaskDependency> TaskDependencies { get; set; }
+        public DbSet<Status> Statuses { get; set; }
 
     }
 }

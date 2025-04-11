@@ -1,23 +1,27 @@
-﻿using CarnetDeTaches.Model;
-using CarnetDeTaches.Repositories;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using CarnetDeTaches.Model;
+using CarnetDeTaches.Repositories;
 
 namespace CarnetDeTaches.Controllers
 {
-    public class RoleController : Controller
+    [Route("api/[controller]")]
+    [ApiController]
+    [Authorize(Roles = "Admin")]
+    public class RoleController : ControllerBase
     {
         private readonly IRoleRepository _roleRepository;
 
-        public RoleController([FromServices] IRoleRepository roleRepository)
+        public RoleController(IRoleRepository roleRepository)
         {
             _roleRepository = roleRepository;
         }
 
         [HttpGet("GetAllRoles")]
-        public ActionResult<Role> GetAllRoles()
+        public ActionResult<IEnumerable<Role>> GetAllRoles()
         {
-            var role = _roleRepository.GetAllRoles();
-            return Ok(role);
+            var roles = _roleRepository.GetAllRoles();
+            return Ok(roles);
         }
 
         [HttpGet("GetRole/{id}")]
@@ -26,7 +30,6 @@ namespace CarnetDeTaches.Controllers
             var role = _roleRepository.GetRole(id);
             if (role == null)
                 return NotFound();
-
             return Ok(role);
         }
 
@@ -38,7 +41,7 @@ namespace CarnetDeTaches.Controllers
         }
 
         [HttpPut("UpdateRole/{id}")]
-        public ActionResult<Role> UpdateRole([FromRoute] Guid id, [FromBody] Role role)
+        public ActionResult UpdateRole([FromRoute] Guid id, [FromBody] Role role)
         {
             if (id != role.RoleId)
                 return BadRequest();
@@ -53,7 +56,6 @@ namespace CarnetDeTaches.Controllers
             var role = _roleRepository.DeleteRole(id);
             if (role == null)
                 return NotFound();
-
             return Ok(role);
         }
     }

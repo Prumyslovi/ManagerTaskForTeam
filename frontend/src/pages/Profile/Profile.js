@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { fetchProfile, updateProfile } from '../../services/api';
+import { fetchProfile, updateProfile } from '../../services/memberApi';
 import DelProfileForm from './DelProfileForm';
 import ChangePasswordModal from './ChangePasswordModal'; // Подключаем новый компонент
 import '../styles/Navbar.css';

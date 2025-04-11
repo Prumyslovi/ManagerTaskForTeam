@@ -8,10 +8,12 @@ namespace CarnetDeTaches.Model
         [Column("CommentId")]
         public Guid CommentId { get; set; }
 
-        [Column("ProjectId")]
+        [Column("TaskId")]
+        [ForeignKey("Task")]
         public Guid TaskId { get; set; }
 
         [Column("MemberId")]
+        [ForeignKey("Member")]
         public Guid MemberId { get; set; }
 
         [Column("CommentText")]
@@ -22,5 +24,8 @@ namespace CarnetDeTaches.Model
 
         [Column("IsDeleted")]
         public bool IsDeleted { get; set; }
+
+        public Member Member { get; set; }
+        public Task Task { get; set; }
     }
 }

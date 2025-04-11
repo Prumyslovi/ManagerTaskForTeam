@@ -16,8 +16,10 @@ namespace CarnetDeTaches.Model
         [Column("CreatedAt")]
         public DateTime CreatedAt { get; set; }
         [Column("CreatorId")]
+        [ForeignKey("Member")]
         public Guid CreatorId { get; set; }
         [Column("IsDeleted")]
         public bool IsDeleted { get; set; }
+        public Member Member { get; set; }
     }
 }

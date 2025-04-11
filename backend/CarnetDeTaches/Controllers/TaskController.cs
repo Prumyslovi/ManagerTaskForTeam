@@ -1,138 +1,108 @@
-﻿using CarnetDeTaches.Model;
-using CarnetDeTaches.Repositories;
-using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using System.Threading.Tasks;
+using CarnetDeTaches.Model;
+using CarnetDeTaches.Repositories;
+using System;
+using System.Collections.Generic;
+using Task = CarnetDeTaches.Model.Task;
 
 namespace CarnetDeTaches.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class TeamController : ControllerBase
+    [Authorize]
+    public class TaskController : ControllerBase
     {
+        private readonly ITaskRepository _taskRepository;
         private readonly ITeamRepository _teamRepository;
 
-        public TeamController([FromServices] ITeamRepository teamRepository)
+        public TaskController(ITaskRepository taskRepository, ITeamRepository teamRepository)
         {
+            _taskRepository = taskRepository;
             _teamRepository = teamRepository;
         }
 
-        [HttpGet("GetAllTeam")]
-        public ActionResult<Team> GetAllTeams()
+        [HttpGet("GetAllTasks")]
+        public ActionResult<IEnumerable<Task>> GetAllTasks()
         {
-            var team = _teamRepository.GetAllTeams();
-            return Ok(team);
+            if (!User.HasClaim(c => c.Type == "Permission" && c.Value.EndsWith("9FB97F5A-B4C9-4F30-93B9-D268F8F1DABC")))
+                return Forbid();
+
+            var tasks = _taskRepository.GetAllTasks();
+            return Ok(tasks);
         }
 
-        [HttpGet("GetTeam/{id}")]
-        public ActionResult<Team> GetTeam([FromRoute] Guid id)
+        [HttpGet("GetTask/{id}")]
+        public ActionResult<Task> GetTask([FromRoute] Guid id)
         {
-            var team = _teamRepository.GetTeam(id);
-            if (team == null)
+            var task = _taskRepository.GetTask(id);
+            if (task == null)
                 return NotFound();
 
-            return Ok(team);
+            var memberId = Guid.Parse(User.FindFirst("MemberId")?.Value);
+            if (task.MemberId != memberId && !HasTeamPermission(task.Project.TeamId, "C0B68CB5-49B2-427B-9C24-403529596B5D"))
+                return Forbid();
+
+            return Ok(task);
         }
 
-        [HttpPost("AddTeam")]
-        public ActionResult<Team> AddTeam([FromBody] Team team)
+        [HttpPost("AddTask")]
+        public ActionResult<Task> AddTask([FromBody] Task task)
         {
-            var createdProject = _teamRepository.AddTeam(team);
-            return CreatedAtAction(nameof(GetTeam), new { id = createdProject.TeamId }, createdProject);
+            var memberId = Guid.Parse(User.FindFirst("MemberId")?.Value);
+            if (!HasTeamPermission(task.Project.TeamId, "E1326EA5-E475-42BC-8631-BAD21AC4956D"))
+                return Forbid();
+
+            task.MemberId = memberId;
+            var createdTask = _taskRepository.AddTask(task);
+            return CreatedAtAction(nameof(GetTask), new { id = createdTask.TaskId }, createdTask);
         }
 
-        [HttpPut("UpdateTeam/{id}")]
-        public ActionResult<Team> UpdateTeam([FromRoute] Guid id, [FromBody] Team team)
+        [HttpPut("UpdateTask/{id}")]
+        public ActionResult UpdateTask([FromRoute] Guid id, [FromBody] Task task)
         {
-            if (id != team.TeamId)
+            if (id != task.TaskId)
                 return BadRequest();
 
-            _teamRepository.UpdateTeam(team);
+            var existingTask = _taskRepository.GetTask(id);
+            if (existingTask == null)
+                return NotFound();
+
+            if (!HasTeamPermission(existingTask.Project.TeamId, "D9F09821-11A1-4C90-915C-62D4F9E92629"))
+                return Forbid();
+
+            _taskRepository.UpdateTask(task);
             return NoContent();
         }
 
-        [HttpDelete("DeleteTeam/{id}")]
-        public ActionResult<Team> DeleteTeam([FromRoute] Guid id)
+        [HttpDelete("DeleteTask/{id}")]
+        public ActionResult<Task> DeleteTask([FromRoute] Guid id)
         {
-            var team = _teamRepository.DeleteTeam(id);
-            if (team == null)
+            var task = _taskRepository.GetTask(id);
+            if (task == null)
                 return NotFound();
 
-            return Ok(team);
-        }
-        [HttpGet("GetTeamMembers/{teamId}")]
-        public async Task<IActionResult> GetTeamMembers(Guid teamId)
-        {
-            try
-            {
-                var members = await _teamRepository.GetTeamMembersAsync(teamId);
-                if (members == null || !members.Any())
-                {
-                    return NotFound("Участники не найдены.");
-                }
+            if (!HasTeamPermission(task.Project.TeamId, "ABBE599F-E991-4471-A8A0-C40A57BCDBC7"))
+                return Forbid();
 
-                return Ok(members);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, "Ошибка при получении участников: " + ex.Message);
-            }
+            var deletedTask = _taskRepository.DeleteTask(id);
+            return Ok(deletedTask);
         }
 
-        [HttpPut("UpdateMemberRole")]
-        public async Task<IActionResult> UpdateMemberRole(Guid teamId, Guid memberId, Guid roleId, Guid updaterId)
+        [HttpGet("GetTasksForProject/{projectId}")]
+        public ActionResult<IEnumerable<Task>> GetTasksForProject(Guid projectId)
         {
-            try
-            {
-                var success = await _teamRepository.UpdateMemberRoleAsync(teamId, memberId, roleId, updaterId);
-                if (!success)
-                    return NotFound("Участник или роль не найдены.");
+            var tasks = _taskRepository.GetTasksByProjectId(projectId);
+            var memberId = Guid.Parse(User.FindFirst("MemberId")?.Value);
+            if (!tasks.Any(t => t.MemberId == memberId) && !HasTeamPermission(tasks.First().Project.TeamId, "C0B68CB5-49B2-427B-9C24-403529596B5D"))
+                return Forbid();
 
-                return NoContent();
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, "Ошибка при обновлении роли участника: " + ex.Message);
-            }
+            return Ok(tasks);
         }
 
-        [HttpDelete("SoftDeleteMember")]
-        public async Task<IActionResult> SoftDeleteMember(Guid teamId, Guid memberId, Guid removerId)
+        private bool HasTeamPermission(Guid teamId, string permissionId)
         {
-            try
-            {
-                var success = await _teamRepository.SoftDeleteMemberAsync(teamId, memberId, removerId);
-                if (!success)
-                    return NotFound("Участник не найден или у вас недостаточно прав.");
-
-                return NoContent();
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, "Ошибка при удалении участника: " + ex.Message);
-            }
-        }
-
-        [HttpPost("JoinTeam")]
-        public ActionResult JoinTeam([FromBody] JoinTeamRequest request)
-        {
-            var team = _teamRepository.GetTeamByInviteCode(request.InviteCode);
-            if (team == null)
-            {
-                return NotFound(new { message = "Команда с таким кодом не найдена." });
-            }
-
-            Guid memberId = new Guid(request.UserId.ToString());
-            if (_teamRepository.IsUserAlreadyInTeam(team.TeamId, memberId))
-            {
-                return BadRequest(new { message = "Вы уже состоите в этой команде." });
-            }
-
-            // Добавление пользователя в команду
-            _teamRepository.AddMemberToTeam(team.TeamId, memberId);
-
-            return Ok(new { success = true, teamName = team.TeamName });
+            return User.HasClaim(c => c.Type == "Permission" && c.Value == $"{teamId}:{permissionId}");
         }
     }
 }

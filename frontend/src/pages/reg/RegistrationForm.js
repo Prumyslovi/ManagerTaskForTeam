@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { addMember } from '../../services/api';
+import { addMember } from '../../services/memberApi';
 import { v4 as uuidv4 } from 'uuid';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
 import '../styles/Modal.css';

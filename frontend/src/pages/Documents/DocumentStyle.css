@@ -1,5 +1,5 @@
 * {
-  box-sizing: border-box; /* Учитываем padding и border в ширине */
+  box-sizing: border-box;
 }
 
 .editor-container {
@@ -7,10 +7,15 @@
   flex-direction: column;
   gap: 20px;
   padding: 20px;
-  width: 1000px; /* Базовая ширина */
-  max-width: 1200px; /* Максимальная ширина */
-  margin: 0 auto;
-  position: relative;
+  width: 100%;
+  min-height: 100vh;
+  background-color: #f5f5f5;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1000;
 }
 
 .toolbar-wrapper {
@@ -27,8 +32,8 @@
   border: 1px solid #1D334A;
   border-radius: 8px;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-  width: 100%; /* Растягиваем на всю ширину родителя */
-  max-width: 1200px; /* Ограничиваем максимум */
+  width: 100%;
+  max-width: 1200px;
   white-space: nowrap;
 }
 
@@ -80,12 +85,12 @@
   border-radius: 4px;
   background-color: #ffffff;
   color: #1D334A;
-  width: 100%; /* Растягиваем на всю ширину родителя */
-  max-width: 1200px; /* Ограничиваем максимум */
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
 }
 
 .editor {
-  min-height: 500px;
   padding: 15px;
   border: 1px solid #1D334A;
   border-radius: 8px;
@@ -94,8 +99,11 @@
   outline: none;
   font-size: 16px;
   color: #333;
-  width: 100%; /* Растягиваем на всю ширину родителя */
-  max-width: 1200px; /* Ограничиваем максимум */
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  flex-grow: 1;
+  overflow-y: auto;
 }
 
 .editor ul,
@@ -226,11 +234,11 @@
   font-size: 24px;
   color: #1D334A;
   cursor: pointer;
-  transition: color 0.3s ease;
+  transition: background-color 0.3s ease, color 0.3s ease;
   z-index: 1001;
 }
 
 .exit-button:hover {
-  background-color: black;
+  background-color: #1D334A;
   color: #F8F8FF;
 }

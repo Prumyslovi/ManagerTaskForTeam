@@ -47,7 +47,6 @@ namespace CarnetDeTaches.Controllers
 
             comment.IsDeleted = true;
             _commentRepository.UpdateComment(comment);
-
             return Ok(comment);
         }
     }

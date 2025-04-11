@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { updateProfile } from '../../services/api';
+import { updateProfile } from '../../services/memberApi';
 import '../styles/TypicalItems.css';
 
 const ChangePasswordModal = ({ onClose, memberId }) => {

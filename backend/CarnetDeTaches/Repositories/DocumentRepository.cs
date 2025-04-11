@@ -16,18 +16,19 @@ namespace CarnetDeTaches.Repositories
         {
             if (_context == null)
             {
-                throw new InvalidOperationException("Database context is not initialized.");
+                throw new InvalidOperationException("Контекст базы данных не инициализирован.");
             }
 
             try
             {
                 return _context.Documents
+                    .Include(d => d.CreatedByMember)
                     .Where(d => d.TeamId == teamId && !d.IsDeleted)
                     .ToList();
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error fetching documents: {ex.Message}");
+                Console.WriteLine($"Ошибка получения всех документов: {ex.Message}");
                 throw;
             }
         }
@@ -35,6 +36,7 @@ namespace CarnetDeTaches.Repositories
         public Document GetDocument(Guid documentId)
         {
             return _context.Documents
+                .Include(d => d.CreatedByMember)
                 .FirstOrDefault(d => d.DocumentId == documentId && !d.IsDeleted);
         }
 
@@ -64,6 +66,7 @@ namespace CarnetDeTaches.Repositories
         public IEnumerable<DocumentChange> GetDocumentChanges(Guid documentId)
         {
             return _context.DocumentChanges
+                .Include(d => d.Member)
                 .Where(dc => dc.DocumentId == documentId)
                 .OrderByDescending(dc => dc.ChangedAt)
                 .ToList();
@@ -72,6 +75,7 @@ namespace CarnetDeTaches.Repositories
         public DocumentChange GetDocumentChange(Guid documentChangeId)
         {
             return _context.DocumentChanges
+                .Include(d => d.Member)
                 .FirstOrDefault(dc => dc.DocumentChangeId == documentChangeId);
         }
 

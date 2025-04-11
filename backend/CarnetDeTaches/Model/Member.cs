@@ -27,5 +27,3 @@ namespace CarnetDeTaches.Model
         public bool IsDeleted { get; set; }
     }
 }
-
-

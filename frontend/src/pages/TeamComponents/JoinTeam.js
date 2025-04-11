@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { joinTeam } from '../../services/api';
+import { joinTeam } from '../../services/teamApi';
 
 const JoinTeam = () => {
   const [inviteCode, setInviteCode] = useState('');

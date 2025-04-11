@@ -1,12 +1,12 @@
 using CarnetDeTaches.Model;
 using CarnetDeTaches.Repositories;
 using CarnetDeTaches.Hubs;
+using CarnetDeTaches.Services;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using Microsoft.OpenApi.Models;
-using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 namespace CarnetDeTaches
 {
@@ -15,7 +15,6 @@ namespace CarnetDeTaches
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
-            var key = Encoding.ASCII.GetBytes("carnetdetacheskursash");
 
             builder.Services.AddAuthentication(options =>
             {
@@ -27,9 +26,12 @@ namespace CarnetDeTaches
                 options.TokenValidationParameters = new TokenValidationParameters
                 {
                     ValidateIssuerSigningKey = true,
-                    IssuerSigningKey = new SymmetricSecurityKey(key),
-                    ValidateIssuer = false,
-                    ValidateAudience = false,
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Secret"])),
+                    ValidateIssuer = true,
+                    ValidateAudience = true,
+                    ValidIssuer = builder.Configuration["Jwt:Issuer"],
+                    ValidAudience = builder.Configuration["Jwt:Audience"],
+                    ValidateLifetime = true
                 };
             });
 
@@ -50,27 +52,26 @@ namespace CarnetDeTaches
             builder.Services.AddScoped<IProjectRepository, ProjectRepository>();
             builder.Services.AddScoped<ITaskRepository, TaskRepository>();
             builder.Services.AddScoped<IDocumentRepository, DocumentRepository>();
+            builder.Services.AddScoped<IStatusRepository, StatusRepository>();
+            builder.Services.AddScoped<ITokenService, JwtService>();
 
-            // Настройка CORS
             builder.Services.AddCors(options =>
             {
                 options.AddPolicy("AllowReactApp", policy =>
                 {
-                    policy.WithOrigins("http://localhost:3000") // Разрешаем конкретный origin
+                    policy.WithOrigins("http://localhost:3000")
                           .AllowAnyHeader()
                           .AllowAnyMethod()
-                          .AllowCredentials(); // Поддержка credentials для SignalR
+                          .AllowCredentials();
                 });
             });
 
             var app = builder.Build();
 
-            // Применение политики CORS
             app.UseCors("AllowReactApp");
 
             if (app.Environment.IsDevelopment())
             {
-                app.UseDeveloperExceptionPage();
                 app.UseSwagger();
                 app.UseSwaggerUI();
             }
@@ -87,13 +88,6 @@ namespace CarnetDeTaches
 
             app.UseAuthentication();
             app.UseAuthorization();
-
-            app.UseSwagger();
-            app.UseSwaggerUI(c =>
-            {
-                c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
-                c.RoutePrefix = string.Empty;
-            });
 
             app.MapControllers();
             app.MapHub<DocumentHub>("/documentHub");

@@ -1,7 +1,9 @@
 ﻿using CarnetDeTaches.Model;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace CarnetDeTaches.Repositories
 {
@@ -16,16 +18,23 @@ namespace CarnetDeTaches.Repositories
 
         public IEnumerable<Team> GetAllTeams()
         {
-            return _context.Teams.ToList();
+            return _context.Teams
+                .Include(t => t.Member)
+                .Where(t => !t.IsDeleted)
+                .ToList();
         }
 
         public Team GetTeam(Guid teamId)
         {
-            return _context.Teams.Find(teamId);
+            return _context.Teams
+                .Include(t => t.Member)
+                .FirstOrDefault(t => t.TeamId == teamId && !t.IsDeleted);
         }
 
         public Team AddTeam(Team team)
         {
+            team.TeamId = Guid.NewGuid();
+            team.IsDeleted = false;
             _context.Teams.Add(team);
             _context.SaveChanges();
             return team;
@@ -33,141 +42,113 @@ namespace CarnetDeTaches.Repositories
 
         public Team UpdateTeam(Team team)
         {
-            _context.Teams.Update(team);
+            var existingTeam = _context.Teams.FirstOrDefault(t => t.TeamId == team.TeamId && !t.IsDeleted);
+            if (existingTeam == null)
+                throw new ArgumentException("Команда не найдена.");
+
+            existingTeam.TeamName = team.TeamName;
+            existingTeam.TeamLink = team.TeamLink;
+            existingTeam.Description = team.Description;
+            _context.Teams.Update(existingTeam);
             _context.SaveChanges();
-            return team;
+            return existingTeam;
         }
 
         public Team DeleteTeam(Guid teamId)
         {
-            var team = _context.Teams.Find(teamId);
+            var team = _context.Teams.FirstOrDefault(t => t.TeamId == teamId && !t.IsDeleted);
             if (team != null)
             {
-                _context.Teams.Remove(team);
+                team.IsDeleted = true;
                 _context.SaveChanges();
             }
             return team;
         }
+
         public async Task<List<MemberWithRole>> GetTeamMembersAsync(Guid teamId)
         {
-            var memberRoles = await _context.MemberRoles
-                .Where(mr => mr.TeamId == teamId)
-                .ToListAsync();
+            var team = _context.Teams.FirstOrDefault(t => t.TeamId == teamId && !t.IsDeleted);
+            if (team == null)
+                return new List<MemberWithRole>();
 
-            var memberIds = memberRoles.Select(mr => mr.MemberId).Distinct().ToList();
-            var roleIds = memberRoles.Select(mr => mr.RoleId).Distinct().ToList();
-
-            var members = await _context.Members
-                .Where(u => memberIds.Contains(u.MemberId))
-                .ToListAsync();
-
-            var roles = await _context.Roles
-                .Where(r => roleIds.Contains(r.RoleId))
-                .ToListAsync();
-
-            var result = memberRoles.Select(mr =>
-            {
-                var member = members.FirstOrDefault(u => u.MemberId == mr.MemberId);
-                var role = roles.FirstOrDefault(r => r.RoleId == mr.RoleId);
-
-                return new MemberWithRole
+            return await _context.MemberRoles
+                .Where(mr => mr.TeamId == teamId && !mr.IsDeleted)
+                .Include(mr => mr.Member)
+                .Include(mr => mr.Role)
+                .Select(mr => new MemberWithRole
                 {
-                    Id = member.MemberId,
-                    FirstName = member?.FirstName,
-                    LastName = member?.LastName,
-                    Role = role?.RoleName
-                };
-            }).ToList();
-
-            return result;
-        }
-        public async Task<bool> UpdateMemberRoleAsync(Guid teamId, Guid memberId, Guid newRoleId, Guid updaterId)
-        {
-            var updaterRole = await _context.MemberRoles
-                .FirstOrDefaultAsync(mr => mr.TeamId == teamId && mr.MemberId == updaterId);
-
-            if (updaterRole == null || updaterRole.RoleId.ToString() != "D1A281BC-2CB5-4A42-8274-3B03C9C8E1C4")
-            {
-                return false;
-            }
-
-            var memberRole = await _context.MemberRoles
-                .FirstOrDefaultAsync(mr => mr.TeamId == teamId && mr.MemberId == memberId && !mr.IsDeleted);
-
-            if (memberRole == null)
-            {
-                return false;
-            }
-
-            memberRole.RoleId = newRoleId;
-            _context.MemberRoles.Update(memberRole);
-            await _context.SaveChangesAsync();
-
-            return true;
+                    Id = mr.MemberId,
+                    FirstName = mr.Member.FirstName,
+                    LastName = mr.Member.LastName,
+                    Role = mr.Role.RoleName
+                })
+                .ToListAsync();
         }
 
-        public async Task<bool> SoftDeleteMemberAsync(Guid teamId, Guid memberId, Guid removerId)
+        public async Task<List<Team>> GetUserTeamsAsync(Guid memberId)
         {
-            var removerRole = await _context.MemberRoles
-                .FirstOrDefaultAsync(mr => mr.TeamId == teamId && mr.MemberId == removerId);
+            return await _context.MemberRoles
+                .Where(mr => mr.MemberId == memberId && !mr.IsDeleted)
+                .Include(mr => mr.Team)
+                .Select(mr => mr.Team)
+                .Where(t => !t.IsDeleted)
+                .Distinct()
+                .ToListAsync();
+        }
 
-            if (removerRole == null || (removerRole.RoleId.ToString() != "7E2A6A88-AD6C-4DD7-801D-0A9201EC04C9" &&
-                                        removerRole.RoleId.ToString() != "D1A281BC-2CB5-4A42-8274-3B03C9C8E1C4"))
-            {
+        public bool RemoveAllTeamMembers(Guid teamId)
+        {
+            var team = _context.Teams.FirstOrDefault(t => t.TeamId == teamId && !t.IsDeleted);
+            if (team == null)
                 return false;
-            }
 
-            var memberRole = await _context.MemberRoles
-                .FirstOrDefaultAsync(mr => mr.TeamId == teamId && mr.MemberId == memberId && !mr.IsDeleted);
-
-            if (memberRole == null)
-            {
+            var memberRoles = _context.MemberRoles
+                .Where(mr => mr.TeamId == teamId && !mr.IsDeleted)
+                .ToList();
+            if (memberRoles.Count == 0)
                 return false;
-            }
 
-            memberRole.IsDeleted = true;
-            _context.MemberRoles.Update(memberRole);
-            await _context.SaveChangesAsync();
-
+            foreach (var memberRole in memberRoles)
+                memberRole.IsDeleted = true;
+            _context.SaveChanges();
             return true;
         }
 
         public Team GetTeamByInviteCode(string inviteCode)
         {
-            return _context.Teams.FirstOrDefault(t => t.TeamLink == inviteCode);
+            return _context.Teams
+                .FirstOrDefault(t => t.TeamLink == inviteCode && !t.IsDeleted);
         }
 
-        public bool IsUserAlreadyInTeam(Guid teamId, Guid userId)
+        public bool IsUserAlreadyInTeam(Guid teamId, Guid memberId)
         {
             return _context.MemberRoles
-                .Any(mr => mr.TeamId == teamId && mr.MemberId == userId);
+                .Any(mr => mr.TeamId == teamId && mr.MemberId == memberId && !mr.IsDeleted);
         }
 
-        public void AddMemberToTeam(Guid teamId, Guid userId)
+        public void AddMemberToTeam(Guid teamId, Guid memberId)
         {
-            var user = _context.Members.FirstOrDefault(m => m.MemberId == userId);
+            var team = _context.Teams.FirstOrDefault(t => t.TeamId == teamId && !t.IsDeleted);
+            if (team == null)
+                throw new ArgumentException("Команда не найдена.");
 
-            if (user == null)
-            {
+            var member = _context.Members.FirstOrDefault(m => m.MemberId == memberId);
+            if (member == null)
                 throw new ArgumentException("Пользователь с таким ID не существует.");
-            }
 
-            var existingMember = _context.MemberRoles
-                                         .FirstOrDefault(mr => mr.TeamId == teamId && mr.MemberId == userId);
-
-            if (existingMember != null)
-            {
+            if (IsUserAlreadyInTeam(teamId, memberId))
                 throw new ArgumentException("Пользователь уже состоит в этой команде.");
-            }
 
-            Guid role = new Guid("7E2A6A88-AD6C-4DD7-801D-0A9201EC04C9");
+            var defaultRole = _context.Roles.FirstOrDefault(r => r.RoleName == "Member");
+            if (defaultRole == null)
+                throw new InvalidOperationException("Роль по умолчанию не найдена.");
 
             var memberRole = new MemberRole
             {
                 MemberRoleId = Guid.NewGuid(),
                 TeamId = teamId,
-                MemberId = userId,
-                RoleId = role
+                MemberId = memberId,
+                RoleId = defaultRole.RoleId
             };
 
             _context.MemberRoles.Add(memberRole);

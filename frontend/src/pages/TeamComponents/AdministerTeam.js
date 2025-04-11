@@ -5,7 +5,7 @@ import '../styles/Modal.css';
 import '../styles/AuthButtons.css';
 import '../styles/PasswordToggle.css';
 import '../styles/Spinner.css';
-import { fetchUserTeams, updateMemberRole, removeTeam, getUsersWithRoles } from '../../services/api';
+import { updateMemberRole, removeTeam, getUsersWithRoles, fetchUserTeams } from '../../services/teamApi';
 import { FaTrashAlt } from 'react-icons/fa';
 
 const AdministerTeam = () => {

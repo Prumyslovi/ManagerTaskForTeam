@@ -1,16 +1,18 @@
-﻿using CarnetDeTaches.Repositories;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using CarnetDeTaches.Model;
+using CarnetDeTaches.Repositories;
 
 namespace CarnetDeTaches.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize(Roles = "Admin")]
     public class RolePermissionController : ControllerBase
     {
         private readonly IRolePermissionRepository _rolePermissionRepository;
 
-        public RolePermissionController([FromServices] IRolePermissionRepository rolePermissionRepository)
+        public RolePermissionController(IRolePermissionRepository rolePermissionRepository)
         {
             _rolePermissionRepository = rolePermissionRepository;
         }
@@ -47,7 +49,6 @@ namespace CarnetDeTaches.Controllers
 
             rolePermission.IsDeleted = true;
             _rolePermissionRepository.UpdateRolePermission(rolePermission);
-
             return Ok(rolePermission);
         }
     }

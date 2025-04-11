@@ -1,15 +1,12 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { createDocument } from '../../services/api';
+import { createDocument } from '../../services/documentApi';
 import Toolbar from './Toolbar';
 import './DocumentStyle.css';
 import '../styles/Message.css';
 import '../styles/Spinner.css';
-import { FaSpinner, FaTimes } from 'react-icons/fa';
+import { FaSpinner } from 'react-icons/fa';
 
-const CreateDocument = () => {
-  const { teamId } = useParams();
-  const navigate = useNavigate();
+const CreateDocument = ({ teamId, onClose }) => {
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const [fontFamily, setFontFamily] = useState('Arial');
@@ -48,17 +45,13 @@ const CreateDocument = () => {
     createDocument(documentData)
       .then(() => {
         setMessage({ type: 'success', text: 'Документ успешно создан!' });
-        setTimeout(() => navigate('/'), 1500); // Возвращаемся на главную
+        setTimeout(() => onClose(), 1500);
       })
       .catch((err) => {
         setMessage({ type: 'error', text: 'Ошибка при создании документа.' });
         console.error('Ошибка при создании документа:', err);
       })
       .finally(() => setIsLoading(false));
-  };
-
-  const handleExitWithoutSaving = () => {
-    navigate('/'); // Возвращаемся на главную
   };
 
   const applyStyle = (style, value) => {
@@ -120,8 +113,8 @@ const CreateDocument = () => {
           {message.text}
         </div>
       )}
-      <button onClick={handleExitWithoutSaving} className="exit-button">
-        <FaTimes />
+      <button onClick={onClose} className="exit-button">
+        ✕
       </button>
       <div className="toolbar-wrapper">
         <Toolbar

@@ -12,7 +12,7 @@ const TeamManagement = () => {
 
   return (
     <div className="team-management programSection">
-      <h2 className="admin-title">Управление командой</h2>
+      <h2 className="admin-title">Управление командами</h2>
       <div className="menu">
         <button onClick={() => navigate(`/team/${defaultTeamId}/manage/create`)} className="Button">Создать команду</button>
         <button onClick={() => navigate(`/team/${defaultTeamId}/manage/administer`)} className="Button">Администрировать</button>

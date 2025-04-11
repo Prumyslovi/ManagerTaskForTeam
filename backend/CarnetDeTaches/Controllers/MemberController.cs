@@ -1,88 +1,49 @@
-using CarnetDeTaches.Repositories;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using CarnetDeTaches.Model;
-using System.Security.Cryptography;
-using Microsoft.EntityFrameworkCore.Metadata;
-using Microsoft.AspNetCore.Identity.Data;
+using CarnetDeTaches.Repositories;
 
 namespace CarnetDeTaches.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class MemberController : ControllerBase
     {
-        public static Guid ProfileId = Guid.Empty;
         private readonly IMemberRepository _memberRepository;
 
-        public MemberController([FromServices] IMemberRepository memberRepository)
+        public MemberController(IMemberRepository memberRepository)
         {
             _memberRepository = memberRepository;
         }
 
         [HttpGet("GetAllMembers")]
-        public ActionResult<Member> GetAllMembers()
+        [Authorize(Roles = "Admin")]
+        public ActionResult<IEnumerable<Member>> GetAllMembers()
         {
             var members = _memberRepository.GetAllMembers();
             return Ok(members);
-        }
-        [HttpPost("GetMember")]
-        public async Task<ActionResult<Member>> GetMember([FromBody] MemberViewModel request)
-        {
-            if (request == null)
-            {
-                Console.WriteLine("Request body is null");
-                return BadRequest("Request body is null");
-            }
-
-            if (string.IsNullOrEmpty(request.Login) || string.IsNullOrEmpty(request.Password))
-            {
-                Console.WriteLine($"Invalid data: Login={request.Login}, PasswordHash={request.Password}");
-                return BadRequest("Некорректные данные");
-            }
-
-            var member = _memberRepository.GetMember(request.Login, request.Password);
-            if (member == null)
-                return NotFound();
-
-            ProfileId = member.MemberId;
-
-            Console.WriteLine(member);
-
-            return Ok(member);
         }
 
         [HttpPost("GetProfile")]
         public async Task<ActionResult<Member>> GetProfile([FromBody] Guid profileId)
         {
-            Console.WriteLine($"Получен запрос с profileId: {profileId}");
+            var currentUserId = Guid.Parse(User.FindFirst("MemberId")?.Value);
+            if (profileId != currentUserId && !User.IsInRole("Admin"))
+                return Forbid();
 
-            if (profileId == null || profileId == Guid.Empty)
-            {
-                Console.WriteLine("Ошибка: profileId пустой или null.");
+            if (profileId == Guid.Empty)
                 return BadRequest("ID профиля не может быть пустым.");
-            }
 
-            try
-            {
-                var member = _memberRepository.GetProfile(profileId);
+            var member = _memberRepository.GetProfile(profileId);
+            if (member == null)
+                return NotFound($"Профиль с ID {profileId} не найден.");
 
-                if (member == null)
-                {
-                    Console.WriteLine($"Участник с ID {profileId} не найден.");
-                    return NotFound($"Профиль с ID {profileId} не найден.");
-                }
-
-                Console.WriteLine($"Запрос успешно обработан. Участник: {member.FirstName} {member.LastName}");
-                return Ok(member);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Ошибка при поиске профиля: {ex.Message}, StackTrace: {ex.StackTrace}");
-                return StatusCode(500, "Внутренняя ошибка сервера.");
-            }
+            return Ok(member);
         }
 
         [HttpPost("AddMember")]
+        [AllowAnonymous]
         public async Task<ActionResult<Member>> AddMember([FromBody] Member member)
         {
             var createdMember = await _memberRepository.AddMember(member);
@@ -92,12 +53,14 @@ namespace CarnetDeTaches.Controllers
         [HttpPut("UpdateMember")]
         public async Task<ActionResult> UpdateMember([FromBody] UpdateMemberRequest updateRequest)
         {
+            var currentUserId = Guid.Parse(User.FindFirst("MemberId")?.Value);
+            if (currentUserId != updateRequest.MemberId && !User.IsInRole("Admin"))
+                return Forbid();
+
             var existingMember = _memberRepository.GetProfile(updateRequest.MemberId);
             if (existingMember == null)
-            {
                 return NotFound("Пользователь не найден.");
-            }
-            
+
             if (!string.IsNullOrEmpty(updateRequest.Username))
                 existingMember.Login = updateRequest.Username;
 
@@ -110,13 +73,8 @@ namespace CarnetDeTaches.Controllers
             {
                 var updateResult = await _memberRepository.UpdateMember(existingMember, updateRequest.OldPassword, updateRequest.NewPassword);
                 if (updateResult == null)
-                {
-                    return BadRequest(updateResult);
-                }
-                else
-                {
-                    return Ok(updateRequest);
-                }
+                    return BadRequest("Ошибка при обновлении пароля.");
+                return Ok(updateRequest);
             }
             else
             {

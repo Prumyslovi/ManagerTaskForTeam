@@ -11,7 +11,5 @@ namespace CarnetDeTaches.Repositories
         CarnetDeTaches.Model.Task UpdateTask(CarnetDeTaches.Model.Task task);
         CarnetDeTaches.Model.Task DeleteTask(Guid taskId);
         public IEnumerable<CarnetDeTaches.Model.Task> GetTasksByProjectId(Guid projectId);
-        public CarnetDeTaches.Model.Task GetTaskById(Guid taskId);
-
     }
 }

@@ -2,7 +2,8 @@ import React, { useState, useEffect } from "react";
 import ProjectTable from './ProjectTable';
 import KanbanBoard from './KanbanBoard';
 import GanttChart from './GanttChart';
-import { fetchProjects, fetchTeam } from "../../services/api";
+import { fetchTeam } from "../../services/teamApi";
+import { fetchProjectsForUser } from "../../services/projectApi";
 import '../styles/ProjectList.css';
 import '../styles/TypicalItems.css';
 
@@ -17,9 +18,13 @@ const ProjectList = ({ memberId }) => {
   const selectedProjectData = projects.find(p => p.projectId === selectedProject);
 
   useEffect(() => {
+    if (!memberId) {
+      console.error('memberId не определен');
+      return;
+    }
     const loadData = async () => {
       try {
-        const fetchedProjects = await fetchProjects(memberId);
+        const fetchedProjects = await fetchProjectsForUser(memberId);
         setProjects(fetchedProjects);
 
         const teamIds = [...new Set(fetchedProjects.map(project => project.teamId))];
@@ -53,18 +58,12 @@ const ProjectList = ({ memberId }) => {
   const toggleTeam = (teamId) => {
     setExpandedTeams(prev => {
       const isExpanded = !prev[teamId];
-  
       if (!isExpanded && selectedProject && projectsByTeam[teamId].some(p => p.projectId === selectedProject)) {
         setSelectedProject(null);
       }
-  
-      return {
-        ...prev,
-        [teamId]: isExpanded
-      };
+      return { ...prev, [teamId]: isExpanded };
     });
   };
-  
 
   const projectsByTeam = projects.reduce((acc, project) => {
     const teamId = project.teamId;

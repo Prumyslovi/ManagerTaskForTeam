@@ -1,6 +1,6 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using CarnetDeTaches.Model;
+﻿using CarnetDeTaches.Model;
+using System;
+using System.Collections.Generic;
 
 namespace CarnetDeTaches.Repositories
 {
@@ -11,9 +11,7 @@ namespace CarnetDeTaches.Repositories
         Project AddProject(Project project);
         Project UpdateProject(Project project);
         Project DeleteProject(Guid projectId);
-        public IEnumerable<Project> GetProjectsByTeamIds(List<Guid> teamIds);
-        public Project GetProjectById(Guid projectId);
-        public IEnumerable<Team> GetTeamsByUserId(Guid userId);
-
+        IEnumerable<Project> GetProjectsByTeamIds(List<Guid> teamIds);
+        IEnumerable<Team> GetTeamsByMemberId(Guid memberId);
     }
 }

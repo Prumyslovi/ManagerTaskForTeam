@@ -1,6 +1,8 @@
 ﻿using CarnetDeTaches.Model;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace CarnetDeTaches.Repositories
 {
@@ -15,12 +17,17 @@ namespace CarnetDeTaches.Repositories
 
         public IEnumerable<Project> GetAllProjects()
         {
-            return _context.Projects.ToList();
+            return _context.Projects
+                .Include(p => p.Team)
+                .Where(p => !p.IsDeleted)
+                .ToList();
         }
 
         public Project GetProject(Guid projectId)
         {
-            return _context.Projects.Find(projectId);
+            return _context.Projects
+                .Include(p => p.Team)
+                .FirstOrDefault(p => p.ProjectId == projectId && !p.IsDeleted);
         }
 
         public Project AddProject(Project project)
@@ -39,42 +46,32 @@ namespace CarnetDeTaches.Repositories
 
         public Project DeleteProject(Guid projectId)
         {
-            var project = _context.Projects.Find(projectId);
+            var project = _context.Projects
+                .FirstOrDefault(p => p.ProjectId == projectId && !p.IsDeleted);
             if (project != null)
             {
-                _context.Projects.Remove(project);
+                project.IsDeleted = true;
                 _context.SaveChanges();
             }
             return project;
         }
+
         public IEnumerable<Project> GetProjectsByTeamIds(List<Guid> teamIds)
         {
             return _context.Projects
+                .Include(p => p.Team)
                 .Where(p => teamIds.Contains(p.TeamId) && !p.IsDeleted)
                 .ToList();
         }
 
-        public Project GetProjectById(Guid projectId)
-        {
-            return _context.Projects
-                .FirstOrDefault(p => p.ProjectId == projectId && !p.IsDeleted);
-        }
-        public IEnumerable<Team> GetTeamsByUserId(Guid userId)
+        public IEnumerable<Team> GetTeamsByMemberId(Guid memberId)
         {
             return _context.MemberRoles
-                .Where(t => t.MemberId == userId && !t.IsDeleted)
-                .Join(_context.Teams,
-                      memberRole => memberRole.TeamId,
-                      team => team.TeamId,
-                      (memberRole, team) => team)
+                .Where(mr => mr.MemberId == memberId && !mr.IsDeleted)
+                .Include(mr => mr.Team)
+                .Select(mr => mr.Team)
+                .Distinct()
                 .ToList();
         }
-
-        public Team GetTeamById(Guid teamId)
-        {
-            return _context.Teams
-                .FirstOrDefault(t => t.TeamId == teamId && !t.IsDeleted);
-        }
     }
-
 }

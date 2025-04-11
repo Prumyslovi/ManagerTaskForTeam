@@ -15,9 +15,11 @@ namespace CarnetDeTaches.Model
         public string Description { get; set; }
 
         [Column("ProjectId")]
+        [ForeignKey("Project")]
         public Guid ProjectId { get; set; }
 
         [Column("MemberId")]
+        [ForeignKey("Member")]
         public Guid MemberId { get; set; }
 
         [Column("Status")]
@@ -28,8 +30,13 @@ namespace CarnetDeTaches.Model
 
         [Column("EndDate")]
         public DateTime EndDate { get; set; }
+        [Column("Priority")]
+        public string Priority { get; set; }
 
         [Column("IsDeleted")]
         public bool IsDeleted { get; set; }
+
+        public Member Member { get; set; }
+        public Project Project { get; set; }
     }
 }

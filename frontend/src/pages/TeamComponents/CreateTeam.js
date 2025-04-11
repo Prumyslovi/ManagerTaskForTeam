@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import '../styles/Modal.css';
-import { getAllTeams, createTeam } from '../../services/api';
+import { fetchTeams, createTeam } from '../../services/teamApi';
 
 const CreateTeam = () => {
   const [teamName, setTeamName] = useState('');
@@ -20,7 +20,7 @@ const CreateTeam = () => {
 
   const checkUniqueLink = async (link) => {
     try {
-      const teams = await getAllTeams();
+      const teams = await fetchTeams();
       return !teams.some(team => team.teamLink === link);
     } catch (error) {
       console.error('Ошибка при проверке уникальности ссылки:', error);

@@ -2,6 +2,9 @@
 using CarnetDeTaches.Repositories;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace CarnetDeTaches.Controllers
 {
@@ -17,7 +20,7 @@ namespace CarnetDeTaches.Controllers
         }
 
         [HttpGet("GetAllMemberRoles")]
-        public ActionResult<MemberRole> GetAllMemberRoles()
+        public ActionResult<IEnumerable<MemberRole>> GetAllMemberRoles()
         {
             var memberRoles = _memberRoleRepository.GetAllMemberRoles();
             return Ok(memberRoles);
@@ -34,44 +37,27 @@ namespace CarnetDeTaches.Controllers
         }
 
         [HttpPost("AddMemberRole")]
-        public ActionResult<MemberRole> AddMember([FromBody] MemberRole memberRole)
+        public ActionResult<MemberRole> AddMemberRole([FromBody] MemberRole memberRole)
         {
             var createdMemberRole = _memberRoleRepository.AddMemberRole(memberRole);
-            return CreatedAtAction(nameof(GetMemberRole), new { id = createdMemberRole.MemberId }, createdMemberRole);
+            return CreatedAtAction(nameof(GetMemberRole), new { id = createdMemberRole.MemberRoleId }, createdMemberRole);
         }
 
         [HttpPut("UpdateMemberRole")]
         public ActionResult<MemberRole> UpdateMemberRole(Guid teamId, Guid memberId, string roleName)
         {
-            try
-            {
-                if (string.IsNullOrEmpty(roleName))
-                {
-                    return BadRequest("Роль не указана.");
-                }
+            if (string.IsNullOrEmpty(roleName))
+                return BadRequest("Роль не указана.");
 
-                var roleId = _memberRoleRepository.GetRoleIdByName(roleName);
+            var roleId = _memberRoleRepository.GetRoleIdByName(roleName);
+            if (roleId == Guid.Empty)
+                return BadRequest("Роль с таким наименованием не найдена.");
 
-                if (roleId == Guid.Empty)
-                {
-                    return BadRequest("Роль с таким наименованием не найдена.");
-                }
+            var updatedRole = _memberRoleRepository.UpdateMemberRole(teamId, memberId, roleId);
+            if (updatedRole == null)
+                return NotFound("Участник или команда не найдены.");
 
-                // Обновляем роль участника с найденным ID роли
-                var updatedRole = _memberRoleRepository.UpdateMemberRole(teamId, memberId, roleId);
-
-                if (updatedRole == null)
-                {
-                    return NotFound("Участник или команда не найдены.");
-                }
-
-                return Ok(updatedRole);
-            }
-            catch (Exception ex)
-            {
-                // Логирование ошибки
-                return StatusCode(500, "Ошибка на сервере.");
-            }
+            return Ok(updatedRole);
         }
 
         [HttpDelete("DeleteMember")]
@@ -79,88 +65,26 @@ namespace CarnetDeTaches.Controllers
         {
             var result = _memberRoleRepository.DeleteMember(deleteMemberRequest.TeamId, deleteMemberRequest.MemberId);
             if (result)
-            {
                 return Ok("Участник успешно удален.");
-            }
-            else
-            {
-                return NotFound("Команда или участник не найдены.");
-            }
+            return NotFound("Команда или участник не найдены.");
         }
 
-        [HttpDelete("RemoveTeam")]
-        public IActionResult RemoveTeam([FromBody] DeleteMemberRequest deleteMemberRequest)
-        {
-
-            var result = _memberRoleRepository.RemoveAllTeamMembers(deleteMemberRequest.TeamId);
-            if (result)
-            {
-                return Ok("Команда успешно удалена.");
-            }
-            else
-            {
-                return NotFound("Команда не найдена.");
-            }
-
-        }
-
-        [HttpGet("GetUserTeams/{memberId}")]
-        public async Task<IActionResult> GetUserTeams(string memberId)
-        {
-            try
-            {
-                Console.WriteLine($"Запрос на получение команд для участника с ID: {memberId}");
-
-                if (string.IsNullOrWhiteSpace(memberId) || !Guid.TryParse(memberId, out var parsedGuid))
-                {
-                    Console.WriteLine("Некорректный формат GUID.");
-                    return BadRequest("Некорректный формат GUID.");
-                }
-
-                var teams = await _memberRoleRepository.GetUserTeamsAsync(parsedGuid);
-
-                if (!teams.Any())
-                {
-                    Console.WriteLine("Команды не найдены.");
-                    return NotFound("Команды не найдены для указанного пользователя.");
-                }
-
-                return Ok(teams);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Ошибка в контроллере: {ex.Message}\n{ex.StackTrace}");
-                return StatusCode(500, "Внутренняя ошибка сервера: " + ex.Message);
-            }
-        }
         [HttpGet("GetUsersWithRoles/{teamId}")]
-        public async Task<IActionResult> GetUsersWithRoles(string teamId)
+        public async Task<IActionResult> GetUsersWithRoles(Guid teamId)
         {
-            try
-            {
-                Console.WriteLine($"Запрос на получение участников и их ролей по ID команды: {teamId}");
+            var membersWithRoles = await _memberRoleRepository.GetUsersWithRolesAsync(teamId);
+            if (!membersWithRoles.Any())
+                return NotFound("Участники не найдены для указанной команды.");
+            return Ok(membersWithRoles);
+        }
 
-                if (string.IsNullOrWhiteSpace(teamId) || !Guid.TryParse(teamId, out var parsedGuid))
-                {
-                    Console.WriteLine("Некорректный формат GUID.");
-                    return BadRequest("Некорректный формат GUID.");
-                }
-
-                var membersWithRoles = await _memberRoleRepository.GetUsersWithRolesAsync(parsedGuid);
-
-                if (!membersWithRoles.Any())
-                {
-                    Console.WriteLine("Участники команды не найдены.");
-                    return NotFound("Участники не найдены для указанной команды.");
-                }
-
-                return Ok(membersWithRoles);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Ошибка в контроллере: {ex.Message}\n{ex.StackTrace}");
-                return StatusCode(500, "Внутренняя ошибка сервера: " + ex.Message);
-            }
+        [HttpDelete("SoftDeleteMember")]
+        public async Task<IActionResult> SoftDeleteMember(Guid teamId, Guid memberId, Guid removerId)
+        {
+            var success = await _memberRoleRepository.SoftDeleteMemberAsync(teamId, memberId, removerId);
+            if (!success)
+                return NotFound("Участник не найден или у вас недостаточно прав.");
+            return NoContent();
         }
     }
 }
