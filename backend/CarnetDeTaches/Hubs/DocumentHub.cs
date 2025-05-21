@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.SignalR;
 
-namespace CarnetDeTaches.Hubs
+namespace ManagerTaskForTeam.API.Hubs
 {
     public class DocumentHub : Hub
     {

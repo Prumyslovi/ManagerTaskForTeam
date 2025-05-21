@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { fetchComments, addComment } from '../../services/commentApi';
 import { fetchProfile } from '../../services/memberApi';
 import { fetchStatusesByTeamId, updateTask } from '../../services/taskApi';
+import { fetchTeamMembers } from '../../services/teamApi';
 import { FaTimes, FaUser, FaCalendarAlt, FaFlag, FaExclamationCircle, FaPaperPlane, FaSearch, FaFilter, FaSortAmountDown, FaChevronDown } from 'react-icons/fa';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
@@ -80,6 +81,7 @@ const TaskModal = ({ task, teamId, onClose }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [currentUserId, setCurrentUserId] = useState(null);
   const [isEditingDescription, setIsEditingDescription] = useState(false);
+  const [teamMembers, setTeamMembers] = useState([]);
 
   const safeGetUserProfile = useCallback((memberId) => {
     return userProfiles[memberId] || { firstName: 'Неизвестный', lastName: 'Пользователь' };
@@ -101,9 +103,10 @@ const TaskModal = ({ task, teamId, onClose }) => {
       }
       setIsLoading(true);
       try {
-        const [fetchedComments, fetchedStatuses] = await Promise.allSettled([
+        const [fetchedComments, fetchedStatuses, fetchedMembers] = await Promise.allSettled([
           fetchComments(task.id),
-          fetchStatusesByTeamId(teamId)
+          fetchStatusesByTeamId(teamId),
+          fetchTeamMembers(teamId)
         ]);
         if (fetchedComments.status === 'fulfilled') {
           setComments(fetchedComments.value || []);
@@ -122,6 +125,12 @@ const TaskModal = ({ task, teamId, onClose }) => {
           console.error("Ошибка при получении статусов:", fetchedStatuses.reason);
           setStatuses([]);
           setSelectedStatus('');
+        }
+        if (fetchedMembers.status === 'fulfilled') {
+          setTeamMembers(fetchedMembers.value || []);
+        } else {
+          console.error("Ошибка при загрузке участников команды:", fetchedMembers.reason);
+          setTeamMembers([]);
         }
         const loadedComments = fetchedComments.status === 'fulfilled' ? fetchedComments.value : [];
         const memberIds = new Set([
@@ -162,13 +171,16 @@ const TaskModal = ({ task, teamId, onClose }) => {
   const handleUpdateTask = async (updates) => {
     try {
       const updatedTask = await updateTask(task.id, { ...task, ...updates });
-      if (updates.status !== undefined) setSelectedStatus(updates.status);
+      if (updates.status !== undefined) setSelectedStatus(updatedTask.status || updates.status);
       if (updates.priority !== undefined) setPriority(updatedTask.priority || updates.priority);
-      if (updates.description !== undefined) setDescription(updates.description);
+      if (updates.description !== undefined) setDescription(updatedTask.description || updates.description);
       if (updates.startDate !== undefined)
-        setStartDate(updates.startDate ? new Date(updates.startDate) : null);
+        setStartDate(updatedTask.startDate ? new Date(updatedTask.startDate) : updates.startDate);
       if (updates.endDate !== undefined)
-        setEndDate(updates.endDate ? new Date(updates.endDate) : null);
+        setEndDate(updatedTask.endDate ? new Date(updatedTask.endDate) : updates.endDate);
+      if (updates.assignee !== undefined) {
+        task.assignee = updatedTask.assignee || updates.assignee;
+      }
     } catch (error) {
       console.error(`Ошибка при обновлении задачи:`, error);
     }
@@ -234,7 +246,7 @@ const TaskModal = ({ task, teamId, onClose }) => {
             </span>
             <FaChevronDown className="metadata-value-icon" />
             <select
-              className="metadata-select-overlay"
+              className="metadata-select-overlay scaleSelect"
               value={selectedStatus}
               onChange={(e) => handleUpdateTask({ status: e.target.value })}
             >
@@ -249,11 +261,23 @@ const TaskModal = ({ task, teamId, onClose }) => {
         );
       case 'Исполнители':
         const assigneeId = task.assignee;
-        if (!assigneeId) return <span className="metadata-value metadata-value--empty">Пусто</span>;
-        const userName = getUserNameById(assigneeId);
+        const assigneeName = assigneeId ? getUserNameById(assigneeId) : 'Не назначен';
         return (
-          <div className="metadata-value metadata-value--assignee">
-            <span>{userName}</span>
+          <div className="metadata-value metadata-value--interactive">
+            <span className="pill">{assigneeName}</span>
+            <FaChevronDown className="metadata-value-icon" />
+            <select
+              className="metadata-select-overlay scaleSelect"
+              value={assigneeId || ''}
+              onChange={(e) => handleUpdateTask({ assignee: e.target.value })}
+            >
+              <option value="">Не назначен</option>
+              {teamMembers.map((member) => (
+                <option key={member.id} value={member.id}>
+                  {`${member.firstName} ${member.lastName}`.trim()}
+                </option>
+              ))}
+            </select>
           </div>
         );
       case 'Даты':
@@ -264,13 +288,13 @@ const TaskModal = ({ task, teamId, onClose }) => {
               <DatePicker
                 value={startDate}
                 onChange={(date) => handleUpdateTask({ startDate: date })}
-                renderInput={(params) => <TextField {...params} />}
+                renderInput={(params) => <TextField {...params} className="date-picker-input" />}
               />
               <span className="date-label">Конец:</span>
               <DatePicker
                 value={endDate}
                 onChange={(date) => handleUpdateTask({ endDate: date })}
-                renderInput={(params) => <TextField {...params} />}
+                renderInput={(params) => <TextField {...params} className="date-picker-input" />}
                 minDate={startDate}
               />
             </div>
@@ -286,7 +310,7 @@ const TaskModal = ({ task, teamId, onClose }) => {
             </span>
             <FaChevronDown className="metadata-value-icon" />
             <select
-              className="metadata-select-overlay"
+              className="metadata-select-overlay scaleSelect"
               value={priority}
               onChange={(e) => handleUpdateTask({ priority: e.target.value })}
             >

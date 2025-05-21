@@ -1,53 +1,51 @@
-﻿using CarnetDeTaches.Repositories;
+﻿using ManagerTaskForTeam.Application.Interfaces.Services;
+using ManagerTaskForTeam.Domain.Entities;
 using Microsoft.AspNetCore.Mvc;
-using CarnetDeTaches.Model;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
-namespace CarnetDeTaches.Controllers
+namespace ManagerTaskForTeam.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
     public class CommentController : ControllerBase
     {
-        private readonly ICommentRepository _commentRepository;
+        private readonly ICommentService _service;
 
-        public CommentController([FromServices] ICommentRepository commentRepository)
+        public CommentController(ICommentService service)
         {
-            _commentRepository = commentRepository;
+            _service = service;
         }
 
         [HttpGet("GetCommentsByTaskId/{taskId}")]
-        public ActionResult<IEnumerable<Comment>> GetCommentsByTaskId([FromRoute] Guid taskId)
+        public async Task<ActionResult<IEnumerable<Comment>>> GetCommentsByTaskId([FromRoute] Guid taskId)
         {
-            var comments = _commentRepository.GetCommentsByTaskId(taskId);
+            var comments = await _service.GetCommentsByTaskIdAsync(taskId);
             return Ok(comments);
         }
 
         [HttpPost("AddComment")]
         public async Task<ActionResult<Comment>> AddComment([FromBody] Comment comment)
         {
-            var createdComment = await _commentRepository.AddComment(comment);
+            var createdComment = await _service.AddCommentAsync(comment);
             return Ok(createdComment);
         }
 
         [HttpPut("UpdateComment")]
-        public async Task<ActionResult> UpdateComment([FromBody] Comment comment)
+        public async Task<ActionResult<Comment>> UpdateComment([FromBody] Comment comment)
         {
-            var updatedComment = await _commentRepository.UpdateComment(comment);
-            if (updatedComment == null)
-                return NotFound();
+            var updatedComment = await _service.UpdateCommentAsync(comment);
             return Ok(updatedComment);
         }
 
         [HttpPut("DeleteComment/{id}")]
-        public ActionResult DeleteComment([FromRoute] Guid id)
+        public async Task<ActionResult<Comment>> DeleteComment([FromRoute] Guid id)
         {
-            var comment = _commentRepository.GetCommentById(id);
-            if (comment == null)
-                return NotFound();
-
+            var comment = await _service.GetCommentByIdAsync(id);
             comment.IsDeleted = true;
-            _commentRepository.UpdateComment(comment);
-            return Ok(comment);
+            var updatedComment = await _service.UpdateCommentAsync(comment);
+            return Ok(updatedComment);
         }
     }
 }

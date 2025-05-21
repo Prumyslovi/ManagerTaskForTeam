@@ -1,65 +1,55 @@
-﻿using CarnetDeTaches.Repositories;
+﻿using ManagerTaskForTeam.Application.Interfaces.Services;
+using ManagerTaskForTeam.Domain.Entities;
 using Microsoft.AspNetCore.Mvc;
-using CarnetDeTaches.Model;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
-namespace CarnetDeTaches.Controllers
+namespace ManagerTaskForTeam.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
     public class PermissionController : ControllerBase
     {
-        private readonly IPermissionRepository _permissionRepository;
+        private readonly IPermissionService _permissionService;
 
-        public PermissionController([FromServices] IPermissionRepository permissionRepository)
+        public PermissionController(IPermissionService permissionService)
         {
-            _permissionRepository = permissionRepository;
+            _permissionService = permissionService;
         }
 
         [HttpGet("GetAllPermissions")]
-        public ActionResult<Permission> GetAllPermissions()
+        public async Task<ActionResult<IEnumerable<Permission>>> GetAllPermissions()
         {
-            var permissions = _permissionRepository.GetAllPermissions();
+            var permissions = await _permissionService.GetAllPermissionsAsync();
             return Ok(permissions);
         }
 
         [HttpPost("GetPermission")]
         public async Task<ActionResult<Permission>> GetPermission([FromBody] Guid permissionId)
         {
-            if (permissionId == Guid.Empty)
-                return BadRequest("Ошибка: Permission Id не может быть пустым.");
-
-            var permission = await _permissionRepository.GetPermission(permissionId);
-            if (permission == null)
-                return NotFound();
-
+            var permission = await _permissionService.GetPermissionAsync(permissionId);
             return Ok(permission);
         }
 
         [HttpPost("AddPermission")]
         public async Task<ActionResult<Permission>> AddPermission([FromBody] Permission permission)
         {
-            var createdPermission = await _permissionRepository.AddPermission(permission);
+            var createdPermission = await _permissionService.AddPermissionAsync(permission);
             return CreatedAtAction(nameof(GetPermission), new { permissionId = createdPermission.PermissionId }, createdPermission);
         }
 
         [HttpPut("UpdatePermission")]
         public async Task<ActionResult> UpdatePermission([FromBody] Permission permission)
         {
-            var existingPermission = await _permissionRepository.GetPermission(permission.PermissionId);
-            if (existingPermission == null)
-                return NotFound();
-
-            await _permissionRepository.UpdatePermission(permission);
+            await _permissionService.UpdatePermissionAsync(permission);
             return NoContent();
         }
 
         [HttpDelete("DeletePermission/{permissionId}")]
         public async Task<ActionResult> DeletePermission([FromRoute] Guid permissionId)
         {
-            var permission = await _permissionRepository.DeletePermission(permissionId);
-            if (permission == null)
-                return NotFound();
-
+            await _permissionService.DeletePermissionAsync(permissionId);
             return NoContent();
         }
     }

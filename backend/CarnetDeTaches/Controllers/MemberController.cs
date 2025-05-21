@@ -1,27 +1,31 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using CarnetDeTaches.Model;
-using CarnetDeTaches.Repositories;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using ManagerTaskForTeam.Application.DTOs;
+using ManagerTaskForTeam.Application.Interfaces.Services;
+using ManagerTaskForTeam.Domain.Entities;
 
-namespace CarnetDeTaches.Controllers
+namespace ManagerTaskForTeam.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
     [Authorize]
     public class MemberController : ControllerBase
     {
-        private readonly IMemberRepository _memberRepository;
+        private readonly IMemberService _memberService;
 
-        public MemberController(IMemberRepository memberRepository)
+        public MemberController(IMemberService memberService)
         {
-            _memberRepository = memberRepository;
+            _memberService = memberService;
         }
 
         [HttpGet("GetAllMembers")]
         [Authorize(Roles = "Admin")]
-        public ActionResult<IEnumerable<Member>> GetAllMembers()
+        public async Task<ActionResult<IEnumerable<Member>>> GetAllMembers()
         {
-            var members = _memberRepository.GetAllMembers();
+            var members = await _memberService.GetAllMembersAsync();
             return Ok(members);
         }
 
@@ -32,21 +36,15 @@ namespace CarnetDeTaches.Controllers
             if (profileId != currentUserId && !User.IsInRole("Admin"))
                 return Forbid();
 
-            if (profileId == Guid.Empty)
-                return BadRequest("ID профиля не может быть пустым.");
-
-            var member = _memberRepository.GetProfile(profileId);
-            if (member == null)
-                return NotFound($"Профиль с ID {profileId} не найден.");
-
+            var member = await _memberService.GetProfileAsync(profileId);
             return Ok(member);
         }
 
         [HttpPost("AddMember")]
         [AllowAnonymous]
-        public async Task<ActionResult<Member>> AddMember([FromBody] Member member)
+        public async Task<ActionResult<Member>> AddMember([FromBody] AddMemberRequest request)
         {
-            var createdMember = await _memberRepository.AddMember(member);
+            var createdMember = await _memberService.AddMemberAsync(request.Member, request.Password);
             return Ok(createdMember);
         }
 
@@ -57,41 +55,23 @@ namespace CarnetDeTaches.Controllers
             if (currentUserId != updateRequest.MemberId && !User.IsInRole("Admin"))
                 return Forbid();
 
-            var existingMember = _memberRepository.GetProfile(updateRequest.MemberId);
-            if (existingMember == null)
-                return NotFound("Пользователь не найден.");
-
-            if (!string.IsNullOrEmpty(updateRequest.Username))
-                existingMember.Login = updateRequest.Username;
-
-            if (!string.IsNullOrEmpty(updateRequest.FirstName))
-                existingMember.FirstName = updateRequest.FirstName;
-            if (!string.IsNullOrEmpty(updateRequest.LastName))
-                existingMember.LastName = updateRequest.LastName;
-
-            if (!string.IsNullOrEmpty(updateRequest.OldPassword) && !string.IsNullOrEmpty(updateRequest.NewPassword))
+            var member = new Member
             {
-                var updateResult = await _memberRepository.UpdateMember(existingMember, updateRequest.OldPassword, updateRequest.NewPassword);
-                if (updateResult == null)
-                    return BadRequest("Ошибка при обновлении пароля.");
-                return Ok(updateRequest);
-            }
-            else
-            {
-                await _memberRepository.UpdateMember(existingMember, null, null);
-            }
+                MemberId = updateRequest.MemberId,
+                Login = updateRequest.Login,
+                FirstName = updateRequest.FirstName,
+                LastName = updateRequest.LastName
+            };
 
+            await _memberService.UpdateMemberAsync(updateRequest.MemberId, member, updateRequest.OldPassword, updateRequest.NewPassword);
             return NoContent();
         }
 
         [HttpDelete("DeleteMember/{id}")]
-        public ActionResult<Member> DeleteMember([FromRoute] Guid id)
+        public async Task<ActionResult> DeleteMember([FromRoute] Guid id)
         {
-            var member = _memberRepository.DeleteMember(id);
-            if (member == null)
-                return NotFound();
-
-            return Ok(member);
+            await _memberService.DeleteMemberAsync(id);
+            return NoContent();
         }
     }
 }

@@ -1,89 +1,71 @@
-﻿using CarnetDeTaches.Model;
-using CarnetDeTaches.Repositories;
+﻿using ManagerTaskForTeam.Application.DTOs;
+using ManagerTaskForTeam.Application.Interfaces.Services;
+using ManagerTaskForTeam.Domain.Entities;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace CarnetDeTaches.Controllers
+namespace ManagerTaskForTeam.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class MemberRoleController : Controller
+    public class MemberRoleController : ControllerBase
     {
-        private readonly IMemberRoleRepository _memberRoleRepository;
+        private readonly IMemberRoleService _memberRoleService;
 
-        public MemberRoleController([FromServices] IMemberRoleRepository memberRoleRepository)
+        public MemberRoleController(IMemberRoleService memberRoleService)
         {
-            _memberRoleRepository = memberRoleRepository;
+            _memberRoleService = memberRoleService;
         }
 
         [HttpGet("GetAllMemberRoles")]
-        public ActionResult<IEnumerable<MemberRole>> GetAllMemberRoles()
+        public async Task<ActionResult<IEnumerable<MemberRole>>> GetAllMemberRoles()
         {
-            var memberRoles = _memberRoleRepository.GetAllMemberRoles();
+            var memberRoles = await _memberRoleService.GetAllMemberRolesAsync();
             return Ok(memberRoles);
         }
 
         [HttpGet("GetMemberRole/{id}")]
-        public ActionResult<MemberRole> GetMemberRole([FromRoute] Guid id)
+        public async Task<ActionResult<MemberRole>> GetMemberRole([FromRoute] Guid id)
         {
-            var memberRole = _memberRoleRepository.GetMemberRole(id);
-            if (memberRole == null)
-                return NotFound();
-
+            var memberRole = await _memberRoleService.GetMemberRoleAsync(id);
             return Ok(memberRole);
         }
 
         [HttpPost("AddMemberRole")]
-        public ActionResult<MemberRole> AddMemberRole([FromBody] MemberRole memberRole)
+        public async Task<ActionResult<MemberRole>> AddMemberRole([FromBody] MemberRole memberRole)
         {
-            var createdMemberRole = _memberRoleRepository.AddMemberRole(memberRole);
+            var createdMemberRole = await _memberRoleService.AddMemberRoleAsync(memberRole);
             return CreatedAtAction(nameof(GetMemberRole), new { id = createdMemberRole.MemberRoleId }, createdMemberRole);
         }
 
         [HttpPut("UpdateMemberRole")]
-        public ActionResult<MemberRole> UpdateMemberRole(Guid teamId, Guid memberId, string roleName)
+        public async Task<ActionResult<MemberRole>> UpdateMemberRole(Guid teamId, Guid memberId, string roleName)
         {
-            if (string.IsNullOrEmpty(roleName))
-                return BadRequest("Роль не указана.");
-
-            var roleId = _memberRoleRepository.GetRoleIdByName(roleName);
-            if (roleId == Guid.Empty)
-                return BadRequest("Роль с таким наименованием не найдена.");
-
-            var updatedRole = _memberRoleRepository.UpdateMemberRole(teamId, memberId, roleId);
-            if (updatedRole == null)
-                return NotFound("Участник или команда не найдены.");
-
+            var roleId = await _memberRoleService.GetRoleIdByNameAsync(roleName);
+            var updatedRole = await _memberRoleService.UpdateMemberRoleAsync(teamId, memberId, roleId);
             return Ok(updatedRole);
         }
 
         [HttpDelete("DeleteMember")]
-        public IActionResult DeleteMember([FromBody] DeleteMemberRequest deleteMemberRequest)
+        public async Task<IActionResult> DeleteMember([FromBody] DeleteMemberRequest deleteMemberRequest)
         {
-            var result = _memberRoleRepository.DeleteMember(deleteMemberRequest.TeamId, deleteMemberRequest.MemberId);
-            if (result)
-                return Ok("Участник успешно удален.");
-            return NotFound("Команда или участник не найдены.");
+            await _memberRoleService.DeleteMemberAsync(deleteMemberRequest.TeamId, deleteMemberRequest.MemberId);
+            return Ok("Участник успешно удален.");
         }
 
         [HttpGet("GetUsersWithRoles/{teamId}")]
         public async Task<IActionResult> GetUsersWithRoles(Guid teamId)
         {
-            var membersWithRoles = await _memberRoleRepository.GetUsersWithRolesAsync(teamId);
-            if (!membersWithRoles.Any())
-                return NotFound("Участники не найдены для указанной команды.");
+            var membersWithRoles = await _memberRoleService.GetUsersWithRolesAsync(teamId);
             return Ok(membersWithRoles);
         }
 
         [HttpDelete("SoftDeleteMember")]
         public async Task<IActionResult> SoftDeleteMember(Guid teamId, Guid memberId, Guid removerId)
         {
-            var success = await _memberRoleRepository.SoftDeleteMemberAsync(teamId, memberId, removerId);
-            if (!success)
-                return NotFound("Участник не найден или у вас недостаточно прав.");
+            await _memberRoleService.SoftDeleteMemberAsync(teamId, memberId, removerId);
             return NoContent();
         }
     }

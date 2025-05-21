@@ -1,61 +1,56 @@
-﻿using CarnetDeTaches.Model;
-using CarnetDeTaches.Repositories;
-using Microsoft.AspNetCore.Http;
+﻿using ManagerTaskForTeam.Application.Interfaces.Services;
+using ManagerTaskForTeam.Domain.Entities;
 using Microsoft.AspNetCore.Mvc;
+using System;
+using System.Threading.Tasks;
 
-namespace CarnetDeTaches.Controllers
+namespace ManagerTaskForTeam.API.Controllers
 {
-    public class ProjectTaskController : Controller
+    [Route("api/[controller]")]
+    [ApiController]
+    public class ProjectTaskController : ControllerBase
     {
-        private readonly IProjectTaskRepository _projectTaskRepository;
+        private readonly IProjectTaskService _projectTaskService;
 
-        public ProjectTaskController([FromServices] IProjectTaskRepository projectTaskRepository)
+        public ProjectTaskController(IProjectTaskService projectTaskService)
         {
-            _projectTaskRepository = projectTaskRepository;
+            _projectTaskService = projectTaskService;
         }
 
         [HttpGet("GetAllProjectTasks")]
-        public ActionResult<ProjectTask> GetAllProjectTasks()
+        public async Task<ActionResult<IEnumerable<ProjectTask>>> GetAllProjectTasks()
         {
-            var projectTask = _projectTaskRepository.GetAllProjectTasks();
-            return Ok(projectTask);
+            var projectTasks = await _projectTaskService.GetAllProjectTasksAsync();
+            return Ok(projectTasks);
         }
 
         [HttpGet("GetProjectTask/{id}")]
-        public ActionResult<ProjectTask> GetProjectTask([FromRoute] Guid id)
+        public async Task<ActionResult<ProjectTask>> GetProjectTask([FromRoute] Guid id)
         {
-            var projectTask = _projectTaskRepository.GetProjectTask(id);
-            if (projectTask == null)
-                return NotFound();
-
+            var projectTask = await _projectTaskService.GetProjectTaskAsync(id);
             return Ok(projectTask);
         }
 
         [HttpPost("AddProjectTask")]
-        public ActionResult<ProjectTask> AddProjectTask([FromBody] ProjectTask projectTask)
+        public async Task<ActionResult<ProjectTask>> AddProjectTask([FromBody] ProjectTask projectTask)
         {
-            var createdProjectTask = _projectTaskRepository.AddProjectTask(projectTask);
+            var createdProjectTask = await _projectTaskService.AddProjectTaskAsync(projectTask);
             return CreatedAtAction(nameof(GetProjectTask), new { id = createdProjectTask.ProjectTaskId }, createdProjectTask);
         }
 
         [HttpPut("UpdateProjectTask/{id}")]
-        public ActionResult<ProjectTask> UpdateProject([FromRoute] Guid id, [FromBody] ProjectTask projectTask)
+        public async Task<ActionResult> UpdateProjectTask([FromRoute] Guid id, [FromBody] ProjectTask projectTask)
         {
-            if (id != projectTask.ProjectTaskId)
-                return BadRequest();
-
-            _projectTaskRepository.UpdateProjectTask(projectTask);
+            projectTask.ProjectTaskId = id;
+            await _projectTaskService.UpdateProjectTaskAsync(projectTask);
             return NoContent();
         }
 
         [HttpDelete("DeleteProjectTask/{id}")]
-        public ActionResult<ProjectTask> DeleteProject([FromRoute] Guid id)
+        public async Task<ActionResult> DeleteProjectTask([FromRoute] Guid id)
         {
-            var projectTask = _projectTaskRepository.DeleteProjectTask(id);
-            if (projectTask == null)
-                return NotFound();
-
-            return Ok(projectTask);
+            await _projectTaskService.DeleteProjectTaskAsync(id);
+            return NoContent();
         }
     }
 }

@@ -1,62 +1,59 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using CarnetDeTaches.Model;
-using CarnetDeTaches.Repositories;
+using ManagerTaskForTeam.Application.Interfaces.Services;
+using ManagerTaskForTeam.Domain.Entities;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
-namespace CarnetDeTaches.Controllers
+namespace ManagerTaskForTeam.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
     [Authorize(Roles = "Admin")]
     public class RoleController : ControllerBase
     {
-        private readonly IRoleRepository _roleRepository;
+        private readonly IRoleService _roleService;
 
-        public RoleController(IRoleRepository roleRepository)
+        public RoleController(IRoleService roleService)
         {
-            _roleRepository = roleRepository;
+            _roleService = roleService;
         }
 
         [HttpGet("GetAllRoles")]
-        public ActionResult<IEnumerable<Role>> GetAllRoles()
+        public async Task<ActionResult<IEnumerable<Role>>> GetAllRoles()
         {
-            var roles = _roleRepository.GetAllRoles();
+            var roles = await _roleService.GetAllRolesAsync();
             return Ok(roles);
         }
 
         [HttpGet("GetRole/{id}")]
-        public ActionResult<Role> GetRole([FromRoute] Guid id)
+        public async Task<ActionResult<Role>> GetRole([FromRoute] Guid id)
         {
-            var role = _roleRepository.GetRole(id);
-            if (role == null)
-                return NotFound();
+            var role = await _roleService.GetRoleByIdAsync(id);
             return Ok(role);
         }
 
         [HttpPost("AddRole")]
-        public ActionResult<Role> AddRole([FromBody] Role role)
+        public async Task<ActionResult<Role>> AddRole([FromBody] Role role)
         {
-            var createdRole = _roleRepository.AddRole(role);
+            var createdRole = await _roleService.AddRoleAsync(role);
             return CreatedAtAction(nameof(GetRole), new { id = createdRole.RoleId }, createdRole);
         }
 
         [HttpPut("UpdateRole/{id}")]
-        public ActionResult UpdateRole([FromRoute] Guid id, [FromBody] Role role)
+        public async Task<ActionResult> UpdateRole([FromRoute] Guid id, [FromBody] Role role)
         {
-            if (id != role.RoleId)
-                return BadRequest();
-
-            _roleRepository.UpdateRole(role);
+            role.RoleId = id;
+            await _roleService.UpdateRoleAsync(role);
             return NoContent();
         }
 
         [HttpDelete("DeleteRole/{id}")]
-        public ActionResult<Role> DeleteRole([FromRoute] Guid id)
+        public async Task<ActionResult> DeleteRole([FromRoute] Guid id)
         {
-            var role = _roleRepository.DeleteRole(id);
-            if (role == null)
-                return NotFound();
-            return Ok(role);
+            await _roleService.DeleteRoleAsync(id);
+            return NoContent();
         }
     }
 }

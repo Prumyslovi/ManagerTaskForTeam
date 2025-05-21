@@ -1,47 +1,44 @@
-﻿using CarnetDeTaches.Hubs;
-using CarnetDeTaches.Model;
-using CarnetDeTaches.Repositories;
+﻿using ManagerTaskForTeam.Application.DTOs;
+using ManagerTaskForTeam.Application.Interfaces.Services;
+using ManagerTaskForTeam.Domain.Entities;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
+using ManagerTaskForTeam.API.Hubs;
+using System;
+using System.Threading.Tasks;
 
-namespace CarnetDeTaches.Controllers
+namespace ManagerTaskForTeam.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
     public class DocumentsController : ControllerBase
     {
-        private readonly IDocumentRepository _documentRepository;
+        private readonly IDocumentService _documentService;
         private readonly IHubContext<DocumentHub> _hubContext;
 
-        public DocumentsController(IDocumentRepository documentRepository, IHubContext<DocumentHub> hubContext)
+        public DocumentsController(IDocumentService documentService, IHubContext<DocumentHub> hubContext)
         {
-            _documentRepository = documentRepository;
+            _documentService = documentService;
             _hubContext = hubContext;
         }
 
         [HttpGet("GetAllDocuments/{teamId}")]
-        public ActionResult GetAllDocuments(Guid teamId)
+        public async Task<ActionResult> GetAllDocuments(Guid teamId)
         {
-            var documents = _documentRepository.GetAllDocuments(teamId);
+            var documents = await _documentService.GetAllDocumentsAsync(teamId);
             return Ok(documents);
         }
 
         [HttpGet("GetDocumentContent/{documentId}")]
-        public ActionResult GetDocumentContent(Guid documentId)
+        public async Task<ActionResult> GetDocumentContent(Guid documentId)
         {
-            var document = _documentRepository.GetDocument(documentId);
-            if (document == null) return NotFound();
+            var document = await _documentService.GetDocumentAsync(documentId);
             return Ok(new { document.Title, document.Content });
         }
 
         [HttpPost("AddDocument")]
-        public ActionResult AddDocument([FromBody] DocumentCreateDto dto)
+        public async Task<ActionResult> AddDocument([FromBody] DocumentCreateDto dto)
         {
-            if (dto.CreatedBy == Guid.Empty)
-            {
-                return BadRequest("CreatedBy не может быть пустым");
-            }
-
             var document = new Document
             {
                 DocumentId = Guid.NewGuid(),
@@ -53,45 +50,26 @@ namespace CarnetDeTaches.Controllers
                 UpdatedAt = DateTime.UtcNow,
                 IsDeleted = false
             };
-            var createdDocument = _documentRepository.AddDocument(document);
+            var createdDocument = await _documentService.AddDocumentAsync(document);
             return CreatedAtAction(nameof(GetDocumentContent), new { documentId = createdDocument.DocumentId }, new { createdDocument.DocumentId });
         }
 
         [HttpPut("UpdateDocument/{documentId}")]
-        public ActionResult UpdateDocument(Guid documentId, [FromBody] DocumentUpdateDto dto)
+        public async Task<ActionResult> UpdateDocument(Guid documentId, [FromBody] DocumentUpdateDto dto)
         {
-            var document = _documentRepository.GetDocument(documentId);
-            if (document == null) return NotFound();
-
+            var document = await _documentService.GetDocumentAsync(documentId);
             document.Content = dto.Content;
             document.UpdatedAt = DateTime.UtcNow;
-            _documentRepository.UpdateDocument(document, dto.MemberId, dto.ChangeDescription);
-
-            _hubContext.Clients.Group(documentId.ToString()).SendAsync("ReceiveUpdate", documentId, dto.Content, dto.MemberId);
+            await _documentService.UpdateDocumentAsync(document, dto.MemberId, dto.ChangeDescription);
+            await _hubContext.Clients.Group(documentId.ToString()).SendAsync("ReceiveUpdate", documentId, dto.Content, dto.MemberId);
             return NoContent();
         }
 
         [HttpGet("GetChanges/{documentId}")]
-        public ActionResult GetChanges(Guid documentId)
+        public async Task<ActionResult> GetChanges(Guid documentId)
         {
-            var changes = _documentRepository.GetDocumentChanges(documentId)
-                .Select(dc => new { dc.MemberId, dc.ChangeDescription, dc.ChangedAt });
+            var changes = await _documentService.GetDocumentChangesAsync(documentId);
             return Ok(changes);
         }
-    }
-
-    public class DocumentCreateDto
-    {
-        public Guid TeamId { get; set; }
-        public string Title { get; set; }
-        public string Content { get; set; }
-        public Guid CreatedBy { get; set; }
-    }
-
-    public class DocumentUpdateDto
-    {
-        public string Content { get; set; }
-        public Guid MemberId { get; set; }
-        public string ChangeDescription { get; set; }
     }
 }

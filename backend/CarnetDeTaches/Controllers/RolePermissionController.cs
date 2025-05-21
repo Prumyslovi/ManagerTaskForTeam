@@ -1,55 +1,51 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using CarnetDeTaches.Model;
-using CarnetDeTaches.Repositories;
+using ManagerTaskForTeam.Application.Interfaces.Services;
+using ManagerTaskForTeam.Domain.Entities;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
-namespace CarnetDeTaches.Controllers
+namespace ManagerTaskForTeam.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
     [Authorize(Roles = "Admin")]
     public class RolePermissionController : ControllerBase
     {
-        private readonly IRolePermissionRepository _rolePermissionRepository;
+        private readonly IRolePermissionService _rolePermissionService;
 
-        public RolePermissionController(IRolePermissionRepository rolePermissionRepository)
+        public RolePermissionController(IRolePermissionService rolePermissionService)
         {
-            _rolePermissionRepository = rolePermissionRepository;
+            _rolePermissionService = rolePermissionService;
         }
 
         [HttpGet("GetAllRolePermissions")]
-        public ActionResult<IEnumerable<RolePermission>> GetAllRolePermissions()
+        public async Task<ActionResult<IEnumerable<RolePermission>>> GetAllRolePermissions()
         {
-            var rolePermissions = _rolePermissionRepository.GetAllRolePermissions();
+            var rolePermissions = await _rolePermissionService.GetAllRolePermissionsAsync();
             return Ok(rolePermissions);
         }
 
         [HttpPost("AddRolePermission")]
         public async Task<ActionResult<RolePermission>> AddRolePermission([FromBody] RolePermission rolePermission)
         {
-            var createdRolePermission = await _rolePermissionRepository.AddRolePermission(rolePermission);
+            var createdRolePermission = await _rolePermissionService.AddRolePermissionAsync(rolePermission);
             return Ok(createdRolePermission);
         }
 
         [HttpPut("UpdateRolePermission")]
         public async Task<ActionResult> UpdateRolePermission([FromBody] RolePermission rolePermission)
         {
-            var updatedRolePermission = await _rolePermissionRepository.UpdateRolePermission(rolePermission);
-            if (updatedRolePermission == null)
-                return NotFound();
-            return Ok(updatedRolePermission);
+            await _rolePermissionService.UpdateRolePermissionAsync(rolePermission);
+            return NoContent();
         }
 
         [HttpPut("DeleteRolePermission/{id}")]
-        public ActionResult DeleteRolePermission([FromRoute] Guid id)
+        public async Task<ActionResult> DeleteRolePermission([FromRoute] Guid id)
         {
-            var rolePermission = _rolePermissionRepository.GetRolePermissionById(id);
-            if (rolePermission == null)
-                return NotFound();
-
-            rolePermission.IsDeleted = true;
-            _rolePermissionRepository.UpdateRolePermission(rolePermission);
-            return Ok(rolePermission);
+            await _rolePermissionService.DeleteRolePermissionAsync(id);
+            return NoContent();
         }
     }
 }

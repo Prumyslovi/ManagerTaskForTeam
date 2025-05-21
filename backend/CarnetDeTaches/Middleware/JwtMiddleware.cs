@@ -1,33 +1,33 @@
-﻿using CarnetDeTaches.Services;
+﻿using ManagerTaskForTeam.Application.Interfaces.Services;
 using Microsoft.AspNetCore.Http;
 using System.Threading.Tasks;
 
-namespace CarnetDeTaches.Middleware
+namespace ManagerTaskForTeam.API.Middleware
 {
     public class JwtMiddleware
     {
         private readonly RequestDelegate _next;
-        private readonly JwtService _jwtService;
 
-        public JwtMiddleware(RequestDelegate next, JwtService jwtService)
+        public JwtMiddleware(RequestDelegate next)
         {
             _next = next;
-            _jwtService = jwtService;
         }
 
         public async Task InvokeAsync(HttpContext context)
         {
+            var tokenService = context.RequestServices.GetRequiredService<ITokenService>();
+
             var token = context.Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last();
             if (!string.IsNullOrEmpty(token))
             {
                 try
                 {
-                    var principal = _jwtService.ValidateToken(token);
+                    var principal = tokenService.ValidateToken(token);
                     context.User = principal;
                 }
                 catch
                 {
-                    // Игнорируем ошибки валидации
+
                 }
             }
             await _next(context);

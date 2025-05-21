@@ -1,14 +1,17 @@
-using CarnetDeTaches.Model;
-using CarnetDeTaches.Repositories;
-using CarnetDeTaches.Hubs;
-using CarnetDeTaches.Services;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.OpenApi.Models;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 using System.Text;
+using ManagerTaskForTeam.Application.Interfaces.Repositories;
+using ManagerTaskForTeam.Application.Interfaces.Services;
+using ManagerTaskForTeam.Application.Services;
+using ManagerTaskForTeam.Infrastructure.Data;
+using ManagerTaskForTeam.Infrastructure.Repositories;
+using ManagerTaskForTeam.Infrastructure.Services;
+using ManagerTaskForTeam.API.Middleware;
 
-namespace CarnetDeTaches
+namespace ManagerTaskForTeam.API
 {
     public class Program
     {
@@ -28,31 +31,66 @@ namespace CarnetDeTaches
                     ValidateIssuerSigningKey = true,
                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Secret"])),
                     ValidateIssuer = true,
-                    ValidateAudience = true,
                     ValidIssuer = builder.Configuration["Jwt:Issuer"],
+                    ValidateAudience = true,
                     ValidAudience = builder.Configuration["Jwt:Audience"],
                     ValidateLifetime = true
                 };
             });
 
-            builder.Services.AddDbContext<DdCarnetDeTaches>(options =>
+            builder.Services.AddDbContext<ManagerTaskForTeamDbContext>(options =>
                 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-            builder.Services.AddControllers();
-            builder.Services.AddSignalR();
+            builder.Services.AddControllers().AddNewtonsoftJson();
             builder.Services.AddEndpointsApiExplorer();
+
             builder.Services.AddSwaggerGen(c =>
             {
-                c.SwaggerDoc("v1", new OpenApiInfo { Title = "Carnet De Taches API", Version = "v1" });
+                c.SwaggerDoc("v1", new OpenApiInfo { Title = "ManagerTaskForTeam API", Version = "v1" });
+                c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+                {
+                    Description = "JWT Authorization header using the Bearer scheme. Example: \"Bearer {token}\"",
+                    Name = "Authorization",
+                    In = ParameterLocation.Header,
+                    Type = SecuritySchemeType.ApiKey,
+                    Scheme = "Bearer"
+                });
+                c.AddSecurityRequirement(new OpenApiSecurityRequirement
+                {
+                    {
+                        new OpenApiSecurityScheme
+                        {
+                            Reference = new OpenApiReference
+                            {
+                                Type = ReferenceType.SecurityScheme,
+                                Id = "Bearer"
+                            }
+                        },
+                        new string[] {}
+                    }
+                });
             });
 
             builder.Services.AddScoped<IMemberRepository, MemberRepository>();
-            builder.Services.AddScoped<IMemberRoleRepository, MemberRoleRepository>();
-            builder.Services.AddScoped<ITeamRepository, TeamRepository>();
+            builder.Services.AddScoped<IMemberService, MemberService>();
             builder.Services.AddScoped<IProjectRepository, ProjectRepository>();
-            builder.Services.AddScoped<ITaskRepository, TaskRepository>();
-            builder.Services.AddScoped<IDocumentRepository, DocumentRepository>();
+            builder.Services.AddScoped<IProjectService, ProjectService>();
+            builder.Services.AddScoped<IPermissionRepository, PermissionRepository>();
+            builder.Services.AddScoped<IPermissionService, PermissionService>();
+            builder.Services.AddScoped<IRoleRepository, RoleRepository>();
+            builder.Services.AddScoped<IRoleService, RoleService>();
+            builder.Services.AddScoped<IRolePermissionRepository, RolePermissionRepository>();
+            builder.Services.AddScoped<IRolePermissionService, RolePermissionService>();
             builder.Services.AddScoped<IStatusRepository, StatusRepository>();
+            builder.Services.AddScoped<IStatusService, StatusService>();
+            builder.Services.AddScoped<ITaskRepository, TaskRepository>();
+            builder.Services.AddScoped<ITaskService, TaskService>();
+            builder.Services.AddScoped<ITaskDependencyRepository, TaskDependencyRepository>();
+            builder.Services.AddScoped<ITaskDependencyService, TaskDependencyService>();
+            builder.Services.AddScoped<ITeamRepository, TeamRepository>();
+            builder.Services.AddScoped<ITeamService, TeamService>();
+            builder.Services.AddScoped<IProjectTaskRepository, ProjectTaskRepository>();
+            builder.Services.AddScoped<IProjectTaskService, ProjectTaskService>();
             builder.Services.AddScoped<ITokenService, JwtService>();
 
             builder.Services.AddCors(options =>
@@ -75,23 +113,13 @@ namespace CarnetDeTaches
                 app.UseSwagger();
                 app.UseSwaggerUI();
             }
-            else
-            {
-                app.UseExceptionHandler("/Home/Error");
-                app.UseHsts();
-            }
 
             app.UseHttpsRedirection();
-            app.UseStaticFiles();
-
-            app.UseRouting();
-
             app.UseAuthentication();
             app.UseAuthorization();
+            app.UseJwtMiddleware();
 
             app.MapControllers();
-            app.MapHub<DocumentHub>("/documentHub");
-            app.UseWebSockets();
 
             app.Run();
         }

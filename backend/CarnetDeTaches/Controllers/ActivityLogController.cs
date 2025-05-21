@@ -1,54 +1,48 @@
-﻿using CarnetDeTaches.Repositories;
+﻿using ManagerTaskForTeam.Application.Interfaces.Services;
+using ManagerTaskForTeam.Domain.Entities;
 using Microsoft.AspNetCore.Mvc;
-using CarnetDeTaches.Model;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
-namespace CarnetDeTaches.Controllers
+namespace ManagerTaskForTeam.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
     public class ActivityLogController : ControllerBase
     {
-        private readonly IActivityLogRepository _activityLogRepository;
+        private readonly IActivityLogService _service;
 
-        public ActivityLogController([FromServices] IActivityLogRepository activityLogRepository)
+        public ActivityLogController(IActivityLogService service)
         {
-            _activityLogRepository = activityLogRepository;
+            _service = service;
         }
 
         [HttpGet("GetAllActivityLogs")]
-        public ActionResult<IEnumerable<ActivityLog>> GetAllActivityLogs()
+        public async Task<ActionResult<IEnumerable<ActivityLog>>> GetAllActivityLogs()
         {
-            var logs = _activityLogRepository.GetAllActivityLogs();
+            var logs = await _service.GetAllActivityLogsAsync();
             return Ok(logs);
         }
 
         [HttpPost("GetActivityLog")]
         public async Task<ActionResult<ActivityLog>> GetActivityLog([FromBody] Guid activityLogId)
         {
-            if (activityLogId == Guid.Empty)
-                return BadRequest("Ошибка: ActivityLog Id не может быть пустым.");
-
-            var log = await _activityLogRepository.GetActivityLog(activityLogId);
-            if (log == null)
-                return NotFound();
-
+            var log = await _service.GetActivityLogAsync(activityLogId);
             return Ok(log);
         }
 
         [HttpPost("AddActivityLog")]
         public async Task<ActionResult<ActivityLog>> AddActivityLog([FromBody] ActivityLog activityLog)
         {
-            var createdLog = await _activityLogRepository.AddActivityLog(activityLog);
+            var createdLog = await _service.AddActivityLogAsync(activityLog);
             return CreatedAtAction(nameof(GetActivityLog), new { activityLogId = createdLog.ActivityLogId }, createdLog);
         }
 
         [HttpDelete("DeleteActivityLog/{activityLogId}")]
         public async Task<ActionResult> DeleteActivityLog([FromRoute] Guid activityLogId)
         {
-            var log = await _activityLogRepository.DeleteActivityLog(activityLogId);
-            if (log == null)
-                return NotFound();
-
+            await _service.DeleteActivityLogAsync(activityLogId);
             return NoContent();
         }
     }

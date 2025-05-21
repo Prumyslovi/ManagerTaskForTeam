@@ -415,3 +415,26 @@
     background-color: #b3d9ff;
     cursor: not-allowed;
 }
+
+.date-picker-input {
+    font-size: 0.95em;
+    padding: 2px 5px;
+}
+
+.date-picker-input .MuiInputBase-input {
+    padding: 5px;
+}
+
+.task-modal-metadata {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 30px;
+}
+
+.metadata-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.95em;
+}
