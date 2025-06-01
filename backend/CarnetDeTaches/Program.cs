@@ -10,6 +10,7 @@ using ManagerTaskForTeam.Infrastructure.Data;
 using ManagerTaskForTeam.Infrastructure.Repositories;
 using ManagerTaskForTeam.Infrastructure.Services;
 using ManagerTaskForTeam.API.Middleware;
+using ManagerTaskForTeam.API.Hubs;
 
 namespace ManagerTaskForTeam.API
 {
@@ -70,9 +71,13 @@ namespace ManagerTaskForTeam.API
                     }
                 });
             });
+            
+            builder.Services.AddSignalR();
 
             builder.Services.AddScoped<IMemberRepository, MemberRepository>();
             builder.Services.AddScoped<IMemberService, MemberService>();
+            builder.Services.AddScoped<IMemberRoleService, MemberRoleService>();
+            builder.Services.AddScoped<IMemberRoleRepository, MemberRoleRepository>();
             builder.Services.AddScoped<IProjectRepository, ProjectRepository>();
             builder.Services.AddScoped<IProjectService, ProjectService>();
             builder.Services.AddScoped<IPermissionRepository, PermissionRepository>();
@@ -92,6 +97,10 @@ namespace ManagerTaskForTeam.API
             builder.Services.AddScoped<IProjectTaskRepository, ProjectTaskRepository>();
             builder.Services.AddScoped<IProjectTaskService, ProjectTaskService>();
             builder.Services.AddScoped<ITokenService, JwtService>();
+            builder.Services.AddScoped<IDocumentService, DocumentService>();
+            builder.Services.AddScoped<IDocumentRepository, DocumentRepository>();
+            builder.Services.AddScoped<ICommentRepository, CommentRepository>();
+            builder.Services.AddScoped<ICommentService, CommentService>();
 
             builder.Services.AddCors(options =>
             {
@@ -118,6 +127,8 @@ namespace ManagerTaskForTeam.API
             app.UseAuthentication();
             app.UseAuthorization();
             app.UseJwtMiddleware();
+
+            app.MapHub<DocumentHub>("/documentHub");
 
             app.MapControllers();
 
