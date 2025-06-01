@@ -1,28 +1,46 @@
 .team-management {
-  margin: 40px 40px; /* Отступы для блока управления командой */
-  padding: 20px; /* Внутренние отступы */
-  background-color: #ffffff; /* Цвет фона системы */
-  border: 2px solid #0E294B; /* Граница */
-  border-radius: 8px; /* Закругление углов */
+  margin: 40px 40px;
+  padding: 20px;
+  background-color: var(--card-bg);
+  border: 2px solid var(--border);
+  border-radius: 8px;
+  box-shadow: var(--shadow);
+  transition: background-color 0.3s ease, border-color 0.3s ease;
 }
 
 .admin-title {
-  color: #1D334A; /* Цвет заголовка */
-  font-size: 28px; /* Размер шрифта заголовка */
-  margin-bottom: 20px; /* Отступ снизу */
+  color: var(--text-primary);
+  font-size: 28px;
+  margin-bottom: 20px;
+  transition: color 0.3s ease;
 }
 
 .menu {
-  display: flex; /* Выравнивание кнопок в ряд */
-  gap: 20px; /* Промежутки между кнопками */
-  margin-bottom: 20px; /* Отступ снизу меню */
+  display: flex;
+  gap: 20px;
+  margin-bottom: 20px;
 }
 
 .menu button {
-  flex-grow: 1; /* Кнопки занимают равное пространство */
-} 
+  flex-grow: 1;
+  background-color: var(--button-bg);
+  color: var(--button-text);
+  border: 2px solid var(--border);
+  border-radius: 8px;
+  padding: 10px 15px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.menu button:hover {
+  background-color: var(--button-hover-bg);
+  color: var(--button-hover-text);
+  box-shadow: var(--shadow-hover);
+}
 
 .content {
-  border-top: 4px solid #0E294B; /* Верхняя граница для разделения меню и контента */
-  padding-top: 15px; /* Отступ сверху для контента */
+  border-top: 4px solid var(--border);
+  padding-top: 15px;
+  transition: border-color 0.3s ease;
 }

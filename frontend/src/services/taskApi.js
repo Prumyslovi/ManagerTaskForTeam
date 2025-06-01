@@ -61,6 +61,7 @@ export const createTask = async (taskData) => {
 };
 
 export const updateTask = async (taskId, taskData) => {
+  console.log('Отправляемые данные:', taskData);
   const response = await api.put(`/Task/UpdateTask/${taskId}`, taskData);
   return response.data;
 };
@@ -71,7 +72,7 @@ export const deleteTask = async (taskId) => {
 };
 
 export const fetchTasksForProject = async (projectId) => {
-  const response = await api.get(`/Task/GetTasksForProject/${projectId}`);
+  const response = await api.get(`/Task/GetTasksByProject/${projectId}`);
   return response.data;
 };
 

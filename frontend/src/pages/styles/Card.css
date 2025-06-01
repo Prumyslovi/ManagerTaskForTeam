@@ -1,0 +1,39 @@
+.card {
+  background-color: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: var(--shadow);
+  color: var(--text-primary);
+  transition: all 0.3s ease;
+  margin-bottom: 20px;
+  font-family: var(--font-primary);
+}
+
+.cardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+  font-family: var(--font-primary);
+}
+
+.cardTitle {
+  font-size: 1.25rem;
+  margin: 0;
+  color: var(--text-primary);
+  font-family: var(--font-primary);
+}
+
+.cardBody {
+  color: var(--text-primary);
+  font-family: var(--font-primary);
+}
+
+.cardFooter {
+  margin-top: 15px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  font-family: var(--font-primary);
+}

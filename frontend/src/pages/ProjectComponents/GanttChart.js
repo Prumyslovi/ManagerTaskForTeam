@@ -16,8 +16,8 @@ const russianDateFormat = (date, type) => {
     const options = type === "month"
         ? { month: "long", year: "numeric", locale: "ru" }
         : type === "monthOnly"
-        ? { month: "long", locale: "ru" }
-        : { day: "numeric", weekday: "short", locale: "ru" };
+            ? { month: "long", locale: "ru" }
+            : { day: "numeric", weekday: "short", locale: "ru" };
     return new Intl.DateTimeFormat("ru-RU", options).format(date);
 };
 
@@ -240,10 +240,10 @@ const GanttChart = ({ projectId, teamId, currentUserId }) => {
     const columns = useMemo(() => [
         { id: "text", header: "Задача", flexGrow: 2, width: columnWidth, align: "center" },
         { id: "start", header: "Начало", flexGrow: 1, width: columnWidth, align: "center", format: (task) => formatDateForInput(task.start) },
-        { 
-            id: "duration", 
-            header: "Длительность", 
-            align: "center", 
+        {
+            id: "duration",
+            header: "Длительность",
+            align: "center",
             flexGrow: 1,
             width: columnWidth,
             format: (task) => scale === "day" ? Math.round(task.duration * 9) : task.duration
@@ -309,22 +309,16 @@ const GanttChart = ({ projectId, teamId, currentUserId }) => {
                 }
             });
 
-            let lastClickTime = 0;
+            // Изменено: теперь открываем модалку по одинарному клику
             element.addEventListener("click", (e) => {
                 e.preventDefault();
-                const currentTime = Date.now();
-                const doubleClickThreshold = 300;
-
-                if (currentTime - lastClickTime < doubleClickThreshold) {
-                    const taskId = element.getAttribute("data-task-id");
-                    if (taskId) {
-                        const fullTask = tasks.find(t => t.id === taskId);
-                        if (fullTask) {
-                            openEditModal(fullTask);
-                        }
+                const taskId = element.getAttribute("data-task-id");
+                if (taskId) {
+                    const fullTask = tasks.find(t => t.id === taskId);
+                    if (fullTask) {
+                        openEditModal(fullTask);
                     }
                 }
-                lastClickTime = currentTime;
             });
         });
     }, [tasks, scale]);
@@ -335,172 +329,187 @@ const GanttChart = ({ projectId, teamId, currentUserId }) => {
     const { scales, start, end } = getScalesAndRange();
 
     return (
-        <div className="gantt-container" style={{ width: "100%", position: "relative" }} ref={ganttRef}>
-            <ImportExport 
-                data={{ tasks, links }} 
-                setData={({ tasks: newTasks, links: newLinks }) => { setTasks(newTasks); setLinks(newLinks); }} 
-                projectId={projectId} 
-                type="gantt" 
+        <div>
+            <ImportExport
+                data={{ tasks, links }}
+                setData={({ tasks: newTasks, links: newLinks }) => { setTasks(newTasks); setLinks(newLinks); }}
+                projectId={projectId}
+                type="gantt"
+                className="import-export-button"
             />
-            <div className="container" style={{ position: "relative" }}>
-                <button 
-                    className="filterButton"
-                    onClick={toggleFilterPanel}
-                >
-                    <FaFilter className="filterIcon" />
-                </button>
-                {isFilterPanelOpen && (
-                    <div className="filterPanel">
-                        <label style={{ display: "flex", alignItems: "center", marginBottom: "10px" }}>
-                            <input 
-                                type="checkbox" 
-                                checked={filterByUser} 
-                                onChange={handleFilterByUserChange} 
-                                style={{ marginRight: "5px" }} 
-                            />
-                            Только мои задачи
-                        </label>
-                        <div style={{ marginBottom: "10px" }}>
-                            <span>Статус:</span>
-                            <select className="scaleSelect" value={statusFilter} onChange={handleStatusFilterChange} style={{ marginLeft: "5px" }}>
-                                <option value="all">Все</option>
-                                <option value="planned">В планах</option>
-                                <option value="in_progress">В процессе</option>
-                                <option value="completed">Выполнено</option>
-                                <option value="failed">Провалено</option>
-                            </select>
+
+            <button
+                className="filterButton"
+                onClick={toggleFilterPanel}
+            >
+                <FaFilter className="filterIcon" />
+            </button>
+
+            <div className="gantt-container" style={{ width: "100%", position: "relative" }} ref={ganttRef}>
+                <div className="container" style={{ position: "relative" }}>
+                    {/* Импорт/Экспорт теперь на уровне других элементов управления */}
+
+                    {isFilterPanelOpen && (
+                        <div className="filterPanel">
+                            <label style={{ display: "flex", alignItems: "center", marginBottom: "10px" }}>
+                                <input
+                                    type="checkbox"
+                                    checked={filterByUser}
+                                    onChange={handleFilterByUserChange}
+                                    style={{ marginRight: "5px" }}
+                                />
+                                Только мои задачи
+                            </label>
+                            <div style={{ marginBottom: "10px" }}>
+                                <span>Статус:</span>
+                                <select className="scaleSelect" value={statusFilter} onChange={handleStatusFilterChange} style={{ marginLeft: "5px" }}>
+                                    <option value="all">Все</option>
+                                    <option value="planned">В планах</option>
+                                    <option value="in_progress">В процессе</option>
+                                    <option value="completed">Выполнено</option>
+                                    <option value="failed">Провалено</option>
+                                </select>
+                            </div>
+                            <label style={{ display: "flex", alignItems: "center" }}>
+                                <input
+                                    type="checkbox"
+                                    checked={filterByDueDate}
+                                    onChange={handleFilterByDueDateChange}
+                                    style={{ marginRight: "5px" }}
+                                />
+                                Ближайшие дедлайны (3 дня)
+                            </label>
                         </div>
-                        <label style={{ display: "flex", alignItems: "center" }}>
-                            <input 
-                                type="checkbox" 
-                                checked={filterByDueDate} 
-                                onChange={handleFilterByDueDateChange} 
-                                style={{ marginRight: "5px" }} 
-                            />
-                            Ближайшие дедлайны (3 дня)
-                        </label>
-                    </div>
-                )}
-                <select className="scaleSelect" value={scale} onChange={handleScaleChange} style={{ margin: "0 5px" }}>
-                    <option value="all">Всё время</option>
-                    <option value="year">Год</option>
-                    <option value="month">Месяц</option>
-                    <option value="week">Неделя</option>
-                    <option value="day">День</option>
-                </select>
-                <span>Ширина колонок таблицы:</span>
-                <select className="scaleSelect" value={columnWidth} onChange={(e) => setColumnWidth(Number(e.target.value))} style={{ margin: "0 5px" }}>
-                    <option value={80}>80px</option>
-                    <option value={100}>100px</option>
-                    <option value={120}>120px</option>
-                    <option value={150}>150px</option>
-                </select>
-                <span>Ширина ячеек графика:</span>
-                <select className="scaleSelect" value={cellWidth} onChange={(e) => setCellWidth(Number(e.target.value))} style={{ margin: "0 5px" }}>
-                    <option value={60}>60px</option>
-                    <option value={80}>80px</option>
-                    <option value={100}>100px</option>
-                    <option value={120}>120px</option>
-                </select>
-                <span>Высота шкалы:</span>
-                <select className="scaleSelect" value={scaleHeight} onChange={(e) => setScaleHeight(Number(e.target.value))} style={{ margin: "0 5px" }}>
-                    <option value={40}>40px</option>
-                    <option value={50}>50px</option>
-                    <option value={60}>60px</option>
-                    <option value={70}>70px</option>
-                </select>
-                <button className="editButton" onClick={openAddTaskModal}>
-                    Добавить задачу
-                </button>
-            </div>
-            <div style={{ marginBottom: "10px" }}></div>
-            <Willow>
-                <Gantt
-                    tasks={filteredTasks.map(task => ({
-                        ...task,
-                        segments: (() => {
-                            const start = new Date(task.start);
-                            const end = new Date(task.end);
-                            const segments = [];
-                            let current = new Date(start);
-                            while (current <= end) {
-                                if (!isWeekend(current)) {
-                                    const startHour = new Date(current);
-                                    startHour.setHours(9, 0, 0, 0);
-                                    const endHour = new Date(current);
-                                    endHour.setHours(18, 0, 0, 0);
-                                    if (startHour >= start && endHour <= end) {
-                                        segments.push({ start: startHour, end: endHour });
-                                    } else if (startHour < start && endHour <= end) {
-                                        segments.push({ start, end: endHour });
-                                    } else if (startHour >= start && endHour > end) {
-                                        segments.push({ start: startHour, end });
+                    )}
+                    <select className="scaleSelect" value={scale} onChange={handleScaleChange} style={{ margin: "0 5px" }}>
+                        <option value="all">Всё время</option>
+                        <option value="year">Год</option>
+                        <option value="month">Месяц</option>
+                        <option value="week">Неделя</option>
+                        <option value="day">День</option>
+                    </select>
+                    <span>Ширина колонок таблицы:</span>
+                    <select className="scaleSelect" value={columnWidth} onChange={(e) => setColumnWidth(Number(e.target.value))} style={{ margin: "0 5px" }}>
+                        <option value={80}>80px</option>
+                        <option value={100}>100px</option>
+                        <option value={120}>120px</option>
+                        <option value={150}>150px</option>
+                    </select>
+                    <span>Ширина ячеек графика:</span>
+                    <select className="scaleSelect" value={cellWidth} onChange={(e) => setCellWidth(Number(e.target.value))} style={{ margin: "0 5px" }}>
+                        <option value={60}>60px</option>
+                        <option value={80}>80px</option>
+                        <option value={100}>100px</option>
+                        <option value={120}>120px</option>
+                    </select>
+                    <span>Высота шкалы:</span>
+                    <select className="scaleSelect" value={scaleHeight} onChange={(e) => setScaleHeight(Number(e.target.value))} style={{ margin: "0 5px" }}>
+                        <option value={40}>40px</option>
+                        <option value={50}>50px</option>
+                        <option value={60}>60px</option>
+                        <option value={70}>70px</option>
+                    </select>
+                    <button className="editButton" onClick={openAddTaskModal}>
+                        Добавить задачу
+                    </button>
+                </div>
+                <div style={{ marginBottom: "10px" }}></div>
+                <Willow>
+                    <Gantt
+                        tasks={filteredTasks.map(task => ({
+                            ...task,
+                            segments: (() => {
+                                const start = new Date(task.start);
+                                const end = new Date(task.end);
+                                const segments = [];
+                                let current = new Date(start);
+                                while (current <= end) {
+                                    if (!isWeekend(current)) {
+                                        const startHour = new Date(current);
+                                        startHour.setHours(9, 0, 0, 0);
+                                        const endHour = new Date(current);
+                                        endHour.setHours(18, 0, 0, 0);
+                                        if (startHour >= start && endHour <= end) {
+                                            segments.push({ start: startHour, end: endHour });
+                                        } else if (startHour < start && endHour <= end) {
+                                            segments.push({ start, end: endHour });
+                                        } else if (startHour >= start && endHour > end) {
+                                            segments.push({ start: startHour, end });
+                                        }
                                     }
+                                    current.setDate(current.getDate() + 1);
                                 }
-                                current.setDate(current.getDate() + 1);
+                                return segments.length > 0 ? segments : [];
+                            })()
+                        }))}
+                        links={links}
+                        columns={columns}
+                        scales={scales}
+                        start={start}
+                        end={end}
+                        readonly={true}
+                        cellWidth={cellWidth}
+                        scaleHeight={scaleHeight}
+                        palette={{
+                            default: "var(--gantt-task-fill)",
+                            progress: "var(--gantt-task-fill)",
+                            borderColor: "var(--border)",
+                            today: scale === "day" ? "var(--accent)" : "transparent"
+                        }}
+                        gridLineColor="var(--border-light)"
+                        taskLabelStyle={{
+                            color: "var(--text-primary)",
+                            fontSize: 16,
+                            fontWeight: "bold"
+                        }}
+                        borderColor="var(--border)"
+                        todayLine={{
+                            color: "transparent",
+                            width: 2,
+                            text: ""
+                        }}
+                    />
+                </Willow>
+                {isEditModalOpen && selectedTask && (
+                    <TaskModal
+                        task={selectedTask}
+                        teamId={teamId}
+                        onClose={closeEditModal}
+                        projectId={projectId}
+                        onSave={async (updatedTask) => {
+                            try {
+                                await updateTask(updatedTask.taskId, {
+                                    taskId: updatedTask.taskId,
+                                    taskName: updatedTask.taskName,
+                                    description: updatedTask.description,
+                                    projectId: updatedTask.projectId,
+                                    memberId: updatedTask.memberId,
+                                    status: updatedTask.status,
+                                    startDate: updatedTask.startDate,
+                                    endDate: updatedTask.endDate,
+                                    progress: updatedTask.progress,
+                                    isDeleted: updatedTask.isDeleted
+                                });
+                                closeEditModal();
+                            } catch (error) {
+                                console.error("Ошибка обновления задачи:", error);
                             }
-                            return segments.length > 0 ? segments : [];
-                        })()
-                    }))}
-                    links={links}
-                    columns={columns}
-                    scales={scales}
-                    start={start}
-                    end={end}
-                    readonly={true}
-                    cellWidth={cellWidth}
-                    scaleHeight={scaleHeight}
-                    palette={{
-                        default: "#1D334A",
-                        progress: "#1D334A",
-                        borderColor: "black",
-                        today: scale === "day" ? "#FF0000" : "transparent"
-                    }}
-                    gridLineColor="#000000"
-                    taskLabelStyle={{ color: "#000000", fontSize: 16, fontWeight: "bold" }}
-                    borderColor="#000000"
-                    todayLine={{ color: "transparent", width: 2, text: "" }}
-                />
-            </Willow>
-            {isEditModalOpen && selectedTask && (
-                <TaskModal
-                    task={selectedTask}
-                    teamId={teamId}
-                    onClose={closeEditModal}
-                    projectId={projectId}
-                    onSave={async (updatedTask) => {
-                        try {
-                            await updateTask(updatedTask.taskId, {
-                                taskId: updatedTask.taskId,
-                                taskName: updatedTask.taskName,
-                                description: updatedTask.description,
-                                projectId: updatedTask.projectId,
-                                memberId: updatedTask.memberId,
-                                status: updatedTask.status,
-                                startDate: updatedTask.startDate,
-                                endDate: updatedTask.endDate,
-                                progress: updatedTask.progress,
-                                isDeleted: updatedTask.isDeleted
-                            });
-                            closeEditModal();
-                        } catch (error) {
-                            console.error("Ошибка обновления задачи:", error);
-                        }
-                    }}
-                />
-            )}
-            {isAddModalOpen && (
-                <AddTaskModal
-                    visible={isAddModalOpen}
-                    onVisibilityChange={closeAddModal}
-                    onTaskAdd={(newTask) => {
-                        setTasks([...tasks, newTask]);
-                        closeAddModal();
-                    }}
-                    teamId={teamId}
-                    projectId={projectId}
-                />
-            )}
+                        }}
+                    />
+                )}
+                {isAddModalOpen && (
+                    <AddTaskModal
+                        visible={isAddModalOpen}
+                        onVisibilityChange={closeAddModal}
+                        onTaskAdd={(newTask) => {
+                            setTasks([...tasks, newTask]);
+                            closeAddModal();
+                        }}
+                        teamId={teamId}
+                        projectId={projectId}
+                    />
+                )}
+            </div>
         </div>
     );
 };

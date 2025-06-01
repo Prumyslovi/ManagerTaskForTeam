@@ -1,8 +1,9 @@
 import React from 'react';
+import '../styles/ProjectTable.css'; // Убедитесь, что этот файл существует
 
 const ProjectTable = ({ projects, onRowClick, selectedProject }) => (
   <div>
-    <table>
+    <table className="project-table">
       <thead>
         <tr>
           <th>Проект</th>
@@ -15,6 +16,7 @@ const ProjectTable = ({ projects, onRowClick, selectedProject }) => (
             key={project.id}
             onClick={() => onRowClick(project.projectId)}
             className={`project-row ${selectedProject === project.id ? 'selected' : ''}`}
+            style={{ backgroundColor: 'var(--card-bg)' }}
           >
             <td>{project.projectName}</td>
             <td>{project.description}</td>

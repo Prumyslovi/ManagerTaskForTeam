@@ -17,62 +17,40 @@ const getInitials = (name) => {
   return (names[0].charAt(0) + names[names.length - 1].charAt(0)).toUpperCase();
 };
 
-const getPillStyle = (type, value) => {
-  let backgroundColor = '#1D334A';
-  let color = '#FFFFFF';
-  if (type === 'status') {
-    const statusLower = value?.toLowerCase() || '';
-    if (statusLower.includes('progress') || statusLower.includes('процессе')) {
-      backgroundColor = '#10447c';
-      color = '#FFFFFF';
-    } else if (statusLower.includes('done') || statusLower.includes('сделано')) {
-      backgroundColor = '#d8a903';
-      color = '#000000';
-    } else {
-      backgroundColor = '#1D334A';
-      color = '#FFFFFF';
-    }
-  } else if (type === 'priority') {
-    switch (value?.toLowerCase()) {
-      case 'низкий':
-      case 'low':
-        backgroundColor = '#4CAF50';
-        color = '#000000';
-        break;
-      case 'средний':
-      case 'medium':
-        backgroundColor = '#2196F3';
-        color = '#FFFFFF';
-        break;
-      case 'высокий':
-      case 'high':
-        backgroundColor = '#FF9800';
-        color = '#000000';
-        break;
-      case 'срочный':
-      case 'urgent':
-        backgroundColor = '#FF5722';
-        color = '#FFFFFF';
-        break;
-      case 'критический':
-      case 'critical':
-        backgroundColor = '#D32F2F';
-        color = '#FFFFFF';
-        break;
-      default:
-        backgroundColor = '#1D334A';
-        color = '#FFFFFF';
-        break;
-    }
-  }
-  return { backgroundColor, color };
+const getStatusStyle = (status) => {
+  const statusLower = status?.toLowerCase() || '';
+  if (statusLower.includes('планах')) return { backgroundColor: 'var(--status-planned-bg)', color: 'var(--status-planned-text)' };
+  if (statusLower.includes('процессе')) return { backgroundColor: 'var(--status-in-progress-bg)', color: 'var(--status-in-progress-text)' };
+  if (statusLower.includes('проверке')) return { backgroundColor: 'var(--status-under-review-bg)', color: 'var(--status-under-review-text)' };
+  if (statusLower.includes('сделано')) return { backgroundColor: 'var(--status-done-bg)', color: 'var(--status-done-text)' };
+
+  const randomColors = ['#0288D1', '#7B1FA2', '#388E3C', '#FBC02D', '#D81B60', '#455A64'];
+  const randomIndex = Math.floor(Math.random() * randomColors.length);
+  return { backgroundColor: randomColors[randomIndex], color: '#FFFFFF' };
 };
 
-const TaskModal = ({ task, teamId, onClose }) => {
+const getPriorityStyle = (priority) => {
+  switch (priority?.toLowerCase()) {
+    case 'низкий': case 'low':
+      return { backgroundColor: 'var(--priority-low-bg)', color: 'var(--priority-low-text)' };
+    case 'средний': case 'medium':
+      return { backgroundColor: 'var(--priority-medium-bg)', color: 'var(--priority-medium-text)' };
+    case 'высокий': case 'high':
+      return { backgroundColor: 'var(--priority-high-bg)', color: 'var(--priority-high-text)' };
+    case 'срочный': case 'urgent':
+      return { backgroundColor: 'var(--priority-urgent-bg)', color: 'var(--priority-urgent-text)' };
+    case 'критический': case 'critical':
+      return { backgroundColor: 'var(--priority-critical-bg)', color: 'var(--priority-critical-text)' };
+    default:
+      return { backgroundColor: 'var(--bg-secondary)', color: 'var(--text-primary)' };
+  }
+};
+
+const TaskModal = ({ task, teamId, onClose, projectId, onTasksRefresh }) => {
   const [comments, setComments] = useState([]);
   const [newComment, setNewComment] = useState('');
   const [description, setDescription] = useState(task.description || '');
-  const [priority, setPriority] = useState(task.priority || 'Низкий');
+  const [priority, setPriority] = useState(task.priority || '');
   const [startDate, setStartDate] = useState(task.startDate ? new Date(task.startDate) : null);
   const [endDate, setEndDate] = useState(task.endDate ? new Date(task.endDate) : null);
   const [userProfiles, setUserProfiles] = useState({});
@@ -97,7 +75,7 @@ const TaskModal = ({ task, teamId, onClose }) => {
     setCurrentUserId(userId);
     const loadData = async () => {
       if (!task?.id || !teamId) {
-        console.error("Task ID или Team ID отсутствует");
+        console.error('Task ID или Team ID отсутствует');
         setIsLoading(false);
         return;
       }
@@ -111,7 +89,7 @@ const TaskModal = ({ task, teamId, onClose }) => {
         if (fetchedComments.status === 'fulfilled') {
           setComments(fetchedComments.value || []);
         } else {
-          console.error("Ошибка при получении комментариев:", fetchedComments.reason);
+          console.error('Ошибка при получении комментариев:', fetchedComments.reason);
           setComments([]);
         }
         if (fetchedStatuses.status === 'fulfilled') {
@@ -122,21 +100,19 @@ const TaskModal = ({ task, teamId, onClose }) => {
             setSelectedStatus('');
           }
         } else {
-          console.error("Ошибка при получении статусов:", fetchedStatuses.reason);
+          console.error('Ошибка при получении статусов:', fetchedStatuses.reason);
           setStatuses([]);
-          setSelectedStatus('');
         }
         if (fetchedMembers.status === 'fulfilled') {
           setTeamMembers(fetchedMembers.value || []);
         } else {
-          console.error("Ошибка при загрузке участников команды:", fetchedMembers.reason);
+          console.error('Ошибка при загрузке участников команды:', fetchedMembers.reason);
           setTeamMembers([]);
         }
         const loadedComments = fetchedComments.status === 'fulfilled' ? fetchedComments.value : [];
         const memberIds = new Set([
           ...loadedComments.map(comment => comment.memberId),
           task.assignee,
-          task.assignedBy,
           userId
         ].filter(Boolean));
         const profilesToFetch = Array.from(memberIds).filter(id => !userProfiles[id]);
@@ -166,23 +142,44 @@ const TaskModal = ({ task, teamId, onClose }) => {
       }
     };
     loadData();
-  }, [task.id, task.assignee, task.assignedBy, teamId, userProfiles, selectedStatus]);
+  }, [task.id, task.assignee, teamId, userProfiles, selectedStatus]);
 
   const handleUpdateTask = async (updates) => {
     try {
-      const updatedTask = await updateTask(task.id, { ...task, ...updates });
-      if (updates.status !== undefined) setSelectedStatus(updatedTask.status || updates.status);
-      if (updates.priority !== undefined) setPriority(updatedTask.priority || updates.priority);
-      if (updates.description !== undefined) setDescription(updatedTask.description || updates.description);
-      if (updates.startDate !== undefined)
-        setStartDate(updatedTask.startDate ? new Date(updatedTask.startDate) : updates.startDate);
-      if (updates.endDate !== undefined)
-        setEndDate(updatedTask.endDate ? new Date(updatedTask.endDate) : updates.endDate);
-      if (updates.assignee !== undefined) {
-        task.assignee = updatedTask.assignee || updates.assignee;
+      const formatDateTime = (date) => {
+        if (!date) throw new Error('Дата обязательна');
+        if (typeof date === 'string' && date.length === 10) {
+          return date + 'T00:00:00Z';
+        }
+        return new Date(date).toISOString();
+      };
+
+      const taskData = {
+        TaskId: task.id,
+        TaskName: task.title,
+        Description: updates.description !== undefined ? updates.description : task.description,
+        ProjectId: projectId,
+        MemberId: updates.memberId !== undefined ? updates.memberId : task.assignee,
+        Status: updates.status !== undefined ? updates.status : task.status,
+        StartDate: updates.startDate ? formatDateTime(updates.startDate) : formatDateTime(task.startDate),
+        EndDate: updates.endDate ? formatDateTime(updates.endDate) : formatDateTime(task.endDate),
+        Priority: updates.priority !== undefined ? updates.priority : task.priority,
+        IsDeleted: task.isDeleted || false,
+      };
+
+      const updatedTask = await updateTask(task.id, taskData);
+      setSelectedStatus(updatedTask.status);
+      setPriority(updatedTask.priority);
+      setDescription(updatedTask.description);
+      setStartDate(updatedTask.startDate ? new Date(updatedTask.startDate) : null);
+      setEndDate(updatedTask.endDate ? new Date(updatedTask.endDate) : null);
+
+      if (updatedTask.memberId) {
+        task.assignee = updatedTask.memberId;
       }
     } catch (error) {
-      console.error(`Ошибка при обновлении задачи:`, error);
+      console.error('Ошибка при обновлении задачи:', error);
+      alert(`Не удалось обновить задачу: ${error.response?.data?.message || error.message}`);
     }
   };
 
@@ -220,6 +217,13 @@ const TaskModal = ({ task, teamId, onClose }) => {
     }
   };
 
+  const handleClose = () => {
+    onClose();
+    if (onTasksRefresh) {
+      onTasksRefresh();
+    }
+  };
+
   const formatDateTime = (dateString) => {
     if (!dateString) return '';
     try {
@@ -238,10 +242,9 @@ const TaskModal = ({ task, teamId, onClose }) => {
   const renderMetadataValue = (field) => {
     switch (field) {
       case 'Статус':
-        const styleStatus = getPillStyle('status', selectedStatus);
         return (
           <div className="metadata-value metadata-value--interactive">
-            <span className="pill" style={styleStatus}>
+            <span className="pill" style={getStatusStyle(selectedStatus)}>
               {selectedStatus || 'Нет'}
             </span>
             <FaChevronDown className="metadata-value-icon" />
@@ -269,7 +272,7 @@ const TaskModal = ({ task, teamId, onClose }) => {
             <select
               className="metadata-select-overlay scaleSelect"
               value={assigneeId || ''}
-              onChange={(e) => handleUpdateTask({ assignee: e.target.value })}
+              onChange={(e) => handleUpdateTask({ memberId: e.target.value })}
             >
               <option value="">Не назначен</option>
               {teamMembers.map((member) => (
@@ -288,13 +291,13 @@ const TaskModal = ({ task, teamId, onClose }) => {
               <DatePicker
                 value={startDate}
                 onChange={(date) => handleUpdateTask({ startDate: date })}
-                renderInput={(params) => <TextField {...params} className="date-picker-input" />}
+                renderInput={(params) => <TextField {...params} className="date-picker-input small-date-picker" />}
               />
               <span className="date-label">Конец:</span>
               <DatePicker
                 value={endDate}
                 onChange={(date) => handleUpdateTask({ endDate: date })}
-                renderInput={(params) => <TextField {...params} className="date-picker-input" />}
+                renderInput={(params) => <TextField {...params} className="date-picker-input small-date-picker" />}
                 minDate={startDate}
               />
             </div>
@@ -302,10 +305,9 @@ const TaskModal = ({ task, teamId, onClose }) => {
         );
       case 'Приоритет':
         const priorities = ['Низкий', 'Средний', 'Высокий', 'Срочный', 'Критический'];
-        const stylePriority = getPillStyle('priority', priority);
         return (
           <div className="metadata-value metadata-value--interactive">
-            <span className="pill" style={stylePriority}>
+            <span className="pill" style={getPriorityStyle(priority)}>
               {priority || 'Нет'}
             </span>
             <FaChevronDown className="metadata-value-icon" />
@@ -336,21 +338,21 @@ const TaskModal = ({ task, teamId, onClose }) => {
 
   if (!task) {
     return (
-      <div className="task-modal-overlay" onClick={onClose}>
+      <div className="task-modal-overlay" onClick={handleClose}>
         <div className="task-modal-content task-modal-error" onClick={e => e.stopPropagation()}>
           Данные задачи недоступны.
-          <button onClick={onClose} className="task-modal-close-btn"><FaTimes /></button>
+          <button onClick={handleClose} className="task-modal-close-btn"><FaTimes /></button>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="task-modal-overlay" onClick={onClose}>
+    <div className="task-modal-overlay" onClick={handleClose}>
       <div className="task-modal-content" onClick={(e) => e.stopPropagation()}>
         <div className="task-modal-top-bar">
           <div className="task-modal-top-actions">
-            <button onClick={onClose} className="task-modal-icon-btn task-modal-close-btn">
+            <button onClick={handleClose} className="task-modal-icon-btn task-modal-close-btn">
               <FaTimes />
             </button>
           </div>

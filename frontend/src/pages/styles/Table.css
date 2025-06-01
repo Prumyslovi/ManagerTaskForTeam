@@ -1,0 +1,32 @@
+.tableContainer {
+  overflow-x: auto;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  color: var(--text-primary);
+}
+
+.table th {
+  background-color: var(--bg-secondary);
+  padding: 12px 15px;
+  text-align: left;
+  border-bottom: 2px solid var(--border);
+  font-weight: 600;
+}
+
+.table td {
+  padding: 12px 15px;
+  border-bottom: 1px solid var(--border);
+  background-color: var(--bg-secondary);
+}
+
+.table tr:hover td {
+  background-color: rgba(0, 0, 0, 0.1);
+}
+
+.tableActions {
+  display: flex;
+  gap: 10px;
+}

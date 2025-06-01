@@ -1,0 +1,23 @@
+.project-table {
+    width: 100%;
+    border-collapse: collapse;
+    color: var(--text-primary);
+}
+
+.project-table th {
+    background-color: var(--bg-secondary);
+    padding: 12px 15px;
+    text-align: left;
+    border-bottom: 2px solid var(--border);
+    font-weight: 600;
+}
+
+.project-table td {
+    padding: 12px 15px;
+    border-bottom: 1px solid var(--border);
+    background-color: var(--card-bg);
+}
+
+.project-row:hover {
+    background-color: var(--hover-bg) !important;
+}

@@ -1,315 +1,202 @@
-.task-form {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  margin: 15px 0;
-  padding: 15px;
-  border: 2px solid #1D334A;
-  border-radius: 8px;
-  background-color: #f8f8ff;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-}
-
-.task-form.active {
-  display: flex;
-}
-
-.input {
-  width: 100%;
-  height: max-content;
-  padding: 10px;
-  font-size: 14px;
-  border: 2px solid #ccc;
-  border-radius: 5px;
-  transition: border-color 0.3s ease;
-  background-color: #ffffff;
-  color: #333;
-  margin-top: 5px;
-  margin-bottom: 5px;
-}
-
-.textarea {
-  width: 100%;
-  height: max-content;
-  padding: 10px;
-  font-size: 14px;
-  border: 2px solid #ccc;
-  border-radius: 5px;
-  transition: border-color 0.3s ease;
-  background-color: #ffffff;
-  color: #333;
-  margin-top: 5px;
-  margin-bottom: 5px;
-}
-
-.input:focus,
-.select:focus {
-  border-color: #1D334A;
-}
-
-.button {
-  background-color: #ffffff;
-  color: #000000;
-  border: 2px solid #1D334A;
-  border-radius: 8px;
-  padding: 10px 15px;
-  font-size: 16px;
-  cursor: pointer;
-  transition: background-color 0.3s ease, transform 0.3s ease;
-}
-
-.buttonYes {
-  background-color: #ffffff;
-  color: #000000;
-  border: 2px solid #1D334A;
-  border-radius: 8px;
-  padding: 10px 15px;
-  font-size: 16px;
-  cursor: pointer;
-  transition: background-color 0.3s ease, transform 0.3s ease;
-  float: left;
-  margin-left: 20px;
-}
-
-.buttonNo {
-  background-color: #ffffff;
-  color: #000000;
-  border: 2px solid #1D334A;
-  border-radius: 8px;
-  padding: 10px 15px;
-  font-size: 16px;
-  cursor: pointer;
-  transition: background-color 0.3s ease, transform 0.3s ease;
-  float: right;
-  margin-right: 20px;
-}
-
-.button:hover,
-.buttonYes:hover,
-.buttonNo:hover {
-  background-color: #000000;
-  color: #ffffff;
-}
-
-.modalRegForm {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.modalContent {
-  background-color: #fefefe;
-  margin: 15% auto;
-  padding: 40px;
-  border: 1px solid #888;
-  border-radius: 8px;
-  position: relative;
-}
-
-.modalInput {
-  width: 99.5%;
-  margin: 8px 0;
-  height: 30px;
-  border: 2px solid #ccc;
-  border-radius: 5px;
-  font-size: 16px;
-  transition: border-color 0.3s ease;
-}
-
-.modalSelect {
-  width: 100%;
-  margin: 8px 0;
-  height: 30px;
-  border: 2px solid #ccc;
-  border-radius: 5px;
-  font-size: 16px;
-  transition: border-color 0.3s ease;
-}
-
-.modalButtonReg {
-  margin-top: 20px;
-  padding: 10px 15px;
-  font-family: 'Roboto', sans-serif;
-  font-size: 16px;
-  border: 2px solid black;
-  border-radius: 5px;
-  cursor: pointer;
-  background: white;
-  color: black;
-  transition: background-color 0.3s ease, opacity 0.3s ease;
-  float: left;
-}
-
-.modalButtonClear {
-  margin-top: 20px;
-  padding: 10px 15px;
-  font-family: 'Roboto', sans-serif;
-  font-size: 16px;
-  border: 2px solid black;
-  border-radius: 5px;
-  cursor: pointer;
-  background: white;
-  color: black;
-  transition: background-color 0.3s ease, opacity 0.3s ease;
-  float: right;
-}
-
-.modalButtonReg:hover,
-.modalButtonClear:hover,
-.exitButton:hover,
-.Button:hover {
-  background-color: black;
-  color: white;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-  border-color: black;
-}
-
-.exitButton {
-  background: none;
-  border: none;
-  font-size: 50px;
-  color: black;
-  cursor: pointer;
-  position: absolute;
-  top: 5px;
-  right: 10px;
-}
-
-.modalContent h2 {
-  text-align: center;
-}
-
-.editing-card {
-  position: relative;
-  width: 100%;
-  padding: 10px;
-  background-color: #f4f4f9;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
-  max-width: 100%;
-  box-sizing: border-box;
-}
-
-.close-editing-btn {
-  position: absolute;
-  top: 5px;
-  right: 5px;
-  background: none;
-  border: none;
-  font-size: 40px;
-  cursor: pointer;
-  margin-bottom: 25px;
-}
-
-.delete-card-btn {
-  position: absolute;
-  bottom: 10px;
-  right: 10px;
-  background: #ffffff;
-  color: rgb(0, 0, 0);
-  border: none;
-  border-radius: 5px;
-  padding: 5px 10px;
-  cursor: pointer;
-}
-
-.delete-card-btn:hover,
-.close-editing-btn:hover {
-  background-color: #000000;
-  color: #ffffff;
-}
-
-.input,
-.textarea {
-  width: 96%;
-  font-family: 'Roboto', sans-serif;
-  margin-bottom: 10px;
-  padding: 10px 15px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  font-size: 14px;
-}
-
-.select {
-  width: 100%;
-  margin-bottom: 10px;
-  padding: 8px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  font-size: 14px;
-}
-
-.inputEdit,
-.textareaEdit {
-  width: 85%;
-  font-family: 'Roboto', sans-serif;
-  margin-bottom: 10px;
-  padding: 10px 15px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  font-size: 14px;
-}
-
-.inputTask {
-  width: 95%;
-  margin-bottom: 10px;
-  padding: 8px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  font-size: 14px;
-  margin-top: 45px;
-}
-
-.delete-modal {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.delete-modal-content {
-  background: white;
+.teams-table {
+  margin: 40px 40px;
   padding: 20px;
-  border-radius: 5px;
-  text-align: center;
-}
-
-.toggle-switch {
-  display: flex;
-  width: fit-content;
-  background-color: #ffffff;
-  border: 2px solid black;
-  border-radius: 10px;
-  overflow: hidden;
-  margin: 20px 0;
-}
-
-.toggle-switch span {
-  padding: 10px 20px;
-  cursor: pointer;
-  font-size: 16px;
-  color: #1D334A;
+  background-color: var(--card-bg);
+  border: 2px solid var(--border);
+  border-radius: 8px;
   transition: all 0.3s ease;
 }
 
-.toggle-switch span.active {
-  background-color: #1D334A;
-  color: #ffffff;
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+  transition: all 0.3s ease;
 }
 
-.toggle-switch span:hover, .toggle-switch span:hover {
-  background-color: #000000;
-  color: white;
+th, td {
+  padding: 12px 20px;
+  text-align: left;
+  font-size: 16px;
+  color: var(--text-primary);
+  border-bottom: 1px solid var(--border-light);
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+th {
+  background-color: var(--table-header-bg);
+  color: var(--table-header-text);
+  font-size: 18px;
+}
+
+tr:hover {
+  background-color: var(--table-row-hover);
+  transition: background-color 0.3s ease;
+}
+
+td {
+  background-color: var(--table-bg);
+  transition: background-color 0.3s ease;
+}
+
+.team-row:hover td,
+.project-row:hover td {
+  background-color: var(--table-row-hover);
+  color: var(--table-row-hover-text);
+}
+
+ul {
+  padding-left: 20px;
+  list-style-type: none;
+  margin-top: 5px;
+}
+
+li {
+  font-size: 16px;
+  color: var(--text-secondary);
+  margin-bottom: 5px;
+  border-bottom: 2px solid var(--border);
+  transition: background-color 0.3s ease;
+}
+
+li:hover {
+  background-color: var(--table-row-hover);
+}
+
+.team-divider,
+.project-divider {
+  border-top: 3px solid var(--table-divider);
+  margin: 10px 0;
+  transition: border-color 0.3s ease;
+}
+
+.team-divider + tr {
+  border-top: 1px solid var(--table-divider);
+}
+
+.team-section {
+  margin-bottom: 20px;
+  transition: all 0.3s ease;
+}
+
+.team-header {
+  font-size: 1.2em;
+  padding: 5px;
+  background-color: var(--table-header-bg);
+  color: var(--table-header-text);
+  border-radius: 4px;
+  transition: all 0.3s ease;
+}
+
+.team-projects {
+  padding-top: 10px;
+  transition: all 0.3s ease;
+}
+
+.teams-table .document-list {
+  padding: 10px;
+  transition: all 0.3s ease;
+}
+
+.teams-table .document-item {
+  margin: 5px 0;
+  transition: all 0.3s ease;
+}
+
+.view-toggle {
+  display: flex;
+  background-color: var(--button-bg);
+  border: 2px solid var(--border);
+  border-radius: 30px;
+  overflow: hidden;
+  margin: 20px 0;
+  box-shadow: var(--shadow);
+  transition: all 0.3s ease;
+}
+
+.view-toggle-btn {
+  flex: 1;
+  padding: 10px 20px;
+  font-size: 16px;
+  font-weight: 500;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  color: var(--text-primary);
+  background-color: transparent;
+  border: none;
+}
+
+.view-toggle-btn.active {
+  background-color: var(--accent);
+  color: var(--button-hover-text);
+}
+
+.view-toggle-btn:not(.active):hover {
+  background-color: var(--hover-bg);
+}
+
+.view-toggle-btn:first-child {
+  border-right: 1px solid var(--border);
+}
+
+.project-table {
+  width: 100%;
+  border-collapse: collapse;
+  color: var(--text-primary);
+}
+
+.project-table th {
+  background-color: var(--bg-secondary);
+  padding: 12px 15px;
+  text-align: left;
+  border-bottom: 2px solid var(--border);
+  font-weight: 600;
+}
+
+.project-table td {
+  padding: 12px 15px;
+  border-bottom: 1px solid var(--border);
+  background-color: var(--card-bg);
+}
+
+.project-table tr:hover td {
+  background-color: var(--accent);
+  color: var(--button-hover-text);
+}
+
+.project-row {
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.team-section {
+  background-color: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  margin-bottom: 15px;
+  overflow: hidden;
+}
+
+.team-header {
+  background-color: var(--bg-secondary);
+  padding: 10px 15px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+}
+
+.team-header h4 {
+  margin: 0;
+  color: var(--text-primary);
+}
+
+.team-projects {
+  padding: 15px;
+  background-color: var(--card-bg);
+}
+
+.project-row.selected {
+  background-color: var(--accent-light) !important;
+  color: var(--button-hover-text) !important;
 }

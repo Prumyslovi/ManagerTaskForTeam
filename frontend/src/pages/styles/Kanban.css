@@ -1,146 +1,140 @@
 .kanban-board {
-    display: flex;
-    gap: 15px;
-    padding: 15px;
-    background-color: #ffffff;
+  display: flex;
+  gap: 15px;
+  padding: 15px;
+  background-color: var(--kanban-bg);
+  font-family: var(--font-primary);
 }
 
 .lane {
-    background-color: #F8F8FF;
-    border: 1px solid #1D334A;
-    border-radius: 8px;
-    padding: 10px;
-    width: 280px;
-    min-height: 200px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  background-color: var(--kanban-lane-bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px;
+  width: 280px;
+  min-height: 200px;
+  box-shadow: var(--shadow);
+  font-family: var(--font-primary);
 }
 
 .lane h3 {
-    margin: 0 0 10px;
-    font-size: 16px;
-    color: #1D334A;
-    text-align: left;
-    padding-bottom: 8px;
-    border-bottom: 1px solid #1D334A;
+  margin: 0 0 10px;
+  font-size: 16px;
+  color: var(--text-primary);
+  text-align: left;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border);
+  font-family: var(--font-primary);
 }
 
 .card {
-    background-color: #ffffff;
-    border: 1px solid #1D334A;
-    border-radius: 4px;
-    padding: 10px;
-    margin-bottom: 8px;
-    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
-    font-size: 14px;
-    color: #333;
-    cursor: pointer;
-    position: relative;
+  background-color: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 4px;
+  padding: 10px;
+  margin-bottom: 8px;
+  box-shadow: var(--shadow);
+  font-size: 14px;
+  color: var(--text-primary);
+  cursor: pointer;
+  position: relative;
+  font-family: var(--font-primary);
 }
 
 .card-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-family: var(--font-primary);
 }
 
 .card h4 {
-    font-size: 15px;
-    color: #1D334A;
-    margin: 0 0 5px;
-    font-weight: 600;
-    flex-grow: 1;
+  font-size: 15px;
+  color: var(--text-primary);
+  margin: 0 0 5px;
+  font-weight: 600;
+  flex-grow: 1;
+  font-family: var(--font-primary);
 }
 
 .card p {
-    font-size: 13px;
-    color: #000000;
-    margin: 5px 0;
-    line-height: 1.4;
-    white-space: nowrap;
-    overflow: hidden;
+  font-size: 13px;
+  color: var(--text-secondary);
+  margin: 5px 0;
+  line-height: 1.4;
+  font-family: var(--font-primary);
 }
 
 .card:hover {
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-    transform: scale(1.02);
-}
-
-.card .priority-tag {
-    display: inline-block;
-    padding: 2px 8px;
-    border-radius: 12px;
-    font-size: 12px;
-    margin-top: 5px;
+  box-shadow: var(--shadow-hover);
+  transform: scale(1.02);
 }
 
 .kanban-actions {
-    display: flex;
-    justify-content: space-between;
-    gap: 10px;
-    margin-bottom: 10px;
-    width: 100%;
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 10px;
+  width: 100%;
+  font-family: var(--font-primary);
 }
 
 .add-task-button,
 .add-column-button,
-.import-export-button {
-    flex: 1;
-    font-size: 14px;
-    background-color: #ffffff;
-    color: #000000;
-    border: 2px solid #1d334a;
-    border-radius: 8px;
-    padding: 8px 12px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
+.import-export-button,
+.filter-button {
+  font-size: 14px;
+  background-color: var(--button-bg);
+  color: var(--button-text);
+  border: 2px solid var(--border);
+  border-radius: 8px;
+  padding: 8px 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-family: var(--font-primary);
 }
 
-.filter-button {
-    font-size: 14px;
-    background-color: #ffffff;
-    color: #000000;
-    border: 2px solid #1d334a;
-    border-radius: 8px;
-    padding: 8px 12px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-    position: relative;
+.import-export {
+  display: flex;
+  gap: 10px;
 }
 
 .add-task-button:hover,
 .add-column-button:hover,
 .import-export-button:hover,
 .filter-button:hover {
-    background-color: #000000;
-    color: #ffffff;
+  background-color: var(--button-hover-bg);
+  color: var(--button-hover-text);
 }
 
 .filter-modal {
-    position: absolute;
-    top: 100%;
-    right: 0;
-    background-color: #F8F8FF;
-    border: 1px solid #1D334A;
-    border-radius: 8px;
-    padding: 15px;
-    z-index: 1000;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    width: 250px;
+  position: absolute;
+  top: calc(100% + 5px);
+  right: 0;
+  background-color: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 15px;
+  z-index: 1000;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  width: 250px;
+  font-family: var(--font-primary);
 }
 
 .filter-modal select {
-    display: block;
-    margin-bottom: 10px;
-    width: 100%;
-    padding: 8px;
-    border: 1px solid #1D334A;
-    border-radius: 4px;
-    background-color: #ffffff;
-    color: #333;
-    font-size: 14px;
+  display: block;
+  margin-bottom: 10px;
+  width: 100%;
+  padding: 8px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background-color: var(--card-bg);
+  color: var(--text-primary);
+  font-size: 14px;
+  font-family: var(--font-primary);
 }
 
 .filter-modal select:focus {
-    outline: none;
-    border-color: #000000;
+  outline: none;
+  border-color: var(--accent);
 }

@@ -1,0 +1,286 @@
+:root {
+  /* Основные фоны */
+  --bg-primary: #ffffff;          /* Основной цвет фона страницы */
+  --bg-secondary: #F8F8FF;        /* Второстепенный фон, например, для карточек */
+
+  /* Цвета текста */
+  --text-primary: #1D334A;        /* Основной цвет текста */
+  --text-secondary: #333;         /* Второстепенный цвет текста */
+
+  /* Цвета для диаграммы Гантта */
+  --gantt-task-fill: #1D334A;     /* Цвет заливки задачи */
+  --gantt-task-text: #ffffff;     /* Цвет текста внутри задачи */
+  --gantt-holiday-bg: #f0f6fa;    /* Фон выходного дня */
+  --gantt-holiday-text: #1D334A;  /* Цвет текста выходного дня */
+
+  /* Цвет акцента */
+  --accent: #1D334A;              /* Основной цвет акцента (кнопки, выделения) */
+  --accent-light: #1D334A;        /* Светлый вариант акцента */
+
+  /* Стили карточек */
+  --card-bg: #ffffff;             /* Фон карточек */
+  --card-border: #1D334A;         /* Цвет рамки карточек */
+
+  /* Стили кнопок */
+  --button-bg: #ffffff;           /* Фон кнопки */
+  --button-text: #000000;         /* Цвет текста кнопки */
+  --button-hover-bg: #000000;     /* Фон кнопки при наведении */
+  --button-hover-text: #ffffff;   /* Цвет текста кнопки при наведении */
+
+  /* Цвета иконок */
+  --icon-color: #1D334A;          /* Основной цвет иконок */
+  --icon-hover: #d8a903;          /* Цвет иконок при наведении */
+
+  /* Цвета рамок */
+  --border: #1D334A;              /* Основной цвет рамок */
+  --border-light: #a0b1c7;        /* Светлый цвет рамок */
+
+  /* Тени */
+  --shadow: 0 2px 8px rgba(0, 0, 0, 0.05);   /* Стандартная тень */
+  --shadow-hover: 0 4px 15px rgba(0, 0, 0, 0.2); /* Тень при наведении */
+
+  /* Цвета для канбан-доски */
+  --kanban-bg: #ffffff;           /* Фон канбан-доски */
+  --kanban-lane-bg: #F8F8FF;      /* Фон колонок канбан-доски */
+
+  /* Цвета навбара */
+  --nav-bg: #1D334A;              /* Фон навигационной панели */
+  --nav-text: #F8F8FF;            /* Цвет текста в навбаре */
+  --nav-hover: rgba(216, 169, 3, 0.2); /* Цвет фона навбара при наведении */
+  --nav-hover-text: #F8F8FF;      /* Цвет текста навбара при наведении */
+
+  /* Цвета таблиц */
+  --table-bg: #ffffff;            /* Фон ячеек таблицы */
+  --table-header-bg: #1D334A;     /* Фон заголовка таблицы */
+  --table-header-text: #1D334A;    /* Цвет текста заголовка */
+  --table-row-hover: #FFD700;            /* Фон строки при наведении */
+  --table-row-hover-text: #000000;   /* Цвет текста строки при наведении */
+  --table-divider: #ced4da;       /* Цвет разделителя таблицы */
+
+  /* Настройки шрифта */
+  --font-primary: 'Roboto', sans-serif; /* Основной шрифт */
+  --font-base-size: 16px;               /* Базовый размер шрифта */
+
+  /* Настройки для виджетов (например, Гантт) */
+  --wx-font-family: var(--font-primary); 
+  --wx-font-size: var(--font-base-size);
+  --wx-font-size-sm: 14px;
+  --wx-font-weight: 400;
+  --wx-font-weight-md: 500;
+
+  /* Ширина столбца по умолчанию */
+  --column-width: 100px;
+
+  /* Цвета приоритетов */
+  --priority-low-bg: #4CAF50;      /* Низкий приоритет - фон */
+  --priority-low-text: #000000;    /* Низкий приоритет - текст */
+  --priority-medium-bg: #2196F3;   /* Средний приоритет - фон */
+  --priority-medium-text: #FFFFFF; /* Средний приоритет - текст */
+  --priority-high-bg: #FF9800;     /* Высокий приоритет - фон */
+  --priority-high-text: #000000;   /* Высокий приоритет - текст */
+  --priority-urgent-bg: #FF5722;   /* Срочный приоритет - фон */
+  --priority-urgent-text: #FFFFFF; /* Срочный приоритет - текст */
+  --priority-critical-bg: #D32F2F; /* Критический приоритет - фон */
+  --priority-critical-text: #FFFFFF; /* Критический приоритет - текст */
+
+  /* Цвета статусов */
+  --status-planned-bg: #1D334A;       /* Статус "В планах" - фон */
+  --status-planned-text: #FFFFFF;     /* Статус "В планах" - текст */
+  --status-in-progress-bg: #10447c;   /* Статус "В прогрессе" - фон */
+  --status-in-progress-text: #FFFFFF; /* Статус "В прогрессе" - текст */
+  --status-under-review-bg: #6d4c41;  /* Статус "На проверке" - фон */
+  --status-under-review-text: #FFFFFF;/* Статус "На проверке" - текст */
+  --status-done-bg: #d8a903;          /* Статус "Сделано" - фон */
+  --status-done-text: #000000;        /* Статус "Сделано" - текст */
+}
+
+[data-theme="dark"] {
+  --bg-primary: #121212;              
+  --bg-secondary: #1e1e1e;            
+  --text-primary: #ffffff;            
+  --text-secondary: #cccccc;          
+  --gantt-task-fill: #1D334A;         
+  --gantt-task-text: #ffffff;         
+  --gantt-holiday-bg: #2d2d2d;        
+  --gantt-holiday-text: #cccccc;      
+  --accent: #d3bd5b;                  
+  --card-bg: #2d2d2d;                  
+  --card-border: #444;                
+  --button-bg: #2d2d2d;                
+  --button-text: #e0e0e0;              
+  --button-hover-bg: #d3bd5b;          
+  --button-hover-text: #121212;        
+  --icon-color: #121212;               
+  --icon-hover: #ffd700;               
+  --border: #444;                      
+  --border-light: #666;                
+  --shadow: 0 2px 8px rgba(0, 0, 0, 0.3);  
+  --kanban-bg: #1e1e1e;                 
+  --kanban-lane-bg: #2d2d2d;            
+  --nav-bg: #333;                       
+  --nav-text: #e0e0e0;                  
+  --nav-hover-text: #121212;            
+  --nav-hover: #d3bd5b;                  
+  --table-bg: #2d2d2d;                  
+  --table-header-bg: #333;              
+  --table-header-text: #e0e0e0;          
+  --table-row-hover: #FFD700;           
+  --table-row-hover-text: #000000;      
+  --table-divider: #444;                
+
+  /* Приоритеты (тёмная тема) */
+  --priority-low-bg: #388E3C;           
+  --priority-low-text: #FFFFFF;         
+  --priority-medium-bg: #1976D2;        
+  --priority-medium-text: #FFFFFF;      
+  --priority-high-bg: #F57C00;          
+  --priority-high-text: #FFFFFF;        
+  --priority-urgent-bg: #E64A19;        
+  --priority-urgent-text: #FFFFFF;      
+  --priority-critical-bg: #C62828;      
+  --priority-critical-text: #FFFFFF;    
+
+  /* Статусы (тёмная тема) */
+  --status-planned-bg: #37474F;         
+  --status-planned-text: #FFFFFF;       
+  --status-in-progress-bg: #0288D1;     
+  --status-in-progress-text: #FFFFFF;   
+  --status-under-review-bg: #5D4037;    
+  --status-under-review-text: #FFFFFF;  
+  --status-done-bg: #FBC02D;            
+  --status-done-text: #000000;          
+}
+
+[data-theme="light"] {
+  --bg-primary: #ffffff;              
+  --bg-secondary: #f8f9fa;            
+  --text-primary: #212529;            
+  --text-secondary: #495057;          
+  --gantt-task-fill: #1D334A;         
+  --gantt-task-text: #ffffff;         
+  --gantt-holiday-bg: #f0f8ff;        
+  --gantt-holiday-text: #495057;      
+  --accent: #1971c2;                  
+  --card-bg: #ffffff;                  
+  --card-border: #ced4da;              
+  --button-bg: #ffffff;                
+  --button-text: #212529;              
+  --button-hover-bg: #1971c2;          
+  --button-hover-text: #ffffff;        
+  --icon-color: #495057;               
+  --icon-hover: #1971c2;               
+  --border: #ced4da;                   
+  --shadow: 0 2px 8px rgba(0, 0, 0, 0.05); 
+  --kanban-bg: #ffffff;                 
+  --kanban-lane-bg: #f0f8ff;            
+  --nav-bg: #f0f8ff;                    
+  --nav-text: #212529;                  
+  --nav-hover-text: #1D334A;            
+  --nav-hover: rgba(25, 113, 194, 0.2);  
+  --table-bg: #ffffff;                  
+  --table-header-bg: #1D334A;           
+  --table-header-text: #1D334A;         
+  --table-row-hover: #FFD700;           
+  --table-row-hover-text: #000000;      
+  --table-divider: #ced4da;             
+
+  /* Приоритеты (светлая тема) */
+  --priority-low-bg: #66BB6A;           
+  --priority-low-text: #FFFFFF;         
+  --priority-medium-bg: #42A5F5;        
+  --priority-medium-text: #FFFFFF;      
+  --priority-high-bg: #FFB300;          
+  --priority-high-text: #000000;        
+  --priority-urgent-bg: #FF7043;        
+  --priority-urgent-text: #000000;      
+  --priority-critical-bg: #EF5350;      
+  --priority-critical-text: #000000;    
+
+  /* Статусы (светлая тема) */
+  --status-planned-bg: #90A4AE;         
+  --status-planned-text: #000000;       
+  --status-in-progress-bg: #0288D1;     
+  --status-in-progress-text: #FFFFFF;   
+  --status-under-review-bg: #8D6E63;    
+  --status-under-review-text: #FFFFFF;  
+  --status-done-bg: #FDD835;            
+  --status-done-text: #000000;          
+}
+
+body {
+  font-family: var(--font-primary);        /* Применяем основной шрифт */
+  font-size: var(--font-base-size);        /* Устанавливаем базовый размер шрифта */
+  background-color: var(--bg-primary);     /* Фон страницы */
+  color: var(--text-primary);              /* Цвет основного текста */
+  transition: background-color 0.3s ease, color 0.3s ease; /* Плавный переход при смене темы */
+  margin: 0;
+  padding: 0;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-primary);        /* Шрифтовое оформление заголовков */
+  color: var(--text-primary);              /* Цвет заголовков */
+  margin: 0;
+  padding: 0;
+}
+
+.pill {
+  display: inline-flex;               
+  align-items: center;               
+  padding: 6px 12px;                  
+  border-radius: 16px;               /* Овальная форма метки */
+  font-size: 14px;                   
+  font-weight: 500;                  
+  transition: background-color 0.3s ease, transform 0.2s ease; /* Эффект плавного Hover */
+  box-shadow: var(--shadow);         /* Тень по умолчанию */
+  border: 1px solid var(--border-light); /* Лёгкая рамка */
+}
+
+.pill:hover {
+  transform: translateY(-1px);       /* Подъём при наведении */
+  box-shadow: var(--shadow-hover);    /* Увеличенная тень на Hover */
+}
+
+.metadata-value--interactive {
+  position: relative;                
+  display: inline-flex;               
+  align-items: center;               
+  gap: 8px;                          
+}
+
+.metadata-value-icon {
+  font-size: 12px;                   
+  color: var(--icon-color);          
+  transition: color 0.3s ease;       
+}
+
+.metadata-value-icon:hover {
+  color: var(--icon-hover);           /* Изменение цвета иконки при наведении */
+}
+
+.metadata-select-overlay {
+  position: absolute;                
+  top: 0;                            
+  left: 0;                          
+  width: 100%;                      
+  height: 100%;                     
+  opacity: 0;                       
+  cursor: pointer;                  
+}
+
+.priority-tag {
+  display: inline-flex;               
+  align-items: center;               
+  padding: 4px 10px;                  
+  border-radius: 12px;               
+  font-size: 12px;                   
+  font-weight: 500;                  
+  transition: background-color 0.3s ease, transform 0.2s ease; /* Hover-эффект */
+  box-shadow: var(--shadow);         /* Тень по умолчанию */
+  border: 1px solid var(--border-light); /* Лёгкая рамка */
+}
+
+.priority-tag:hover {
+  transform: translateY(-1px);       
+  box-shadow: var(--shadow-hover);    
+}

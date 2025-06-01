@@ -9,24 +9,43 @@ import ImportExport from './ImportExport';
 import { FaFilter } from 'react-icons/fa';
 
 const getPriorityStyle = (priority) => {
-    switch (priority?.toLowerCase()) {
+    const priorityLower = priority?.toLowerCase();
+    switch (priorityLower) {
         case 'низкий':
         case 'low':
-            return { backgroundColor: '#4CAF50', color: '#000000' };
+            return {
+                backgroundColor: 'var(--priority-low-bg)',
+                color: 'var(--priority-low-color)'
+            };
         case 'средний':
         case 'medium':
-            return { backgroundColor: '#2196F3', color: '#FFFFFF' };
+            return {
+                backgroundColor: 'var(--priority-medium-bg)',
+                color: 'var(--priority-medium-color)'
+            };
         case 'высокий':
         case 'high':
-            return { backgroundColor: '#FF9800', color: '#000000' };
+            return {
+                backgroundColor: 'var(--priority-high-bg)',
+                color: 'var(--priority-high-color)'
+            };
         case 'срочный':
         case 'urgent':
-            return { backgroundColor: '#FF5722', color: '#FFFFFF' };
+            return {
+                backgroundColor: 'var(--priority-urgent-bg)',
+                color: 'var(--priority-urgent-color)'
+            };
         case 'критический':
         case 'critical':
-            return { backgroundColor: '#D32F2F', color: '#FFFFFF' };
+            return {
+                backgroundColor: 'var(--priority-critical-bg)',
+                color: 'var(--priority-critical-color)'
+            };
         default:
-            return { backgroundColor: '#1D334A', color: '#FFFFFF' };
+            return {
+                backgroundColor: 'var(--status-default-bg)',
+                color: 'var(--status-default-color)'
+            };
     }
 };
 
@@ -43,6 +62,7 @@ const KanbanBoard = ({ projectId, setData, teamId }) => {
     const [filterDate, setFilterDate] = useState('');
     const [filterPriority, setFilterPriority] = useState('');
     const [filterStatus, setFilterStatus] = useState('');
+    const [error, setError] = useState(null); // Added error state
 
     const openAddModal = () => setIsAddModalOpen(true);
     const closeAddModal = () => setIsAddModalOpen(false);
@@ -82,30 +102,29 @@ const KanbanBoard = ({ projectId, setData, teamId }) => {
     const handleAddTask = async (newTask) => {
         try {
             const taskData = {
-                taskName: newTask.title,
-                description: newTask.description,
-                projectId: projectId,
-                memberId: null,
-                status: 'В планах',
-                endDate: newTask.deadline,
-                startDate: new Date().toISOString(),
-                isDeleted: false,
-                assignedBy: localStorage.getItem('userId'),
-                priority: newTask.priority || 'Низкий'
+                TaskName: newTask.title,
+                Description: newTask.description,
+                ProjectId: projectId,
+                MemberId: null,
+                Status: 'В планах',
+                EndDate: newTask.deadline,
+                StartDate: new Date().toISOString(),
+                IsDeleted: false,
+                Priority: newTask.priority || 'Низкий'
             };
 
             const createdTask = await createTask(taskData);
             const newTaskWithId = {
                 ...newTask,
                 id: createdTask.taskId,
-                startDate: taskData.startDate,
-                assignedBy: taskData.assignedBy,
-                priority: taskData.priority
+                startDate: taskData.StartDate,
+                priority: taskData.Priority,
+                assignee: taskData.MemberId,
+                status: taskData.Status
             };
 
             setBoardData((prevData) => {
-                const updatedLane = { ...prevData.lanes['lane-planned'] };
-                updatedLane.cards = [...updatedLane.cards, newTaskWithId];
+                const updatedLane = { ...prevData.lanes['lane-planned'], cards: [...(prevData.lanes['lane-planned']?.cards || []), newTaskWithId] };
                 return {
                     ...prevData,
                     lanes: { ...prevData.lanes, [updatedLane.id]: updatedLane },
@@ -114,6 +133,7 @@ const KanbanBoard = ({ projectId, setData, teamId }) => {
             closeAddModal();
         } catch (error) {
             console.error('Ошибка добавления задачи:', error);
+            setError('Не удалось добавить задачу. Попробуйте снова.');
         }
     };
 
@@ -129,6 +149,7 @@ const KanbanBoard = ({ projectId, setData, teamId }) => {
             closeAddColumnModal();
         } catch (error) {
             console.error('Ошибка добавления статуса:', error);
+            setError('Не удалось добавить статус. Попробуйте снова.');
         }
     };
 
@@ -156,47 +177,49 @@ const KanbanBoard = ({ projectId, setData, teamId }) => {
 
         try {
             await updateTask(draggedCard.id, {
-                taskId: draggedCard.id,
-                taskName: draggedCard.title,
-                description: draggedCard.description,
-                projectId: projectId,
-                memberId: draggedCard.memberId,
-                status: draggedCard.status,
-                startDate: draggedCard.startDate || new Date().toISOString(),
-                endDate: draggedCard.endDate,
-                isDeleted: false,
-                assignedBy: draggedCard.assignedBy,
-                priority: draggedCard.priority
+                TaskId: draggedCard.id,
+                TaskName: draggedCard.title,
+                Description: draggedCard.description,
+                ProjectId: projectId,
+                MemberId: draggedCard.assignee || null,
+                Status: draggedCard.status,
+                StartDate: draggedCard.startDate || new Date().toISOString(),
+                EndDate: draggedCard.endDate,
+                Priority: draggedCard.priority || 'Низкий',
+                IsDeleted: false
             });
         } catch (error) {
             console.error(`Ошибка обновления задачи ${draggedCard.id}:`, error);
+            setError('Не удалось обновить задачу. Попробуйте снова.');
         }
     };
 
     useEffect(() => {
         const loadTasksAndStatuses = async () => {
             try {
+                setError(null);
                 const fetchedStatuses = await fetchStatusesByTeamId(teamId);
                 const lanes = fetchedStatuses.reduce((acc, status) => {
-                    acc[status.name] = { id: `lane-${status.statusId}`, title: status.name, cards: [] };
+                    acc[`lane-${status.statusId}`] = { id: `lane-${status.statusId}`, title: status.name, cards: [] };
                     return acc;
                 }, {});
 
                 const fetchedTasks = await fetchTasksForProject(projectId);
                 fetchedTasks.forEach((task) => {
-                    if (lanes[task.status]) {
-                        lanes[task.status].cards.push({
-                            id: task.taskId,
-                            title: task.taskName,
-                            description: task.description,
-                            startDate: task.startDate,
-                            endDate: task.endDate,
-                            assignee: task.memberId,
-                            status: task.status,
-                            assignedBy: task.assignedBy,
-                            priority: task.priority || 'Низкий'
-                        });
+                    const laneId = Object.keys(lanes).find(key => lanes[key].title === task.status) || 'lane-planned';
+                    if (!lanes[laneId]) {
+                        lanes[laneId] = { id: laneId, title: task.status, cards: [] };
                     }
+                    lanes[laneId].cards.push({
+                        id: task.taskId,
+                        title: task.taskName,
+                        description: task.description,
+                        startDate: task.startDate,
+                        endDate: task.endDate,
+                        assignee: task.memberId,
+                        status: task.status,
+                        priority: task.priority || 'Низкий'
+                    });
                 });
 
                 setBoardData({ lanes });
@@ -214,10 +237,48 @@ const KanbanBoard = ({ projectId, setData, teamId }) => {
                 setUserProfiles(profiles);
             } catch (error) {
                 console.error('Ошибка загрузки данных:', error);
+                setError('Не удалось загрузить задачи или статусы. Проверьте соединение с сервером.');
             }
         };
         loadTasksAndStatuses();
     }, [projectId, teamId]);
+
+    const refreshTasks = () => {
+        const loadTasksAndStatuses = async () => {
+            try {
+                setError(null);
+                const fetchedStatuses = await fetchStatusesByTeamId(teamId);
+                const lanes = fetchedStatuses.reduce((acc, status) => {
+                    acc[`lane-${status.statusId}`] = { id: `lane-${status.statusId}`, title: status.name, cards: [] };
+                    return acc;
+                }, {});
+
+                const fetchedTasks = await fetchTasksForProject(projectId);
+                fetchedTasks.forEach((task) => {
+                    const laneId = Object.keys(lanes).find(key => lanes[key].title === task.status) || 'lane-planned';
+                    if (!lanes[laneId]) {
+                        lanes[laneId] = { id: laneId, title: task.status, cards: [] };
+                    }
+                    lanes[laneId].cards.push({
+                        id: task.taskId,
+                        title: task.taskName,
+                        description: task.description,
+                        startDate: task.startDate,
+                        endDate: task.endDate,
+                        assignee: task.memberId,
+                        status: task.status,
+                        priority: task.priority || 'Низкий'
+                    });
+                });
+
+                setBoardData({ lanes });
+            } catch (error) {
+                console.error('Ошибка обновления задач:', error);
+                setError('Не удалось обновить задачи. Попробуйте снова.');
+            }
+        };
+        loadTasksAndStatuses();
+    };
 
     const applyFilters = (cards) => {
         return cards.filter(card =>
@@ -230,11 +291,12 @@ const KanbanBoard = ({ projectId, setData, teamId }) => {
 
     const lanes = boardData?.lanes ? Object.values(boardData.lanes).map(lane => ({
         ...lane,
-        cards: applyFilters(lane.cards)
+        cards: applyFilters(lane.cards || [])
     })) : [];
 
     return (
         <div>
+            {error && <div className="error-message">{error}</div>}
             <div className="kanban-actions">
                 <ImportExport data={boardData} setData={setBoardData} projectId={projectId} type="kanban" className="import-export-button" />
                 <button className="add-task-button" onClick={openAddModal}>Добавить задачу</button>
@@ -296,14 +358,12 @@ const KanbanBoard = ({ projectId, setData, teamId }) => {
                                                     {card.description && <p>{truncateDescription(card.description)}</p>}
                                                     <p>Дедлайн: {formatDateTime(card.endDate)}</p>
                                                     <p>Ответственный: {getUserNameById(card.assignee)}</p>
-                                                    {card.priority && (
-                                                        <span
-                                                            className="priority-tag"
-                                                            style={getPriorityStyle(card.priority)}
-                                                        >
-                                                            {card.priority}
-                                                        </span>
-                                                    )}
+                                                    <span
+                                                        className="priority-tag"
+                                                        style={getPriorityStyle(card.priority)}
+                                                    >
+                                                        {card.priority}
+                                                    </span>
                                                 </div>
                                             )}
                                         </Draggable>
@@ -325,7 +385,13 @@ const KanbanBoard = ({ projectId, setData, teamId }) => {
                 />
             )}
             {isEditModalOpen && selectedCard && (
-                <TaskModal task={selectedCard} teamId={teamId} onClose={closeEditModal} projectId={projectId} />
+                <TaskModal
+                    task={selectedCard}
+                    teamId={teamId}
+                    onClose={closeEditModal}
+                    projectId={projectId}
+                    onTasksRefresh={refreshTasks}
+                />
             )}
             {isAddColumnModalOpen && (
                 <div className="modalRegForm">

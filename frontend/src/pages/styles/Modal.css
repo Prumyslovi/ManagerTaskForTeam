@@ -1,75 +1,54 @@
-/* ../styles/Modal.css */
-.modalRegForm {
+.modalOverlay {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
+  background-color: rgba(0, 0, 0, 0.5);
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 1000;
 }
 
-.modalContent {
-  background-color: #fefefe;
-  margin: 15% auto;
-  padding: 40px;
-  border: 1px solid #888;
+.modal {
+  background-color: var(--bg-secondary);
   border-radius: 8px;
-  position: relative;
-  width: 330px;
-}
-
-.modalInput {
+  box-shadow: var(--shadow);
   width: 100%;
-  margin: 8px 0;
-  height: 30px;
-  border: 2px solid #ccc;
-  border-radius: 5px;
-  font-size: 16px;
-  font-family: 'Roboto', sans-serif;
-  transition: border-color 0.3s ease;
+  max-width: 500px;
+  padding: 20px;
+  position: relative;
+  color: var(--text-primary);
 }
 
-.modalButtonReg,
-.modalButtonClear {
-  margin-top: 20px;
-  font-family: 'Roboto', sans-serif;
-  font-size: 16px;
-  border: 2px solid black;
-  border-radius: 5px;
-  cursor: pointer;
-  background: white;
-  color: black;
-  transition: background-color 0.3s ease, opacity 0.3s ease;
+.modalHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
 }
 
-.modalButtonReg:hover,
-.modalButtonClear:hover,
-.exitButton:hover,
-.Button:hover {
-  background-color: black;
-  color: white;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-  border-color: black;
+.modalTitle {
+  margin: 0;
+  font-size: 1.5rem;
+  color: var(--text-primary);
 }
 
-.exitButton {
+.closeButton {
   background: none;
   border: none;
-  font-size: 40px;
-  color: black;
+  font-size: 1.5rem;
   cursor: pointer;
-  position: absolute;
-  top: 10px;
-  right: 15px;
+  color: var(--icon-color);
 }
 
-.button-wrapper {
-  position: relative;
+.modalBody {
+  margin-bottom: 20px;
+}
+
+.modalFooter {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
+  justify-content: flex-end;
+  gap: 10px;
 }

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import '../styles/ProjectList.css';
+import '../styles/ProjectManagement.css';
 
 const ProjectManagement = () => {
     const [activeTab, setActiveTab] = useState('create'); // Переключатель вкладок
@@ -66,7 +66,7 @@ const ProjectManagement = () => {
             )}
 
             {activeTab === 'manage' && (
-                <table>
+               <table className="project-table"> 
                     <thead>
                         <tr>
                             <th>Название</th>

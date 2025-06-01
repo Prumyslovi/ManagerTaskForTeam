@@ -1,15 +1,28 @@
+import axios from 'axios';
+
 const API_URL = 'http://localhost:5062/api';
 
+const api = axios.create({
+  baseURL: API_URL,
+  withCredentials: true,
+});
+
 export const fetchComments = async (taskId) => {
-  const response = await fetch(`/${API_URL}/Comment/GetCommentsByTaskId/${taskId}`);
-  return response.json();
-}
+  try {
+    const response = await api.get(`/Comment/GetCommentsByTaskId/${taskId}`);
+    return response.data; // axios автоматически парсит JSON
+  } catch (error) {
+    console.error('Ошибка при получении комментариев:', error);
+    throw error;
+  }
+};
 
 export const addComment = async (commentData) => {
-  const response = await fetch('/${API_URL}/Comment/AddComment', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(commentData),
-  });
-  return response.json();
-}
+  try {
+    const response = await api.post('/Comment/AddComment', commentData);
+    return response.data;
+  } catch (error) {
+    console.error('Ошибка при добавлении комментария:', error);
+    throw error;
+  }
+};

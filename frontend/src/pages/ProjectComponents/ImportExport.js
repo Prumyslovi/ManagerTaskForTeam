@@ -123,7 +123,7 @@ const ImportExport = ({ data, setData, projectId, type = "kanban" }) => {
     };
 
     return (
-        <div>
+        <div className="import-export">
             <button className="add-task-button" onClick={() => document.getElementById('import-file-input').click()}>
                 Импорт
             </button>

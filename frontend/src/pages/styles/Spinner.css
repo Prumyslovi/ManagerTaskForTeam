@@ -1,7 +1,7 @@
 .spinner {
     margin-top: 20px;
     font-size: 1.5rem;
-    color: #000000;
+    color: var(--text-primary);
     animation: spin 1s linear infinite;
 }
 

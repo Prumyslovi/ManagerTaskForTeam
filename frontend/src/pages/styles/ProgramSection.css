@@ -2,21 +2,21 @@
   position: relative;
   margin: 40px 40px;
   padding: 20px;
-  background-color: #ffffff;
-  border: 2px solid #1D334A;
+  background-color: var(--card-bg);
+  border: 2px solid var(--card-border);
   border-radius: 8px;
 }
 
 .programSection h2,
 .programSection h3 {
-  color: #1D334A;
+  color: var(--text-primary);
 }
 
 .programSection p {
   font-size: 16px;
   line-height: 1.5;
   margin-bottom: 15px;
-  color: #000000;
-  border-bottom: 4px solid #1D334A;
+  color: var(--text-primary);
+  border-bottom: 4px solid var(--accent);
   padding-bottom: 10px;
 }

@@ -1,14 +1,17 @@
 .administer-team {
   margin: 40px 40px;
   padding: 20px;
-  background-color: #ffffff; /* Цвет фона системы */
-  border: 2px solid #ddd;
+  background-color: var(--card-bg);
+  border: 2px solid var(--border-light);
   border-radius: 8px;
+  box-shadow: var(--shadow);
+  transition: all 0.3s ease;
 }
 
 .admin-title {
-  color: #1D334A; /* Цвет заголовка */
-  font-size: 24px; /* Размер шрифта заголовка */
+  color: var(--text-primary);
+  font-size: 24px;
+  transition: color 0.3s ease;
 }
 
 .admin-list {
@@ -21,14 +24,14 @@
   margin: 10px 0;
   cursor: pointer;
   padding: 10px;
-  border: 1px solid #ccc;
+  border: 1px solid var(--border-light);
   border-radius: 5px;
-  background-color: #ffffff; /* Белый фон для списка */
-  transition: background-color 0.3s;
+  background-color: var(--card-bg);
+  transition: background-color 0.3s ease, border-color 0.3s ease;
 }
 
 .admin-list-item:hover {
-  background-color: #ffffff; /* Фон при наведении */
+  background-color: var(--bg-secondary);
 }
 
 .member-info {
@@ -43,51 +46,59 @@
   text-overflow: ellipsis;
   white-space: nowrap;
   overflow: hidden;
+  color: var(--text-primary);
 }
 
 .member-role {
   min-width: 150px;
+  color: var(--text-primary);
 }
 
 .team-member {
   display: flex;
   align-items: center;
-  justify-content: space-between; /* Распределяет элементы по краям */
+  justify-content: space-between;
   margin: 5px 0;
-  position: relative; /* Для того чтобы использовать абсолютное позиционирование на внутренних элементах */
+  position: relative;
 }
 
 .team-member span {
-  color: black;
-  flex-shrink: 0; /* Не сжимаем */
-  white-space: nowrap; /* Не переносим текст */
-  text-overflow: ellipsis; /* Троеточие для длинного текста */
-  max-width: 150px; /* Ограничиваем максимальную ширину */
+  color: var(--text-primary);
+  flex-shrink: 0;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  max-width: 150px;
 }
 
 .team-member select {
-  position: absolute; /* Абсолютно позиционируем select */
-  left: 50%; /* Размещаем по центру */
-  transform: translateX(-50%); /* Центрируем по горизонтали */
-  margin-bottom: 5px; /* Отступ снизу */
-  max-width: 150px; /* Ограничение ширины */
-  min-width: 120px; /* Минимальная ширина */
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  margin-bottom: 5px;
+  max-width: 150px;
+  min-width: 120px;
+  background-color: var(--card-bg);
+  color: var(--text-primary);
+  border: 1px solid var(--border-light);
 }
 
 .team-member button {
-  color: black;
-  flex-shrink: 0; /* Не сжимаем */
-  max-width: 50px; /* Ограничиваем максимальную ширину */
+  color: var(--text-primary);
+  flex-shrink: 0;
+  max-width: 50px;
   text-align: center;
-  margin-bottom: 5px; /* Отступ снизу */
+  margin-bottom: 5px;
+  background-color: var(--button-bg);
+  border: 1px solid var(--border);
 }
 
 .modalInput {
   width: 100%;
   margin: 8px 0;
   height: 30px;
-  background-color: #ffffff;
-  border: 2px solid #ccc;
+  background-color: var(--card-bg);
+  color: var(--text-primary);
+  border: 2px solid var(--border-light);
   border-radius: 5px;
   font-size: 16px;
   transition: border-color 0.3s ease;
@@ -96,18 +107,18 @@
 .Button {
   padding: 10px 15px;
   font-size: 16px;
-  border: 2px solid black;
+  border: 2px solid var(--border);
   border-radius: 5px;
-  background: #ffffff;
-  color: black;
+  background: var(--button-bg);
+  color: var(--button-text);
   cursor: pointer;
-  transition: background-color 0.3s ease, color 0.3s ease;
+  transition: all 0.3s ease;
 }
 
 .Button:hover {
-  background-color: black; /* Черный фон при наведении */
-  color: white; /* Белый цвет текста при наведении */
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); /* Тень при наведении */
+  background-color: var(--button-hover-bg);
+  color: var(--button-hover-text);
+  box-shadow: var(--shadow-hover);
 }
 
 .add-member-container {
@@ -120,20 +131,31 @@
 .add-member-container input,
 .add-member-container select {
   margin-right: 10px;
-  flex: 1; /* Ширина элемента заполняет доступное пространство */
+  flex: 1;
+  background-color: var(--card-bg);
+  color: var(--text-primary);
+  border: 1px solid var(--border-light);
 }
 
 .list {
   padding: 10px 15px;
   font-size: 16px;
-  border: 2px solid black;
+  border: 2px solid var(--border);
   border-radius: 2px;
-  background: #ffffff;
-  color: black;
+  background: var(--button-bg);
+  color: var(--button-text);
   cursor: pointer;
-  transition: background-color 0.3s ease, color 0.3s ease;
+  transition: all 0.3s ease;
+}
+
+.list:hover {
+  background-color: var(--button-hover-bg);
+  color: var(--button-hover-text);
 }
 
 .remove-button {
   margin-left: 10px;
+  background-color: var(--button-bg);
+  color: var(--button-text);
+  border: 1px solid var(--border);
 }

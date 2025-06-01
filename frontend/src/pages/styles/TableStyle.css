@@ -1,45 +1,48 @@
 .teams-table {
-  margin: 40px 40px; /* Отступы по краям */
-  padding: 20px; /* Внутренние отступы */
-  background-color: #ffffff; /* Цвет фона таблицы */
-  border: 2px solid #1D334A; /* Цвет и стиль границы */
-  border-radius: 8px; /* Закругление углов */
+  margin: 40px 40px;
+  padding: 20px;
+  background-color: var(--card-bg);
+  border: 2px solid var(--border);
+  border-radius: 8px;
+  transition: all 0.3s ease;
 }
 
 table {
-  width: 100%; /* Ширина таблицы */
-  border-collapse: collapse; /* Убираем промежутки между ячейками */
-  margin-top: 20px; /* Отступ сверху */
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+  transition: all 0.3s ease;
 }
 
 th, td {
-  padding: 12px 20px; /* Отступы в ячейках */
-  text-align: left; /* Выравнивание текста в ячейках */
-  font-size: 16px; /* Размер шрифта */
-  color: #0E294B; /* Цвет текста */
-  border-bottom: 1px solid #ddd; /* Граница снизу для ячеек */
-  transition: background-color 0.5s ease, color 0.5s ease; /* Плавный переход для фона и цвета текста */
+  padding: 12px 20px;
+  text-align: left;
+  font-size: 16px;
+  color: var(--text-primary);
+  border-bottom: 1px solid var(--border-light);
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 th {
-  background-color: #1D334A; /* Цвет фона для заголовков */
-  color: #F8F8FF; /* Цвет текста заголовков */
-  font-size: 18px; /* Размер шрифта заголовков */
+  background-color: var(--table-header-bg);
+  color: var(--table-header-text);
+  font-size: 18px;
 }
 
 tr:hover {
-  background-color: #FFD700;
-  transition: background-color 0.5s ease;
+  background-color: var(--table-row-hover);
+  transition: background-color 0.3s ease;
 }
 
 td {
-  background-color: #fff;
-  transition: background-color 0.5s ease;
+  background-color: var(--table-bg);
+  transition: background-color 0.3s ease;
 }
 
-.team-row:hover td {
-  background-color: #FFD700;
-  color: #000000;
+.team-row:hover td,
+.project-row:hover td {
+  background-color: var(--table-row-hover);
+  color: var(--table-row-hover-text);
 }
 
 ul {
@@ -50,56 +53,89 @@ ul {
 
 li {
   font-size: 16px;
-  color: #555;
+  color: var(--text-secondary);
   margin-bottom: 5px;
-  border-bottom: 2px solid #1D334A;
-  transition: background-color 0.5s ease;
+  border-bottom: 2px solid var(--border);
+  transition: background-color 0.3s ease;
 }
 
 li:hover {
-  background-color: #FFD700;
+  background-color: var(--table-row-hover);
 }
 
-.team-divider {
-  border-top: 3px solid #1D334A;
+.team-divider,
+.project-divider {
+  border-top: 3px solid var(--table-divider);
   margin: 10px 0;
-  transition: border-top 0.5s ease;
+  transition: border-color 0.3s ease;
 }
 
 .team-divider + tr {
-  border-top: 1px solid #1D334A;
-}
-
-.project-row:hover td {
-  background-color: #FFD700;
-  color: #000000;
-}
-
-.project-divider {
-  border-top: 3px solid #1D334A;
-  margin: 10px 0;
+  border-top: 1px solid var(--table-divider);
 }
 
 .team-section {
   margin-bottom: 20px;
+  transition: all 0.3s ease;
 }
 
 .team-header {
   font-size: 1.2em;
   padding: 5px;
-  background-color: #1D334A;
-  color: #fff;
+  background-color: var(--table-header-bg);
+  color: var(--table-header-text);
   border-radius: 4px;
+  transition: all 0.3s ease;
 }
 
 .team-projects {
   padding-top: 10px;
+  transition: all 0.3s ease;
 }
 
 .teams-table .document-list {
   padding: 10px;
+  transition: all 0.3s ease;
 }
 
 .teams-table .document-item {
   margin: 5px 0;
+  transition: all 0.3s ease;
+}
+
+.view-toggle {
+  display: flex;
+  background-color: var(--button-bg);
+  border: 2px solid var(--border);
+  border-radius: 30px;
+  overflow: hidden;
+  margin: 20px 0;
+  box-shadow: var(--shadow);
+  transition: all 0.3s ease;
+}
+
+.view-toggle-btn {
+  flex: 1;
+  padding: 10px 20px;
+  font-size: 16px;
+  font-weight: 500;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  color: var(--text-primary);
+  background-color: transparent;
+  border: none;
+}
+
+.view-toggle-btn.active {
+  background-color: var(--accent);
+  color: var(--button-hover-text);
+}
+
+.view-toggle-btn:not(.active):hover {
+  background-color: var(--hover-bg);
+}
+
+.view-toggle-btn:first-child {
+  border-right: 1px solid var(--border);
 }

@@ -38,6 +38,7 @@ const TeamList = () => {
     if (selectedTeam !== teamId) {
       try {
         const members = await fetchTeamMembers(teamId);
+        console.log('Найденные участники:', members);
         setTeamMembers((prev) => ({
           ...prev,
           [teamId]: sortMembersByRole(members),
@@ -141,7 +142,7 @@ const TeamList = () => {
                                 }}
                               >
                                 <td>{member.firstName + " " + member.lastName}</td>
-                                <td>{member.role}</td>
+                                <td>{member.roleName || 'Роль не указана'}</td>
                               </tr>
                             ))
                           ) : (

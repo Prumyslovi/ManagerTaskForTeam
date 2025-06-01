@@ -1,0 +1,41 @@
+.inputGroup {
+  margin-bottom: 15px;
+  font-family: var(--font-primary);
+}
+
+.inputLabel {
+  display: block;
+  margin-bottom: 5px;
+  color: var(--text-primary);
+  font-weight: 500;
+  font-family: var(--font-primary);
+}
+
+.input {
+  width: 100%;
+  padding: 10px 15px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  font-size: 16px;
+  background-color: var(--bg-secondary);
+  color: var(--text-primary);
+  transition: border-color 0.3s;
+  font-family: var(--font-primary);
+}
+
+.input:focus {
+  border-color: var(--accent);
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.25);
+}
+
+.inputError {
+  border-color: #dc3545;
+}
+
+.errorText {
+  color: #dc3545;
+  font-size: 14px;
+  margin-top: 5px;
+  font-family: var(--font-primary);
+}
