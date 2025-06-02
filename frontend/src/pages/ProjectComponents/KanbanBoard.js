@@ -62,18 +62,15 @@ const KanbanBoard = ({ projectId, setData, teamId }) => {
     const [filterDate, setFilterDate] = useState('');
     const [filterPriority, setFilterPriority] = useState('');
     const [filterStatus, setFilterStatus] = useState('');
-    const [error, setError] = useState(null); // Added error state
+    const [error, setError] = useState(null);
 
     const openAddModal = () => setIsAddModalOpen(true);
     const closeAddModal = () => setIsAddModalOpen(false);
-
     const openEditModal = (card) => {
         setSelectedCard(card);
         setIsEditModalOpen(true);
     };
-
     const closeEditModal = () => setIsEditModalOpen(false);
-
     const openAddColumnModal = () => setIsAddColumnModalOpen(true);
     const closeAddColumnModal = () => setIsAddColumnModalOpen(false);
 
@@ -112,7 +109,6 @@ const KanbanBoard = ({ projectId, setData, teamId }) => {
                 IsDeleted: false,
                 Priority: newTask.priority || 'Низкий'
             };
-
             const createdTask = await createTask(taskData);
             const newTaskWithId = {
                 ...newTask,
@@ -122,7 +118,6 @@ const KanbanBoard = ({ projectId, setData, teamId }) => {
                 assignee: taskData.MemberId,
                 status: taskData.Status
             };
-
             setBoardData((prevData) => {
                 const updatedLane = { ...prevData.lanes['lane-planned'], cards: [...(prevData.lanes['lane-planned']?.cards || []), newTaskWithId] };
                 return {
@@ -156,15 +151,11 @@ const KanbanBoard = ({ projectId, setData, teamId }) => {
     const onDragEnd = async (result) => {
         const { destination, source } = result;
         if (!destination || (destination.droppableId === source.droppableId && destination.index === source.index)) return;
-
         const sourceLane = boardData.lanes[source.droppableId];
         const destinationLane = boardData.lanes[destination.droppableId];
-
         if (!sourceLane || !destinationLane) return;
-
         const [draggedCard] = sourceLane.cards.splice(source.index, 1);
         destinationLane.cards.splice(destination.index, 0, draggedCard);
-
         setBoardData({
             lanes: {
                 ...boardData.lanes,
@@ -172,9 +163,7 @@ const KanbanBoard = ({ projectId, setData, teamId }) => {
                 [destinationLane.id]: destinationLane,
             },
         });
-
         draggedCard.status = destinationLane.title;
-
         try {
             await updateTask(draggedCard.id, {
                 TaskId: draggedCard.id,
@@ -203,7 +192,6 @@ const KanbanBoard = ({ projectId, setData, teamId }) => {
                     acc[`lane-${status.statusId}`] = { id: `lane-${status.statusId}`, title: status.name, cards: [] };
                     return acc;
                 }, {});
-
                 const fetchedTasks = await fetchTasksForProject(projectId);
                 fetchedTasks.forEach((task) => {
                     const laneId = Object.keys(lanes).find(key => lanes[key].title === task.status) || 'lane-planned';
@@ -221,9 +209,7 @@ const KanbanBoard = ({ projectId, setData, teamId }) => {
                         priority: task.priority || 'Низкий'
                     });
                 });
-
                 setBoardData({ lanes });
-
                 const uniqueMemberIds = [...new Set(fetchedTasks.map(task => task.memberId).filter(Boolean))];
                 const profiles = {};
                 for (const memberId of uniqueMemberIds) {
@@ -252,7 +238,6 @@ const KanbanBoard = ({ projectId, setData, teamId }) => {
                     acc[`lane-${status.statusId}`] = { id: `lane-${status.statusId}`, title: status.name, cards: [] };
                     return acc;
                 }, {});
-
                 const fetchedTasks = await fetchTasksForProject(projectId);
                 fetchedTasks.forEach((task) => {
                     const laneId = Object.keys(lanes).find(key => lanes[key].title === task.status) || 'lane-planned';
@@ -270,7 +255,6 @@ const KanbanBoard = ({ projectId, setData, teamId }) => {
                         priority: task.priority || 'Низкий'
                     });
                 });
-
                 setBoardData({ lanes });
             } catch (error) {
                 console.error('Ошибка обновления задач:', error);
@@ -281,12 +265,35 @@ const KanbanBoard = ({ projectId, setData, teamId }) => {
     };
 
     const applyFilters = (cards) => {
-        return cards.filter(card =>
-            (!filterAssignee || getUserNameById(card.assignee) === filterAssignee) &&
-            (!filterDate || formatDateTime(card.endDate) === filterDate) &&
-            (!filterPriority || card.priority === filterPriority) &&
-            (!filterStatus || card.status === filterStatus)
-        );
+        const now = new Date();
+        const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+        const startOfTomorrow = new Date(startOfToday);
+        startOfTomorrow.setDate(startOfTomorrow.getDate() + 1);
+        const startOfDayAfterTomorrow = new Date(startOfTomorrow);
+        startOfDayAfterTomorrow.setDate(startOfDayAfterTomorrow.getDate() + 1);
+        const startOfYesterday = new Date(startOfToday);
+        startOfYesterday.setDate(startOfYesterday.getDate() - 1);
+        const endOfYesterday = new Date(startOfToday);
+        const endOfNextFive = new Date(startOfToday);
+        endOfNextFive.setDate(endOfNextFive.getDate() + 5);
+
+        return cards.filter(card => {
+            const endDateObj = card.endDate ? new Date(card.endDate) : null;
+            let dateMatch = true;
+            if (filterDate === 'yesterday') {
+                dateMatch = endDateObj && endDateObj >= startOfYesterday && endDateObj < endOfYesterday;
+            } else if (filterDate === 'today') {
+                dateMatch = endDateObj && endDateObj >= startOfToday && endDateObj < startOfTomorrow;
+            } else if (filterDate === 'tomorrow') {
+                dateMatch = endDateObj && endDateObj >= startOfTomorrow && endDateObj < startOfDayAfterTomorrow;
+            } else if (filterDate === 'next5') {
+                dateMatch = endDateObj && endDateObj >= startOfToday && endDateObj <= endOfNextFive;
+            }
+            const assigneeMatch = !filterAssignee || getUserNameById(card.assignee) === filterAssignee;
+            const priorityMatch = !filterPriority || card.priority === filterPriority;
+            const statusMatch = !filterStatus || card.status === filterStatus;
+            return dateMatch && assigneeMatch && priorityMatch && statusMatch;
+        });
     };
 
     const lanes = boardData?.lanes ? Object.values(boardData.lanes).map(lane => ({
@@ -317,9 +324,10 @@ const KanbanBoard = ({ projectId, setData, teamId }) => {
                     </select>
                     <select value={filterDate} onChange={(e) => setFilterDate(e.target.value)}>
                         <option value="">Все даты</option>
-                        {[...new Set(Object.values(boardData.lanes).flatMap(lane => lane.cards.map(card => formatDateTime(card.endDate))))].map(date => (
-                            <option key={date} value={date}>{date}</option>
-                        ))}
+                        <option value="yesterday">Вчера</option>
+                        <option value="today">Сегодня</option>
+                        <option value="tomorrow">Завтра</option>
+                        <option value="next5">5 дней</option>
                     </select>
                     <select value={filterPriority} onChange={(e) => setFilterPriority(e.target.value)}>
                         <option value="">Все приоритеты</option>

@@ -37,7 +37,7 @@ const Navbar = ({ isLoggedIn, toggleVisibility, handleMenuItemClick, handleLogou
   return (
     <div className="navbar">
       <div className="navContainer">
-        <h1 className="navbarTitle">ИС МЗ</h1>
+        <h1 className="navbarTitle">Управление задачами команды</h1>
         <ul className="navList">
           <li className="navItem" onClick={() => handleMenuItemClick('home', '/')}>Главная</li>
           <li className="navItem">
@@ -45,6 +45,8 @@ const Navbar = ({ isLoggedIn, toggleVisibility, handleMenuItemClick, handleLogou
             <ul className="dropdown">
               <li onClick={() => handleMenuItemClick('program', '/program')}>О программе</li>
               <li onClick={() => handleMenuItemClick('howToStart', '/howToStart')}>Как начать пользоваться</li>
+              <li onClick={() => handleMenuItemClick('security', '/security')}>Безопасность</li>
+              <li onClick={() => handleMenuItemClick('tutorial', '/tutorial')}>Обучение</li>
             </ul>
           </li>
           <li className="navItem">
@@ -57,8 +59,8 @@ const Navbar = ({ isLoggedIn, toggleVisibility, handleMenuItemClick, handleLogou
           <li className="navItem">
             Проекты <AiOutlineDown className="arrow" />
             <ul className="dropdown">
-              <li onClick={() => handleMenuItemClick('projectsList', `/team/${teamId}/projects`)}>Список проектов</li>
-              <li onClick={() => handleMenuItemClick('createProject', `/team/${teamId}/projects/${projectId}/manage`)}>Управление проектами</li>
+              <li onClick={() => handleMenuItemClick('projectsList', `/team/projects`)}>Список проектов</li>
+              <li onClick={() => handleMenuItemClick('createProject', `/team/projectsmanage`)}>Управление проектами</li>
             </ul>
           </li>
         </ul>

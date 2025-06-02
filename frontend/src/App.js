@@ -20,23 +20,39 @@ const AppContent = () => {
   const [memberId, setMemberId] = useState(null);
   const navigate = useNavigate();
 
+  const isValidUUID = (id) => id && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
+
   useEffect(() => {
     const token = localStorage.getItem('accessToken');
-    if (token) {
+    const storedMemberId = localStorage.getItem('memberId');
+    if (token && storedMemberId && isValidUUID(storedMemberId)) {
       setIsLoggedIn(true);
-      setMemberId(localStorage.getItem('memberId'));
+      setMemberId(storedMemberId);
+      console.log('Авторизация успешна, memberId:', storedMemberId);
     } else {
       setIsLoggedIn(false);
       setMemberId(null);
       localStorage.removeItem('memberId');
+      localStorage.removeItem('accessToken');
+      console.log('Авторизация отсутствует или memberId некорректен:', storedMemberId);
     }
   }, []);
 
   const handleLogin = (id, token) => {
+    if (!isValidUUID(id)) {
+      console.error('Недействительный memberId при авторизации:', id);
+      return;
+    }
+    if (!token) {
+      console.error('Токен отсутствует при авторизации');
+      return;
+    }
     setIsLoggedIn(true);
     setMemberId(id);
     localStorage.setItem('memberId', id);
     localStorage.setItem('accessToken', token);
+    console.log('Успешный вход, memberId:', id);
+    navigate('/');
   };
 
   const handleLogout = () => {
@@ -44,6 +60,8 @@ const AppContent = () => {
     setMemberId(null);
     localStorage.removeItem('memberId');
     localStorage.removeItem('accessToken');
+    localStorage.removeItem('currentTeamId');
+    console.log('Выход из системы');
     navigate('/');
   };
 
@@ -75,13 +93,15 @@ const AppContent = () => {
         <Route path="/" element={<Home memberId={memberId} />} />
         <Route path="/program" element={<Home memberId={memberId} />} />
         <Route path="/howToStart" element={<Home memberId={memberId} />} />
+        <Route path="/security" element={<Home memberId={memberId} />} />
+        <Route path="/tutorial" element={<Home memberId={memberId} />} />
         <Route path="/teams" element={<TeamList memberId={memberId} />} />
         <Route path="/team/:teamId/manage" element={<TeamManagement memberId={memberId} />} />
         <Route path="/team/:teamId/manage/create" element={<TeamManagement memberId={memberId} />} />
         <Route path="/team/:teamId/manage/administer" element={<TeamManagement memberId={memberId} />} />
         <Route path="/team/:teamId/manage/join" element={<TeamManagement memberId={memberId} />} />
-        <Route path="/team/:teamId/projects" element={<ProjectList memberId={memberId} />} />
-        <Route path="/team/:teamId/projects/:projectId/manage" element={<ProjectManagement />} />
+        <Route path="/team/projects" element={<ProjectList memberId={memberId} />} />
+        <Route path="/team/projectsmanage" element={<ProjectManagement />} />
         <Route path="/profile" element={<Profile memberId={memberId} />} />
         <Route path="/create-document" element={<CreateDocument />} />
         <Route path="/edit-document/:documentId" element={<DocumentEditor />} />

@@ -1,6 +1,6 @@
 .navbar {
   background-color: var(--nav-bg);
-  padding: 10px 20px;
+  padding: 10px 10px;
   box-shadow: var(--shadow);
   font-family: var(--font-primary);
 }
@@ -29,7 +29,7 @@
 }
 
 .navItem {
-  margin: 0 15px;
+  margin: 10px;
   position: relative;
   cursor: pointer;
   color: var(--nav-text);

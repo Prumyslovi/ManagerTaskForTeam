@@ -1,171 +1,153 @@
-.wx-willow-theme {
-  --wx-gantt-border: 1px solid var(--border-light);
-  --wx-gantt-form-header-border: none;
-  --wx-gantt-icon-color: var(--icon-color);
-  --wx-gantt-bar-font: var(--wx-font-weight) var(--wx-font-size) var(--wx-font-family);
-  --wx-gantt-bar-border-radius: 4px;
-  --wx-gantt-milestone-border-radius: 4px;
-  --wx-gantt-task-color: var(--gantt-task-fill);
-  --wx-gantt-task-font-color: var(--gantt-task-text);
-  --wx-gantt-task-fill-color: var(--gantt-task-fill);
-  --wx-gantt-task-border-color: var(--border);
-  --wx-gantt-task-border: 1px solid var(--border);
-  --wx-gantt-project-color: var(--accent);
-  --wx-gantt-project-font-color: var(--text-primary);
-  --wx-gantt-project-fill-color: var(--accent);
-  --wx-gantt-project-border-color: var(--border);
-  --wx-gantt-project-border: 1px solid var(--border);
-  --wx-gantt-milestone-color: var(--accent);
-  --wx-gantt-select-color: var(--icon-hover);
-  --wx-gantt-link-color: var(--accent);
-  --wx-gantt-link-marker-background: var(--bg-secondary);
-  --wx-gantt-link-marker-color: var(--icon-color);
-  --wx-gantt-bar-shadow: 0px 4px 8px var(--shadow), 0px 6px 12px var(--shadow);
-  --wx-gantt-progress-marker-height: 26px;
-  --wx-gantt-progress-border-color: var(--border-light);
-  --wx-gantt-baseline-border-radius: 4px;
-  --wx-grid-header-font: var(--wx-font-weight-md) var(--wx-font-size) var(--wx-font-family);
-  --wx-grid-header-font-color: var(--text-primary);
-  --wx-grid-header-text-transform: capitalize;
-  --wx-grid-header-shadow: none;
-  --wx-grid-body-font: var(--wx-font-weight) var(--wx-font-size) var(--wx-font-family);
-  --wx-grid-body-font-color: var(--text-secondary);
-  --wx-grid-body-row-border: var(--wx-gantt-border);
-  --wx-grid-body-cell-border: 1px solid transparent;
-  --wx-timescale-font: var(--wx-font-weight-md) var(--wx-font-size-sm) var(--wx-font-family);
-  --wx-timescale-font-color: var(--text-primary);
-  --wx-timescale-text-transform: uppercase;
-  --wx-timescale-shadow: none;
-  --wx-timescale-border: var(--wx-gantt-border);
-  --wx-gantt-holiday-background: var(--gantt-holiday-bg);
-  --wx-gantt-holiday-color: var(--gantt-holiday-text);
-  --wx-gantt-marker-font: var(--wx-font-weight-md) var(--wx-font-size-sm) var(--wx-font-family);
-  --wx-gantt-marker-font-color: var(--text-primary);
-  --wx-gantt-marker-color: var(--icon-color);
-  --wx-tooltip-font: var(--wx-font-weight) var(--wx-font-size) var(--wx-font-family);
-  --wx-tooltip-font-color: var(--text-primary);
-  --wx-tooltip-background: var(--shadow);
-  --wx-sidebar-close-icon: var(--icon-color);
+.gantt-container {
+    width: 100%;
+    position: relative;
+    min-height: 0;
+    height: auto;
+    overflow: auto;
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+    transition: background-color 0.3s ease;
 }
 
-.gantt-container {
-  width: 100%;
-  position: relative;
-  min-height: 0;
-  height: auto;
-  overflow: auto;
-  background-color: var(--bg-primary);
-  color: var(--text-primary);
-  transition: background-color 0.3s ease;
+.container {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    padding: 10px;
+    background-color: var(--bg-secondary);
+    border-bottom: 1px solid var(--border-light);
+}
+
+.gantt-content {
+    padding: 10px;
+}
+
+.controls {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 10px;
 }
 
 .wx-gantt {
-  background-color: var(--bg-primary) !important;
+    background-color: var(--bg-primary) !important;
 }
 
 .wx-gantt .wx-grid-header,
 .wx-gantt .wx-timescale {
-  background-color: var(--bg-secondary) !important;
-  border-bottom: 1px solid var(--border-light) !important;
-  color: var(--text-primary) !important;
+    background-color: var(--bg-secondary) !important;
+    border-bottom: 1px solid var(--border-light) !important;
+    color: var(--text-primary) !important;
 }
 
 .wx-gantt .wx-column-header,
 .wx-gantt .wx-body-cell {
-  background-color: var(--bg-primary) !important;
-  color: var(--text-primary) !important;
-  border-color: var(--border-light) !important;
+    background-color: var(--bg-primary) !important;
+    color: var(--text-primary) !important;
+    border-color: var(--border-light) !important;
 }
 
 .wx-gantt .wx-grid-body-row {
-  background-color: var(--bg-primary) !important;
-  border-bottom: 1px solid var(--border-light) !important;
+    background-color: var(--bg-primary) !important;
+    border-bottom: 1px solid var(--border-light) !important;
 }
 
 .wx-gantt .wx-grid-body-cell {
-  background-color: var(--bg-primary) !important;
-  color: var(--text-primary) !important;
+    background-color: var(--bg-primary) !important;
+    color: var(--text-primary) !important;
 }
 
 .wx-gantt .wx-task-bar {
-  background-color: var(--gantt-task-fill) !important;
-  color: var(--gantt-task-text) !important;
-  fill: var(--gantt-task-fill) !important;
+    background-color: var(--gantt-task-fill) !important;
+    color: var(--gantt-task-text) !important;
+    fill: var(--gantt-task-fill) !important;
 }
 
 .wx-gantt .wx-project-bar {
-  background-color: var(--accent) !important;
-  color: var(--text-primary) !important;
-  fill: var(--accent) !important;
+    background-color: var(--accent) !important;
+    color: var(--text-primary) !important;
+    fill: var(--accent) !important;
 }
 
 .wx-gantt .wx-milestone {
-  background-color: var(--accent) !important;
-  fill: var(--accent) !important;
+    background-color: var(--accent) !important;
+    fill: var(--accent) !important;
 }
 
 .wx-gantt .wx-grid-body-row:hover {
-  background-color: var(--table-row-hover) !important;
-  color: var(--table-row-hover-text) !important;
+    background-color: var(--table-row-hover) !important;
+    color: var(--table-row-hover-text) !important;
 }
 
 .wx-gantt .wx-grid-header-cell {
-  background-color: var(--table-header-bg) !important;
-  color: var(--table-header-text) !important;
-  border-right: 1px solid var(--border-light) !important;
+    background-color: var(--table-header-bg) !important;
+    color: var(--table-header-text) !important;
+    border-right: 1px solid var(--border-light) !important;
 }
 
 .wx-gantt .wx-grid-header-cell:last-child {
-  border-right: none !important;
+    border-right: none !important;
 }
 
 .wx-gantt .wx-grid-body-row:nth-child(even) {
-  background-color: var(--bg-secondary) !important;
+    background-color: var(--bg-secondary) !important;
 }
 
 .wx-gantt .wx-timescale-cell {
-  border-right: 1px solid var(--border-light) !important;
-  color: var(--text-primary) !important;
+    border-right: 1px solid var(--border-light) !important;
+    color: var(--text-primary) !important;
 }
 
 .wx-gantt .wx-timescale-cell:last-child {
-  border-right: none !important;
+    border-right: none !important;
 }
 
 .wx-gantt .wx-link {
-  stroke: var(--accent) !important;
+    stroke: var(--accent) !important;
 }
 
 .wx-gantt .wx-link-marker {
-  fill: var(--bg-secondary) !important;
-  stroke: var(--icon-color) !important;
+    fill: var(--bg-secondary) !important;
+    stroke: var(--icon-color) !important;
 }
 
 .wx-gantt .wx-link-marker-text {
-  fill: var(--icon-color) !important;
+    fill: var(--icon-color) !important;
 }
 
 .wx-gantt .wx-holiday {
-  background-color: var(--gantt-holiday-bg) !important;
-  color: var(--gantt-holiday-text) !important;
+    background-color: var(--gantt-holiday-bg) !important;
+    color: var(--gantt-holiday-text) !important;
 }
 
 .wx-gantt .wx-marker {
-  color: var(--text-primary) !important;
+    color: var(--text-primary) !important;
 }
 
 .wx-gantt .wx-tooltip {
-  background: var(--shadow) !important;
-  color: var(--text-primary) !important;
-  font-family: var(--font-primary) !important;
-}
-
-.container {
-  display: flex;
-  align-items: center;
-  margin-bottom: 10px;
+    background: var(--shadow) !important;
+    color: var(--text-primary) !important;
+    font-family: var(--font-primary) !important;
 }
 
 .wx-row {
-  transition: height 0.3s ease;
+    transition: height 0.3s ease;
+}
+
+.editButton, .scaleSelect {
+    padding: 8px 12px;
+    border-radius: 4px;
+    border: 1px solid var(--border-light);
+    background-color: var(--button-bg);
+    color: var(--button-text);
+    cursor: pointer;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.editButton:hover, .scaleSelect:hover {
+    background-color: var(--button-hover-bg);
+    color: var(--button-hover-text);
 }

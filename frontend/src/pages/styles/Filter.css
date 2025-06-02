@@ -1,39 +1,38 @@
-.container {
-  position: relative;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  flex-wrap: wrap;
-  padding: 5px 0;
-}
-
 .filterButton {
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 5px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 5px;
 }
 
 .filterIcon {
-  color: black;
-  transition: color 0.3s ease;
-  font-size: 20px;
+    color: var(--icon-color);
+    transition: color 0.3s ease;
+    font-size: 20px;
 }
 
 .filterButton:hover .filterIcon {
-  color: #1D334A;
+    color: var(--icon-hover);
 }
 
 .filterPanel {
-  position: absolute;
-  top: 100%; /* Располагаем под элементами управления */
-  left: 0;
-  background: white;
-  border: 1px solid #000000;
-  border-radius: 5px;
-  padding: 10px;
-  z-index: 1000;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-  width: 100%;
-  margin-top: 5px;
+    position: absolute;
+    right: 4%;
+    background: var(--bg-primary);
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    padding: 8px;
+    z-index: 2000; /* Higher than Gantt chart */
+    box-shadow: var(--shadow);
+    width: 200px; /* Smaller width */
+    user-select: none; /* Prevent text selection while dragging */
+}
+
+.filterPanel label, .filterPanel select {
+    color: var(--text-primary);
+    font-size: 14px; /* Smaller font size */
+}
+
+.filterPanel select {
+    padding: 4px; /* Adjust padding for smaller select */
 }

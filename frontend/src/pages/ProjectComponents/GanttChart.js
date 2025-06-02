@@ -66,7 +66,11 @@ const GanttChart = ({ projectId, teamId, currentUserId }) => {
     const [statusFilter, setStatusFilter] = useState("all");
     const [filterByDueDate, setFilterByDueDate] = useState(false);
     const [isFilterPanelOpen, setIsFilterPanelOpen] = useState(false);
+    const [filterPanelPosition, setFilterPanelPosition] = useState({ x: 0, y: 0 });
     const ganttRef = useRef(null);
+    const filterButtonRef = useRef(null);
+    const filterPanelRef = useRef(null);
+    const dragRef = useRef({ isDragging: false, startX: 0, startY: 0 });
 
     const loadData = async () => {
         try {
@@ -274,6 +278,31 @@ const GanttChart = ({ projectId, teamId, currentUserId }) => {
         setIsAddModalOpen(true);
     };
 
+    const handleMouseDown = (e) => {
+        if (e.button === 0) { // Left mouse button
+            const rect = filterPanelRef.current.getBoundingClientRect();
+            dragRef.current = {
+                isDragging: true,
+                startX: e.clientX - rect.left,
+                startY: e.clientY - rect.top
+            };
+            e.preventDefault();
+        }
+    };
+
+    const handleMouseMove = (e) => {
+        if (dragRef.current.isDragging) {
+            setFilterPanelPosition({
+                x: e.clientX - dragRef.current.startX,
+                y: e.clientY - dragRef.current.startY
+            });
+        }
+    };
+
+    const handleMouseUp = () => {
+        dragRef.current.isDragging = false;
+    };
+
     useEffect(() => {
         loadData();
     }, []);
@@ -309,7 +338,6 @@ const GanttChart = ({ projectId, teamId, currentUserId }) => {
                 }
             });
 
-            // Изменено: теперь открываем модалку по одинарному клику
             element.addEventListener("click", (e) => {
                 e.preventDefault();
                 const taskId = element.getAttribute("data-task-id");
@@ -321,7 +349,15 @@ const GanttChart = ({ projectId, teamId, currentUserId }) => {
                 }
             });
         });
-    }, [tasks, scale]);
+
+        document.addEventListener("mousemove", handleMouseMove);
+        document.addEventListener("mouseup", handleMouseUp);
+
+        return () => {
+            document.removeEventListener("mousemove", handleMouseMove);
+            document.removeEventListener("mouseup", handleMouseUp);
+        };
+    }, [tasks, scale, filterPanelPosition]);
 
     if (isLoading) return <div className="spinner"></div>;
     if (error) return <div className="message restricted-content">Ошибка: {error}</div>;
@@ -329,58 +365,74 @@ const GanttChart = ({ projectId, teamId, currentUserId }) => {
     const { scales, start, end } = getScalesAndRange();
 
     return (
-        <div>
-            <ImportExport
-                data={{ tasks, links }}
-                setData={({ tasks: newTasks, links: newLinks }) => { setTasks(newTasks); setLinks(newLinks); }}
-                projectId={projectId}
-                type="gantt"
-                className="import-export-button"
-            />
-
-            <button
-                className="filterButton"
-                onClick={toggleFilterPanel}
-            >
-                <FaFilter className="filterIcon" />
-            </button>
-
-            <div className="gantt-container" style={{ width: "100%", position: "relative" }} ref={ganttRef}>
-                <div className="container" style={{ position: "relative" }}>
-                    {/* Импорт/Экспорт теперь на уровне других элементов управления */}
-
-                    {isFilterPanelOpen && (
-                        <div className="filterPanel">
-                            <label style={{ display: "flex", alignItems: "center", marginBottom: "10px" }}>
-                                <input
-                                    type="checkbox"
-                                    checked={filterByUser}
-                                    onChange={handleFilterByUserChange}
-                                    style={{ marginRight: "5px" }}
-                                />
-                                Только мои задачи
-                            </label>
-                            <div style={{ marginBottom: "10px" }}>
-                                <span>Статус:</span>
-                                <select className="scaleSelect" value={statusFilter} onChange={handleStatusFilterChange} style={{ marginLeft: "5px" }}>
-                                    <option value="all">Все</option>
-                                    <option value="planned">В планах</option>
-                                    <option value="in_progress">В процессе</option>
-                                    <option value="completed">Выполнено</option>
-                                    <option value="failed">Провалено</option>
-                                </select>
-                            </div>
-                            <label style={{ display: "flex", alignItems: "center" }}>
-                                <input
-                                    type="checkbox"
-                                    checked={filterByDueDate}
-                                    onChange={handleFilterByDueDateChange}
-                                    style={{ marginRight: "5px" }}
-                                />
-                                Ближайшие дедлайны (3 дня)
-                            </label>
+        <div className="gantt-container">
+            <div className="container">
+                <ImportExport
+                    data={{ tasks, links }}
+                    setData={({ tasks: newTasks, links: newLinks }) => { setTasks(newTasks); setLinks(newLinks); }}
+                    projectId={projectId}
+                    type="gantt"
+                    className="import-export-button"
+                />
+                <button
+                    className="filterButton"
+                    onClick={toggleFilterPanel}
+                    ref={filterButtonRef}
+                >
+                    <FaFilter className="filterIcon" />
+                </button>
+                <button className="editButton" onClick={openAddTaskModal}>
+                    Добавить задачу
+                </button>
+                {isFilterPanelOpen && (
+                    <div
+                        className="filterPanel"
+                        ref={filterPanelRef}
+                        style={{
+                            transform: dragRef.current.isDragging
+                                ? `translate(${filterPanelPosition.x}px, ${filterPanelPosition.y}px)`
+                                : 'none',
+                            cursor: dragRef.current.isDragging ? "grabbing" : "grab"
+                        }}
+                        onMouseDown={handleMouseDown}
+                    >
+                        <label style={{ display: "flex", alignItems: "center", marginBottom: "8px" }}>
+                            <input
+                                type="checkbox"
+                                checked={filterByUser}
+                                onChange={handleFilterByUserChange}
+                                style={{ marginRight: "5px" }}
+                            />
+                            Только мои задачи
+                        </label>
+                        <div style={{ marginBottom: "8px" }}>
+                            <span>Статус:</span>
+                            <select
+                                className="filterSelect"
+                                value={statusFilter}
+                                onChange={handleStatusFilterChange}
+                            >
+                                <option value="all">Все</option>
+                                <option value="planned">В планах</option>
+                                <option value="in_progress">В процессе</option>
+                                <option value="completed">Выполнено</option>
+                                <option value="failed">Провалено</option>
+                            </select>
                         </div>
-                    )}
+                        <label style={{ display: "flex", alignItems: "center" }}>
+                            <input
+                                type="checkbox"
+                                checked={filterByDueDate}
+                                onChange={handleFilterByDueDateChange}
+                                style={{ marginRight: "5px" }}
+                            />
+                            Ближайшие дедлайны (3 дня)
+                        </label>
+                    </div>
+                )}
+            </div>
+            <div className="gantt-content" ref={ganttRef}>
+                <div className="controls">
                     <select className="scaleSelect" value={scale} onChange={handleScaleChange} style={{ margin: "0 5px" }}>
                         <option value="all">Всё время</option>
                         <option value="year">Год</option>
@@ -409,11 +461,7 @@ const GanttChart = ({ projectId, teamId, currentUserId }) => {
                         <option value={60}>60px</option>
                         <option value={70}>70px</option>
                     </select>
-                    <button className="editButton" onClick={openAddTaskModal}>
-                        Добавить задачу
-                    </button>
                 </div>
-                <div style={{ marginBottom: "10px" }}></div>
                 <Willow>
                     <Gantt
                         tasks={filteredTasks.map(task => ({
