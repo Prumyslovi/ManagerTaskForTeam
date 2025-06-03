@@ -21,6 +21,19 @@ namespace ManagerTaskForTeam.API.Controllers
             _teamService = teamService;
         }
 
+        // Функция для генерации случайной строки из 12 символов
+        private string GenerateRandomTeamLink(int length = 12)
+        {
+            const string characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+            var random = new Random();
+            char[] result = new char[length];
+            for (int i = 0; i < length; i++)
+            {
+                result[i] = characters[random.Next(characters.Length)];
+            }
+            return new string(result);
+        }
+
         [HttpGet("GetAllTeams")]
         public async Task<ActionResult<IEnumerable<Team>>> GetAllTeams()
         {
@@ -41,12 +54,23 @@ namespace ManagerTaskForTeam.API.Controllers
         }
 
         [HttpPost("AddTeam")]
-        public async Task<ActionResult<Team>> AddTeam([FromBody] Team team)
+        public async Task<ActionResult<Team>> AddTeam([FromBody] TeamDto teamDto)
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
             var memberId = Guid.Parse(User.FindFirst("MemberId")?.Value);
-            team.CreatorId = memberId;
-            team.CreatedAt = DateTime.UtcNow;
-            team.TeamLink = Guid.NewGuid().ToString("N").Substring(0, 8);
+            var team = new Team
+            {
+                TeamName = teamDto.TeamName,
+                Description = teamDto.Description,
+                TeamLink = GenerateRandomTeamLink(), // Генерируем строку из 12 символов
+                CreatedAt = DateTime.UtcNow,
+                CreatorId = memberId,
+                IsDeleted = false
+            };
             var createdTeam = await _teamService.AddTeamAsync(team);
             await _teamService.AddMemberToTeamAsync(createdTeam.TeamId, memberId);
             return CreatedAtAction(nameof(GetTeam), new { id = createdTeam.TeamId }, createdTeam);
@@ -58,7 +82,7 @@ namespace ManagerTaskForTeam.API.Controllers
             if (!HasPermission(id, "D9F09821-11A1-4C90-915C-62D4F9E92629"))
                 return Forbid();
 
-            team.TeamId = id; // Устанавливаем ID из маршрута
+            team.TeamId = id;
             await _teamService.UpdateTeamAsync(team);
             return NoContent();
         }

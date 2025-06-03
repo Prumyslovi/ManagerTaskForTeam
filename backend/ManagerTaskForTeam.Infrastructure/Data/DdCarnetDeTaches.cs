@@ -23,7 +23,9 @@ namespace ManagerTaskForTeam.Infrastructure.Data
 
         public ManagerTaskForTeamDbContext(DbContextOptions<ManagerTaskForTeamDbContext> options)
             : base(options)
+
         {
         }
+       
     }
 }

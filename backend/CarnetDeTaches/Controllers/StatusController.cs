@@ -48,8 +48,8 @@ namespace ManagerTaskForTeam.API.Controllers
         [HttpPost("AddStatus")]
         public async Task<ActionResult<Status>> AddStatus([FromBody] Status status)
         {
-            if (!HasTeamPermission(status.TeamId, "E1326EA5-E475-42BC-8631-BAD21AC4956D"))
-                return Forbid();
+            //if (!HasTeamPermission(status.TeamId, "E1326EA5-E475-42BC-8631-BAD21AC4956D"))
+            //    return Forbid();
 
             var createdStatus = await _statusService.AddStatusAsync(status);
             return CreatedAtAction(nameof(GetStatus), new { id = createdStatus.StatusId }, createdStatus);

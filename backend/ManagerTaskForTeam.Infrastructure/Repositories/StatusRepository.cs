@@ -21,14 +21,12 @@ namespace ManagerTaskForTeam.Infrastructure.Repositories
         public async Task<IEnumerable<Status>> GetAllStatusesAsync()
         {
             return await _context.Statuses
-                .Include(s => s.Team)
                 .ToListAsync();
         }
 
         public async Task<Status> GetStatusAsync(Guid statusId)
         {
             return await _context.Statuses
-                .Include(s => s.Team)
                 .FirstOrDefaultAsync(s => s.StatusId == statusId);
         }
 
@@ -76,7 +74,6 @@ namespace ManagerTaskForTeam.Infrastructure.Repositories
         public async Task<IEnumerable<Status>> GetStatusesByTeamIdAsync(Guid teamId)
         {
             return await _context.Statuses
-                .Include(s => s.Team)
                 .Where(s => s.TeamId == teamId)
                 .ToListAsync();
         }

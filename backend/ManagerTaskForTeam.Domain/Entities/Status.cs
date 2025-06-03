@@ -1,6 +1,7 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 namespace ManagerTaskForTeam.Domain.Entities
 {
@@ -16,6 +17,5 @@ namespace ManagerTaskForTeam.Domain.Entities
         public string Name { get; set; }
         [Column("IsStandard")]
         public bool IsStandard { get; set; }
-        public Team Team { get; set; }
     }
 }

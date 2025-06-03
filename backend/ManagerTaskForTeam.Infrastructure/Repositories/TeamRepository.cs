@@ -176,7 +176,7 @@ namespace ManagerTaskForTeam.Infrastructure.Repositories
             }
 
             var defaultRole = await _context.Roles
-                .FirstOrDefaultAsync(r => r.RoleName == "Member");
+                .FirstOrDefaultAsync(r => r.RoleName == "Создатель");
 
             if (defaultRole == null)
             {
