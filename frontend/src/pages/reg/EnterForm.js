@@ -23,6 +23,11 @@ const EnterForm = ({ visible, onVisibilityChange, onLogin }) => {
     const login = loginRef.current.value.trim();
     const password = passwordRef.current.value.trim();
 
+    if (!login || !password) {
+      setErrorMessage('Пожалуйста, заполните все поля.');
+      return;
+    }
+
     setIsLoading(true);
     setErrorMessage('');
 
@@ -30,15 +35,18 @@ const EnterForm = ({ visible, onVisibilityChange, onLogin }) => {
       const member = await fetchMember(login, password);
 
       if (!member.memberId || !member.accessToken) {
-        setErrorMessage('Сервер не вернул необходимые данные для авторизации.');
-        setIsLoading(false);
-        return;
+        throw new Error('Сервер не вернул необходимые данные для авторизации.');
       }
 
+      // Сохранение токена и memberId
       localStorage.setItem('memberId', member.memberId);
       localStorage.setItem('accessToken', member.accessToken);
-      setAccessToken(member.accessToken);
+      setAccessToken(member.accessToken); // Установка токена в глобальный контекст Axios
+
+      // Вызов callback для уведомления родительского компонента об успешном входе
       onLogin(member.memberId, member.accessToken);
+
+      // Очистка формы и закрытие модального окна
       clearForm();
       onVisibilityChange(false);
     } catch (error) {
@@ -77,7 +85,15 @@ const EnterForm = ({ visible, onVisibilityChange, onLogin }) => {
         </button>
         <div>
           <label htmlFor="login">Логин:</label>
-          <input type="text" id="login" name="login" required className="modalInput" ref={loginRef} />
+          <input
+            type="text"
+            id="login"
+            name="login"
+            required
+            className="modalInput"
+            ref={loginRef}
+            disabled={isLoading}
+          />
         </div>
         <div>
           <label htmlFor="password">Пароль:</label>
@@ -89,11 +105,13 @@ const EnterForm = ({ visible, onVisibilityChange, onLogin }) => {
               required
               className="modalInput"
               ref={passwordRef}
+              disabled={isLoading}
             />
             <button
               type="button"
               className="password-toggle"
-              onClick={() => setShowPassword(prev => !prev)}
+              onClick={() => setShowPassword((prev) => !prev)}
+              disabled={isLoading}
             >
               {showPassword ? <FaEyeSlash /> : <FaEye />}
             </button>
@@ -102,10 +120,15 @@ const EnterForm = ({ visible, onVisibilityChange, onLogin }) => {
         {errorMessage && <div className="restricted-content">{errorMessage}</div>}
         <div className="button-wrapper">
           <button type="submit" className="modalButtonReg" disabled={isLoading}>
-            Войти
+            {isLoading ? 'Вход...' : 'Войти'}
           </button>
           {isLoading && <FaSpinner className="spinner" />}
-          <button className="modalButtonClear" type="button" onClick={clearForm} disabled={isLoading}>
+          <button
+            className="modalButtonClear"
+            type="button"
+            onClick={clearForm}
+            disabled={isLoading}
+          >
             Очистить
           </button>
         </div>

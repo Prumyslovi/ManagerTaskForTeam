@@ -1,4 +1,5 @@
-﻿using ManagerTaskForTeam.Application.Interfaces.Services;
+﻿using ManagerTaskForTeam.Application.Dtos;
+using ManagerTaskForTeam.Application.Interfaces.Services;
 using ManagerTaskForTeam.Domain.Entities;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -26,8 +27,22 @@ namespace ManagerTaskForTeam.API.Controllers
         }
 
         [HttpPost("AddComment")]
-        public async Task<ActionResult<Comment>> AddComment([FromBody] Comment comment)
+        public async Task<ActionResult<Comment>> AddComment([FromBody] CommentCreateDto commentDto)
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            var comment = new Comment
+            {
+                TaskId = commentDto.TaskId,
+                MemberId = commentDto.MemberId,
+                CommentText = commentDto.CommentText,
+                CreatedAt = commentDto.CreatedAt,
+                IsDeleted = commentDto.IsDeleted
+            };
+
             var createdComment = await _service.AddCommentAsync(comment);
             return Ok(createdComment);
         }

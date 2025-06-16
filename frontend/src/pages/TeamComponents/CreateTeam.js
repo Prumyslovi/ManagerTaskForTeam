@@ -1,70 +1,52 @@
 import React, { useState } from 'react';
 import '../styles/Modal.css';
-import { fetchTeams, createTeam } from '../../services/teamApi';
+import { createTeam } from '../../services/teamApi';
 
 const CreateTeam = () => {
   const [teamName, setTeamName] = useState('');
   const [teamDescription, setTeamDescription] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
-  const creatorId = localStorage.getItem('memberId');
-
-  const generateRandomLink = () => {
-    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-    let randomLink = '';
-    for (let i = 0; i < 6; i++) {
-      randomLink += characters.charAt(Math.floor(Math.random() * characters.length));
-    }
-    return randomLink;
-  };
-
-  const checkUniqueLink = async (link) => {
-    try {
-      const teams = await fetchTeams();
-      return !teams.some(team => team.teamLink === link);
-    } catch (error) {
-      console.error('Ошибка при проверке уникальности ссылки:', error);
-      return false;
-    }
-  };
-
-  const generateUniqueLink = async () => {
-    let link = generateRandomLink();
-    let isUnique = await checkUniqueLink(link);
-    while (!isUnique) {
-      link = generateRandomLink();
-      isUnique = await checkUniqueLink(link);
-    }
-    return link;
-  };
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleCreateTeam = async (e) => {
     e.preventDefault();
-    if (!teamName || !teamDescription) {
-      setErrorMessage('Пожалуйста, заполните все поля.');
-      return;
-    }
-
-    const teamLink = await generateUniqueLink();
-
-    const newTeam = {
-      teamName,
-      description: teamDescription,
-      createdAt: new Date().toISOString(),
-      creatorId,
-      isDeleted: false,
-      teamLink,
-    };
+    setIsLoading(true);
+    setErrorMessage('');
+    setSuccessMessage('');
 
     try {
+      const memberId = localStorage.getItem('memberId');
+      
+      if (!teamName.trim() || !teamDescription.trim()) {
+        throw new Error('Заполните все поля');
+      }
+
+      if (!memberId) {
+        throw new Error('Пользователь не авторизован');
+      }
+
+      const newTeam = {
+        TeamName: teamName.trim(),
+        Description: teamDescription.trim(),
+      };
+
       const response = await createTeam(newTeam);
-      setSuccessMessage(`Команда "${response.teamName}" успешно создана!`);
-      setErrorMessage('');
+      setSuccessMessage(`Команда "${response.teamName}" создана!`);
       setTeamName('');
       setTeamDescription('');
+      
     } catch (error) {
-      console.error(error);
-      setErrorMessage('Ошибка при создании команды. Попробуйте снова.');
+      console.error('Ошибка создания команды:', error);
+      
+      if (error.response) {
+        const errorData = error.response.data;
+        setErrorMessage(errorData.title || errorData || 'Ошибка сервера');
+      } else {
+        setErrorMessage(error.message || 'Ошибка при создании команды');
+      }
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -79,6 +61,7 @@ const CreateTeam = () => {
             onChange={(e) => setTeamName(e.target.value)}
             placeholder="Введите название команды"
             className="modalInput"
+            disabled={isLoading}
           />
         </div>
         <div>
@@ -88,13 +71,20 @@ const CreateTeam = () => {
             onChange={(e) => setTeamDescription(e.target.value)}
             placeholder="Введите описание команды"
             className="modalInput"
+            disabled={isLoading}
           />
         </div>
-        <button type="submit" className="Button">Создать команду</button>
+        <button 
+          type="submit" 
+          className="Button"
+          disabled={isLoading}
+        >
+          {isLoading ? 'Создание...' : 'Создать команду'}
+        </button>
       </form>
 
-      {successMessage && <div className="restricted-content">{successMessage}</div>}
-      {errorMessage && <div className="restricted-content">{errorMessage}</div>}
+      {successMessage && <div className="success">{successMessage}</div>}
+      {errorMessage && <div className="error">{errorMessage}</div>}
     </div>
   );
 };

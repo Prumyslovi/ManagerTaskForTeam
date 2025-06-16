@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Route, Routes, useNavigate } from 'react-router-dom';
+import { createTheme, ThemeProvider } from '@mui/material/styles';
 import Navbar from './pages/Navbar';
 import Home from './pages/Home';
 import Profile from './pages/Profile/Profile';
@@ -12,6 +13,16 @@ import DocumentEditor from './pages/Documents/DocumentEditor';
 import RegistrationForm from './pages/reg/RegistrationForm';
 import EnterForm from './pages/reg/EnterForm';
 import './pages/styles/Message.css';
+
+const theme = createTheme({
+  components: {
+    MuiTextField: {
+      defaultProps: {
+        size: 'small',
+      },
+    },
+  },
+});
 
 const AppContent = () => {
   const [isVisibleRegistrationForm, setIsVisibleRegistrationForm] = useState(false);
@@ -130,9 +141,11 @@ const AppContent = () => {
 
 function App() {
   return (
-    <Router>
-      <AppContent />
-    </Router>
+    <ThemeProvider theme={theme}>
+      <Router>
+        <AppContent />
+      </Router>
+    </ThemeProvider>
   );
 }
 

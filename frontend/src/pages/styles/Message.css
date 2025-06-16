@@ -1,19 +1,45 @@
 .restricted-content {
-    padding: 20px;
-    background-color: #f8d7da;
-    border: 1px solid #f5c6cb;
-    color: #721c24;
-    border-radius: 4px;
-    margin-top: 10px; 
-    margin-bottom: 10px; 
-  }
-  
-  .right-content {
-    padding: 20px;
-    background-color: #d7f8e2;
-    border: 1px solid #1f7233;
-    color: #1c7236;
-    border-radius: 4px;
-    margin-bottom: 20px; 
-  }
-  
+  padding: 20px;
+  background-color: #f8d7da;
+  border: 1px solid #f5c6cb;
+  color: #721c24;
+  border-radius: 4px;
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
+.right-content {
+  padding: 20px;
+  background-color: #d7f8e2;
+  border: 1px solid #1f7233;
+  color: #1c7236;
+  border-radius: 4px;
+  margin-bottom: 20px;
+}
+
+.restricted-content-fade {
+  padding: 20px;
+  background-color: #f8d7da;
+  border: 1px solid #f5c6cb;
+  color: #721c24;
+  border-radius: 4px;
+  margin-top: 10px;
+  margin-bottom: 10px;
+  animation: fadeOut 5s forwards;
+}
+
+.right-content-fade {
+  padding: 20px;
+  background-color: #d7f8e2;
+  border: 1px solid #1f7233;
+  color: #1c7236;
+  border-radius: 4px;
+  margin-bottom: 20px;
+  animation: fadeOut 5s forwards;
+}
+
+@keyframes fadeOut {
+  0% { opacity: 1; }
+  80% { opacity: 1; }
+  100% { opacity: 0; }
+}

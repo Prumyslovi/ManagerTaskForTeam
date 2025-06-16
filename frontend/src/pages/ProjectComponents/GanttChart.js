@@ -95,7 +95,12 @@ const GanttChart = ({ projectId, teamId, currentUserId }) => {
                     projectId: task.projectId || "",
                     memberId: task.memberId || "",
                     status: task.status || "",
-                    isDeleted: task.isDeleted || false
+                    isDeleted: task.isDeleted || false,
+                    $custom: {
+                        status: task.status || "planned",
+                        priority: task.priority || "medium",
+                        className: `task-status-${task.status || 'planned'}`
+                    }
                 };
             });
 
@@ -279,7 +284,7 @@ const GanttChart = ({ projectId, teamId, currentUserId }) => {
     };
 
     const handleMouseDown = (e) => {
-        if (e.button === 0) { // Left mouse button
+        if (e.button === 0) {
             const rect = filterPanelRef.current.getBoundingClientRect();
             dragRef.current = {
                 isDragging: true,
@@ -324,6 +329,13 @@ const GanttChart = ({ projectId, teamId, currentUserId }) => {
             if (!taskMatch) return;
 
             element.setAttribute("data-task-id", taskMatch.id);
+            element.setAttribute("data-status", taskMatch.status || "planned");
+
+            const taskBars = ganttContainer.querySelectorAll(`.wx-task-bar[data-id="${taskMatch.id}"]`);
+            taskBars.forEach(bar => {
+                bar.setAttribute("data-status", taskMatch.status || "planned");
+                bar.classList.add(`task-status-${taskMatch.status || 'planned'}`);
+            });
 
             const durationCells = element.querySelectorAll('[data-col-id="duration"]');
             durationCells.forEach(cell => {
@@ -363,6 +375,17 @@ const GanttChart = ({ projectId, teamId, currentUserId }) => {
     if (error) return <div className="message restricted-content">Ошибка: {error}</div>;
 
     const { scales, start, end } = getScalesAndRange();
+
+    const ganttPalette = {
+        default: "var(--gantt-task-fill)",
+        progress: "var(--gantt-task-fill)",
+        borderColor: "var(--border)",
+        today: scale === "day" ? "var(--accent)" : "transparent",
+        planned: "var(--status-planned-bg)",
+        in_progress: "var(--status-in-progress-bg)",
+        completed: "var(--status-done-bg)",
+        failed: "var(--priority-critical-bg)"
+    };
 
     return (
         <div className="gantt-container">
@@ -498,12 +521,7 @@ const GanttChart = ({ projectId, teamId, currentUserId }) => {
                         readonly={true}
                         cellWidth={cellWidth}
                         scaleHeight={scaleHeight}
-                        palette={{
-                            default: "var(--gantt-task-fill)",
-                            progress: "var(--gantt-task-fill)",
-                            borderColor: "var(--border)",
-                            today: scale === "day" ? "var(--accent)" : "transparent"
-                        }}
+                        palette={ganttPalette}
                         gridLineColor="var(--border-light)"
                         taskLabelStyle={{
                             color: "var(--text-primary)",

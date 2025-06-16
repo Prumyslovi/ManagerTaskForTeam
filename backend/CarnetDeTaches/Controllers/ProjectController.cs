@@ -4,7 +4,9 @@ using ManagerTaskForTeam.Application.Interfaces.Services;
 using ManagerTaskForTeam.Domain.Entities;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
+using ManagerTaskForTeam.Application.DTOs;
 
 namespace ManagerTaskForTeam.API.Controllers
 {
@@ -14,16 +16,25 @@ namespace ManagerTaskForTeam.API.Controllers
     public class ProjectController : ControllerBase
     {
         private readonly IProjectService _projectService;
+        private readonly IRoleService _roleService;
+        private readonly IMemberRoleService _memberRoleService;
 
-        public ProjectController(IProjectService projectService)
+        public ProjectController(
+            IProjectService projectService,
+            IRoleService roleService,
+            IMemberRoleService memberRoleService)
         {
             _projectService = projectService;
+            _roleService = roleService;
+            _memberRoleService = memberRoleService;
         }
 
         [HttpGet("GetAllProjects")]
         public async Task<ActionResult<IEnumerable<Project>>> GetAllProjects()
         {
-            if (!User.HasClaim(c => c.Type == "Permission" && c.Value.EndsWith("9FB97F5A-B4C9-4F30-93B9-D268F8F1DABC")))
+            var memberId = Guid.Parse(User.FindFirst("MemberId")?.Value);
+            var hasPermission = await HasTeamPermissionAsync(null, memberId, "9FB97F5A-B4C9-4F30-93B9-D268F8F1DABC");
+            if (!hasPermission)
                 return Forbid();
 
             var projects = await _projectService.GetAllProjectsAsync();
@@ -46,7 +57,9 @@ namespace ManagerTaskForTeam.API.Controllers
         [HttpPost("AddProject")]
         public async Task<ActionResult<Project>> AddProject([FromBody] Project project)
         {
-            if (!HasTeamPermission(project.TeamId, "E1326EA5-E475-42BC-8631-BAD21AC4956D"))
+            var memberId = Guid.Parse(User.FindFirst("MemberId")?.Value);
+            var hasPermission = await HasTeamPermissionAsync(project.TeamId, memberId, "9FB97F5A-B4C9-4F30-93B9-D268F8F1DABC");
+            if (!hasPermission)
                 return Forbid();
 
             var createdProject = await _projectService.AddProjectAsync(project);
@@ -56,10 +69,13 @@ namespace ManagerTaskForTeam.API.Controllers
         [HttpPut("UpdateProject/{id}")]
         public async Task<ActionResult> UpdateProject([FromRoute] Guid id, [FromBody] Project project)
         {
-            if (!HasTeamPermission(project.TeamId, "D9F09821-11A1-4C90-915C-62D4F9E92629"))
+            var existingProject = await _projectService.GetProjectAsync(id);
+            var memberId = Guid.Parse(User.FindFirst("MemberId")?.Value);
+            var hasPermission = await HasTeamPermissionAsync(existingProject.TeamId, memberId, "0CF2FABF-B343-4392-9F18-A7828E22D4C5");
+            if (!hasPermission)
                 return Forbid();
 
-            project.ProjectId = id; // Устанавливаем ID из маршрута
+            project.ProjectId = id;
             await _projectService.UpdateProjectAsync(project);
             return NoContent();
         }
@@ -68,7 +84,9 @@ namespace ManagerTaskForTeam.API.Controllers
         public async Task<ActionResult> DeleteProject([FromRoute] Guid id)
         {
             var project = await _projectService.GetProjectAsync(id);
-            if (!HasTeamPermission(project.TeamId, "ABBE599F-E991-4471-A8A0-C40A57BCDBC7"))
+            var memberId = Guid.Parse(User.FindFirst("MemberId")?.Value);
+            var hasPermission = await HasTeamPermissionAsync(project.TeamId, memberId, "E6F16439-12D2-44BD-A75C-0C8111C48D31");
+            if (!hasPermission)
                 return Forbid();
 
             await _projectService.DeleteProjectAsync(id);
@@ -79,8 +97,12 @@ namespace ManagerTaskForTeam.API.Controllers
         public async Task<ActionResult<IEnumerable<Project>>> GetProjectsForUser(Guid memberId)
         {
             var currentUserId = Guid.Parse(User.FindFirst("MemberId")?.Value);
-            if (memberId != currentUserId && !HasPermission(Guid.Empty, "9FB97F5A-B4C9-4F30-93B9-D268F8F1DABC"))
-                return Forbid();
+            if (memberId != currentUserId)
+            {
+                var hasPermission = await HasTeamPermissionAsync(null, currentUserId, "9FB97F5A-B4C9-4F30-93B9-D268F8F1DABC");
+                if (!hasPermission)
+                    return Forbid();
+            }
 
             var teams = await _projectService.GetTeamsByMemberIdAsync(memberId);
             var teamIds = teams.Select(t => t.TeamId).ToList();
@@ -88,14 +110,24 @@ namespace ManagerTaskForTeam.API.Controllers
             return Ok(projects);
         }
 
-        private bool HasTeamPermission(Guid teamId, string permissionId)
+        private async Task<bool> HasTeamPermissionAsync(Guid? teamId, Guid memberId, string permissionId)
         {
-            return User.HasClaim(c => c.Type == "Permission" && c.Value == $"{teamId}:{permissionId}");
-        }
-
-        private bool HasPermission(Guid teamId, string permissionId)
-        {
-            return User.HasClaim(c => c.Type == "Permission" && c.Value == $"{teamId}:{permissionId}");
+            var userTeams = await _memberRoleService.GetUserTeamsAsync(memberId);
+            foreach (var team in userTeams)
+            {
+                if (!teamId.HasValue || team.TeamId == teamId)
+                {
+                    var userRoles = await _memberRoleService.GetUsersWithRolesAsync(team.TeamId);
+                    var userRole = userRoles.FirstOrDefault(r => r.MemberId == memberId);
+                    if (userRole != null)
+                    {
+                        var permissions = await _roleService.GetPermissionsByRoleIdAsync(userRole.RoleId);
+                        if (permissions.Any(p => p.PermissionId == Guid.Parse(permissionId)))
+                            return true;
+                    }
+                }
+            }
+            return false;
         }
     }
 }

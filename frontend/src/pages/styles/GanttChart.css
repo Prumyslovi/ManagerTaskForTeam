@@ -1,3 +1,5 @@
+/* ==================== ОСНОВНЫЕ СТИЛИ ДИАГРАММЫ ГАНТТА ==================== */
+
 .gantt-container {
     width: 100%;
     position: relative;
@@ -6,7 +8,10 @@
     overflow: auto;
     background-color: var(--bg-primary);
     color: var(--text-primary);
-    transition: background-color 0.3s ease;
+    transition: background-color 0.3s ease, color 0.3s ease;
+    font-family: var(--font-primary);
+    border-radius: 8px;
+    box-shadow: var(--shadow);
 }
 
 .container {
@@ -15,66 +20,197 @@
     align-items: center;
     gap: 10px;
     flex-wrap: wrap;
-    padding: 10px;
+    padding: 12px;
     background-color: var(--bg-secondary);
     border-bottom: 1px solid var(--border-light);
+    border-radius: 8px 8px 0 0;
 }
 
 .gantt-content {
-    padding: 10px;
+    padding: 12px;
+    background-color: var(--bg-primary);
 }
 
 .controls {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 12px;
     flex-wrap: wrap;
-    margin-bottom: 10px;
+    margin-bottom: 12px;
+    padding: 12px;
+    background-color: var(--bg-secondary);
+    border-radius: 8px;
+    border: 1px solid var(--border-light);
+    box-shadow: var(--shadow);
 }
+
+.controls span {
+    font-weight: var(--wx-font-weight-md);
+    color: var(--text-primary);
+    font-size: var(--wx-font-size-sm);
+}
+
+/* ==================== СТИЛИ КНОПОК И ЭЛЕМЕНТОВ УПРАВЛЕНИЯ ==================== */
+
+.editButton, 
+.scaleSelect,
+.filterButton {
+    padding: 8px 16px;
+    border-radius: 6px;
+    border: 1px solid var(--border-light);
+    background-color: var(--button-bg);
+    color: var(--button-text);
+    cursor: pointer;
+    font-family: var(--font-primary);
+    font-size: var(--wx-font-size-sm);
+    font-weight: var(--wx-font-weight);
+    transition: all 0.3s ease;
+    box-shadow: var(--shadow);
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.editButton:hover, 
+.scaleSelect:hover,
+.filterButton:hover {
+    background-color: var(--button-hover-bg);
+    color: var(--button-hover-text);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-hover);
+}
+
+.filterButton {
+    padding: 8px 12px;
+    min-width: 40px;
+    justify-content: center;
+}
+
+.filterIcon {
+    font-size: 14px;
+    color: inherit;
+}
+
+/* ==================== ПАНЕЛЬ ФИЛЬТРОВ ==================== */
+
+.filterPanel {
+    position: fixed;
+    top: 100px;
+    right: 20px;
+    background-color: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 8px;
+    padding: 16px;
+    box-shadow: var(--shadow-hover);
+    z-index: 1000;
+    min-width: 250px;
+    font-family: var(--font-primary);
+    color: var(--text-primary);
+    backdrop-filter: blur(10px);
+}
+
+.filterPanel label {
+    display: flex;
+    align-items: center;
+    margin-bottom: 12px;
+    font-size: var(--wx-font-size-sm);
+    font-weight: var(--wx-font-weight);
+    cursor: pointer;
+    transition: color 0.3s ease;
+}
+
+.filterPanel label:hover {
+    color: var(--accent);
+}
+
+.filterPanel input[type="checkbox"] {
+    margin-right: 8px;
+    width: 16px;
+    height: 16px;
+    accent-color: var(--accent);
+    cursor: pointer;
+}
+
+.filterSelect {
+    width: 100%;
+    padding: 6px 10px;
+    border: 1px solid var(--border-light);
+    border-radius: 4px;
+    background-color: var(--button-bg);
+    color: var(--button-text);
+    font-family: var(--font-primary);
+    font-size: var(--wx-font-size-sm);
+    margin-top: 4px;
+    transition: all 0.3s ease;
+}
+
+.filterSelect:hover,
+.filterSelect:focus {
+    border-color: var(--accent);
+    background-color: var(--button-hover-bg);
+    color: var(--button-hover-text);
+    outline: none;
+}
+
+/* ==================== ОСНОВНЫЕ СТИЛИ WX-GANTT КОМПОНЕНТА ==================== */
 
 .wx-gantt {
     background-color: var(--bg-primary) !important;
+    color: var(--text-primary) !important;
+    font-family: var(--font-primary) !important;
+    font-size: var(--wx-font-size) !important;
+    border-radius: 6px !important;
+    overflow: hidden !important;
 }
+
+/* ==================== ЗАГОЛОВКИ И ВРЕМЕННАЯ ШКАЛА ==================== */
 
 .wx-gantt .wx-grid-header,
 .wx-gantt .wx-timescale {
-    background-color: var(--bg-secondary) !important;
-    border-bottom: 1px solid var(--border-light) !important;
-    color: var(--text-primary) !important;
+    background-color: var(--table-header-bg) !important;
+    color: var(--table-header-text) !important;
+    border-bottom: 2px solid var(--border-light) !important;
+    font-weight: var(--wx-font-weight-md) !important;
 }
 
 .wx-gantt .wx-column-header,
-.wx-gantt .wx-body-cell {
-    background-color: var(--bg-primary) !important;
-    color: var(--text-primary) !important;
-    border-color: var(--border-light) !important;
+.wx-gantt .wx-grid-header-cell {
+    background-color: var(--table-header-bg) !important;
+    color: var(--table-header-text) !important;
+    border-right: 1px solid var(--border-light) !important;
+    border-bottom: 1px solid var(--border-light) !important;
+    font-weight: var(--wx-font-weight-md) !important;
+    padding: 8px 12px !important;
+    text-align: center !important;
 }
+
+.wx-gantt .wx-grid-header-cell:last-child {
+    border-right: none !important;
+}
+
+.wx-gantt .wx-timescale-cell {
+    background-color: var(--table-header-bg) !important;
+    color: var(--table-header-text) !important;
+    border-right: 1px solid var(--border-light) !important;
+    padding: 4px 8px !important;
+    text-align: center !important;
+    font-size: var(--wx-font-size-sm) !important;
+}
+
+.wx-gantt .wx-timescale-cell:last-child {
+    border-right: none !important;
+}
+
+/* ==================== СТРОКИ И ЯЧЕЙКИ ТАБЛИЦЫ ==================== */
 
 .wx-gantt .wx-grid-body-row {
-    background-color: var(--bg-primary) !important;
+    background-color: var(--table-bg) !important;
     border-bottom: 1px solid var(--border-light) !important;
+    transition: background-color 0.2s ease !important;
 }
 
-.wx-gantt .wx-grid-body-cell {
-    background-color: var(--bg-primary) !important;
-    color: var(--text-primary) !important;
-}
-
-.wx-gantt .wx-task-bar {
-    background-color: var(--gantt-task-fill) !important;
-    color: var(--gantt-task-text) !important;
-    fill: var(--gantt-task-fill) !important;
-}
-
-.wx-gantt .wx-project-bar {
-    background-color: var(--accent) !important;
-    color: var(--text-primary) !important;
-    fill: var(--accent) !important;
-}
-
-.wx-gantt .wx-milestone {
-    background-color: var(--accent) !important;
-    fill: var(--accent) !important;
+.wx-gantt .wx-grid-body-row:nth-child(even) {
+    background-color: var(--bg-secondary) !important;
 }
 
 .wx-gantt .wx-grid-body-row:hover {
@@ -82,72 +218,220 @@
     color: var(--table-row-hover-text) !important;
 }
 
-.wx-gantt .wx-grid-header-cell {
-    background-color: var(--table-header-bg) !important;
-    color: var(--table-header-text) !important;
-    border-right: 1px solid var(--border-light) !important;
-}
-
-.wx-gantt .wx-grid-header-cell:last-child {
-    border-right: none !important;
-}
-
-.wx-gantt .wx-grid-body-row:nth-child(even) {
-    background-color: var(--bg-secondary) !important;
-}
-
-.wx-gantt .wx-timescale-cell {
-    border-right: 1px solid var(--border-light) !important;
+.wx-gantt .wx-grid-body-cell,
+.wx-gantt .wx-body-cell {
+    background-color: inherit !important;
     color: var(--text-primary) !important;
+    border-right: 1px solid var(--border-light) !important;
+    padding: 8px 12px !important;
+    font-size: var(--wx-font-size-sm) !important;
 }
 
-.wx-gantt .wx-timescale-cell:last-child {
-    border-right: none !important;
+/* ==================== ЗАДАЧИ И ЭЛЕМЕНТЫ ДИАГРАММЫ ==================== */
+
+.wx-gantt .wx-task-bar {
+    background-color: var(--gantt-task-fill) !important;
+    color: var(--gantt-task-text) !important;
+    fill: var(--gantt-task-fill) !important;
+    border-radius: 4px !important;
+    border: 1px solid var(--border) !important;
+    transition: all 0.2s ease !important;
 }
+
+.wx-gantt .wx-task-bar:hover {
+    filter: brightness(1.1) !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15) !important;
+}
+
+.wx-gantt .wx-project-bar {
+    background-color: var(--accent) !important;
+    color: var(--text-primary) !important;
+    fill: var(--accent) !important;
+    border-radius: 4px !important;
+    border: 1px solid var(--border) !important;
+}
+
+.wx-gantt .wx-milestone {
+    background-color: var(--accent) !important;
+    fill: var(--accent) !important;
+    border: 2px solid var(--border) !important;
+}
+
+/* ==================== СВЯЗИ МЕЖДУ ЗАДАЧАМИ ==================== */
 
 .wx-gantt .wx-link {
     stroke: var(--accent) !important;
+    stroke-width: 2px !important;
+    opacity: 0.8 !important;
+}
+
+.wx-gantt .wx-link:hover {
+    stroke-width: 3px !important;
+    opacity: 1 !important;
 }
 
 .wx-gantt .wx-link-marker {
-    fill: var(--bg-secondary) !important;
-    stroke: var(--icon-color) !important;
+    fill: var(--accent) !important;
+    stroke: var(--bg-primary) !important;
+    stroke-width: 1px !important;
 }
 
 .wx-gantt .wx-link-marker-text {
-    fill: var(--icon-color) !important;
+    fill: var(--text-primary) !important;
+    font-size: var(--wx-font-size-sm) !important;
 }
+
+/* ==================== ВЫХОДНЫЕ ДНИ И ПРАЗДНИКИ ==================== */
 
 .wx-gantt .wx-holiday {
     background-color: var(--gantt-holiday-bg) !important;
     color: var(--gantt-holiday-text) !important;
+    opacity: 0.7 !important;
 }
+
+/* ==================== МАРКЕРЫ И ИНДИКАТОРЫ ==================== */
 
 .wx-gantt .wx-marker {
     color: var(--text-primary) !important;
+    font-size: var(--wx-font-size-sm) !important;
 }
+
+.wx-gantt .wx-today-line {
+    stroke: var(--accent) !important;
+    stroke-width: 2px !important;
+    opacity: 0.8 !important;
+}
+
+/* ==================== ВСПЛЫВАЮЩИЕ ПОДСКАЗКИ ==================== */
 
 .wx-gantt .wx-tooltip {
-    background: var(--shadow) !important;
+    background: var(--card-bg) !important;
     color: var(--text-primary) !important;
+    border: 1px solid var(--card-border) !important;
+    border-radius: 6px !important;
+    padding: 8px 12px !important;
     font-family: var(--font-primary) !important;
+    font-size: var(--wx-font-size-sm) !important;
+    box-shadow: var(--shadow-hover) !important;
+    backdrop-filter: blur(10px) !important;
 }
+
+/* ==================== АНИМАЦИИ И ПЕРЕХОДЫ ==================== */
 
 .wx-row {
-    transition: height 0.3s ease;
+    transition: all 0.3s ease !important;
 }
 
-.editButton, .scaleSelect {
-    padding: 8px 12px;
-    border-radius: 4px;
-    border: 1px solid var(--border-light);
+.wx-gantt * {
+    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease !important;
+}
+
+/* ==================== АДАПТИВНОСТЬ ==================== */
+
+@media (max-width: 768px) {
+    .controls {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 8px;
+    }
+    
+    .controls > * {
+        width: 100%;
+        text-align: center;
+    }
+    
+    .filterPanel {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 90%;
+        max-width: 300px;
+    }
+    
+    .wx-gantt .wx-grid-header-cell,
+    .wx-gantt .wx-grid-body-cell {
+        padding: 6px 8px !important;
+        font-size: 12px !important;
+    }
+}
+
+/* ==================== ДОПОЛНИТЕЛЬНЫЕ СТИЛИ ДЛЯ ИНТЕГРАЦИИ ==================== */
+
+.gantt-container .import-export-button {
     background-color: var(--button-bg);
     color: var(--button-text);
-    cursor: pointer;
-    transition: background-color 0.3s ease, color 0.3s ease;
+    border: 1px solid var(--border-light);
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-family: var(--font-primary);
+    font-size: var(--wx-font-size-sm);
+    transition: all 0.3s ease;
+    box-shadow: var(--shadow);
 }
 
-.editButton:hover, .scaleSelect:hover {
+.gantt-container .import-export-button:hover {
     background-color: var(--button-hover-bg);
     color: var(--button-hover-text);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-hover);
+}
+
+/* ==================== КАСТОМНЫЕ СТИЛИ ДЛЯ ЗАДАЧ ПО СТАТУСАМ ==================== */
+
+.wx-gantt .wx-task-bar[data-status="planned"] {
+    background-color: var(--status-planned-bg) !important;
+    color: var(--status-planned-text) !important;
+}
+
+.wx-gantt .wx-task-bar[data-status="in_progress"] {
+    background-color: var(--status-in-progress-bg) !important;
+    color: var(--status-in-progress-text) !important;
+}
+
+.wx-gantt .wx-task-bar[data-status="completed"] {
+    background-color: var(--status-done-bg) !important;
+    color: var(--status-done-text) !important;
+}
+
+.wx-gantt .wx-task-bar[data-status="failed"] {
+    background-color: var(--priority-critical-bg) !important;
+    color: var(--priority-critical-text) !important;
+}
+
+/* ==================== УЛУЧШЕНИЯ СКРОЛЛБАРА ==================== */
+
+.gantt-container::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+.gantt-container::-webkit-scrollbar-track {
+    background-color: var(--bg-secondary);
+    border-radius: 4px;
+}
+
+.gantt-container::-webkit-scrollbar-thumb {
+    background-color: var(--border-light);
+    border-radius: 4px;
+    transition: background-color 0.3s ease;
+}
+
+.gantt-container::-webkit-scrollbar-thumb:hover {
+    background-color: var(--accent);
+}
+
+/* ==================== ФОКУС И ДОСТУПНОСТЬ ==================== */
+
+.editButton:focus,
+.scaleSelect:focus,
+.filterButton:focus {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+}
+
+.wx-gantt .wx-task-bar:focus {
+    outline: 2px solid var(--accent) !important;
+    outline-offset: 2px !important;
 }

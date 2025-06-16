@@ -7,13 +7,18 @@
   border-radius: 8px;
 }
 
-.programSection h2,
+.programSection h2 {
+  color: var(--text-primary);
+  font-size: var(--heading-2-size); /* 20px */
+}
+
 .programSection h3 {
   color: var(--text-primary);
+  font-size: var(--heading-3-size); /* 18px */
 }
 
 .programSection p {
-  font-size: 16px;
+  font-size: var(--text-main-size); /* 16px */
   line-height: 1.5;
   margin-bottom: 15px;
   color: var(--text-primary);
@@ -35,13 +40,13 @@
 }
 
 .welcomeSection h1 {
-  font-size: 2.5rem;
+  font-size: var(--heading-1-size); /* 24px */
   color: var(--text-primary);
   margin-bottom: 15px;
 }
 
 .welcomeSection p {
-  font-size: 1.2rem;
+  font-size: var(--text-main-size); /* 16px */
   color: var(--text-secondary);
   max-width: 600px;
   margin: 0 auto;
@@ -74,13 +79,13 @@
 }
 
 .actionIcon {
-  font-size: 2.5rem;
+  font-size: var(--heading-1-size); /* 24px */
   margin-bottom: 15px;
   color: var(--accent);
 }
 
 .actionCard span {
-  font-size: 1.2rem;
+  font-size: var(--text-main-size); /* 16px */
   font-weight: 500;
   color: var(--text-primary);
   text-align: center;

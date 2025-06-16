@@ -103,3 +103,15 @@
 .auth-footer a:hover {
   text-decoration: underline;
 }
+
+.button-wrapper {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px 0;
+}
+
+.modalButtonReg,
+.modalButtonClear {
+  flex: 1;
+  max-width: 48%; /* Чтобы кнопки не растягивались на всю ширину */
+}

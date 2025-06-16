@@ -21,6 +21,6 @@ namespace ManagerTaskForTeam.Domain.Entities
         public Guid TeamId { get; set; }
         [Column("IsDeleted")]
         public Boolean IsDeleted { get; set; }
-        public Team Team { get; set; }
+        public Team? Team { get; set; }
     }
 }

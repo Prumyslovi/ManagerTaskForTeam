@@ -12,8 +12,10 @@ let accessToken = null;
 
 export const setAccessToken = (token) => {
   accessToken = token;
+  api.defaults.headers.Authorization = `Bearer ${token}`; // Установка токена в заголовки по умолчанию
 };
 
+// Интерцептор для добавления Access Token
 api.interceptors.request.use(
   (config) => {
     if (accessToken) {
@@ -24,6 +26,7 @@ api.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
+// Интерцептор для обновления токена
 api.interceptors.response.use(
   (response) => response,
   async (error) => {
@@ -34,12 +37,9 @@ api.interceptors.response.use(
         const response = await axios.post(`${API_URL}/auth/refresh`, null, { withCredentials: true });
         const newAccessToken = response.data.accessToken;
         setAccessToken(newAccessToken);
-        localStorage.setItem('accessToken', newAccessToken);
         originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
         return api(originalRequest);
       } catch (refreshError) {
-        localStorage.removeItem('accessToken');
-        localStorage.removeItem('memberId');
         window.location.href = '/login';
         return Promise.reject(refreshError);
       }
@@ -47,11 +47,6 @@ api.interceptors.response.use(
     return Promise.reject(error);
   }
 );
-
-export const fetchMembers = async () => {
-  const response = await api.get('/Member/GetAllMembers');
-  return response.data;
-};
 
 export const addMember = async (memberData) => {
   const response = await api.post('/Member/AddMember', memberData);

@@ -5,7 +5,7 @@ import '../styles/Modal.css';
 import '../styles/AuthButtons.css';
 import '../styles/PasswordToggle.css';
 import '../styles/Spinner.css';
-import { updateMemberRole, removeTeam, getUsersWithRoles, fetchUserTeams } from '../../services/teamApi';
+import { updateMemberRole, removeTeam, getUsersWithRoles, fetchUserTeams, deleteMember } from '../../services/teamApi';
 import { FaTrashAlt } from 'react-icons/fa';
 
 const AdministerTeam = () => {
@@ -30,6 +30,15 @@ const AdministerTeam = () => {
     loadUserTeams(memberId);
   }, []);
 
+  useEffect(() => {
+    if (errorMessage) {
+      const timer = setTimeout(() => {
+        setErrorMessage('');
+      }, 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [errorMessage]);
+
   const loadUserTeams = async (memberId) => {
     try {
       const teams = await fetchUserTeams(memberId);
@@ -46,13 +55,16 @@ const AdministerTeam = () => {
     }
     try {
       const membersWithRoles = await getUsersWithRoles(teamId);
-      console.log('Members with roles:', membersWithRoles); // Логирование для отладки
+      console.log('Members with roles:', membersWithRoles);
+      
       const activeMember = membersWithRoles.find(member => member.memberId === activeMemberId);
       setTeamMembers(membersWithRoles);
       setCurrentUserRole(activeMember?.roleName || 'Участник');
-      const uniqueRolesFromApi = [...new Set(membersWithRoles.map(member => member.roleName))];
-      console.log('Unique roles from API:', uniqueRolesFromApi); // Логирование уникальных ролей
-      updateAvailableRoles();
+      
+      setTimeout(() => {
+        updateAvailableRoles(activeMember?.roleName || 'Участник');
+      }, 0);
+      
     } catch (error) {
       setErrorMessage('Ошибка при загрузке участников команды.');
     }
@@ -67,28 +79,32 @@ const AdministerTeam = () => {
       'Участник': 5,
       'Гость': 6,
     };
-    return rolePriorities[roleName] || 5; // По умолчанию Участник
+    return rolePriorities[roleName] || 5;
   };
 
-  const hasPermission = (permissionName) => {
+  const hasPermission = (permissionName, userRole = null) => {
+    const roleToCheck = userRole || currentUserRole;
     const rolePermissions = {
       'Создатель': ['ManageUsers', 'DeleteUsers', 'ViewProjectUserActions', 'ViewAllProjectUserActions', 'DeleteProject', 'Import', 'UpdateTask', 'DeleteTask', 'ReadTask', 'ChangeTaskStatus', 'EditTaskDates', 'ApproveTaskStatus', 'UpdateProject', 'AssignableToTask', 'Comment', 'Export', 'CreateProject', 'AssignTaskToOthers', 'CreateTask'],
-      'Администратор': ['ManageUsers', 'ViewProjectUserActions', 'ViewAllProjectUserActions', 'Import', 'UpdateTask', 'ReadTask', 'ChangeTaskStatus', 'EditTaskDates', 'ApproveTaskStatus', 'UpdateProject', 'Comment', 'Export', 'CreateProject', 'AssignTaskToOthers', 'CreateTask'],
+      'Администратор': ['ManageUsers', 'DeleteUsers', 'ViewProjectUserActions', 'ViewAllProjectUserActions', 'Import', 'UpdateTask', 'ReadTask', 'ChangeTaskStatus', 'EditTaskDates', 'ApproveTaskStatus', 'UpdateProject', 'Comment', 'Export', 'CreateProject', 'AssignTaskToOthers', 'CreateTask'],
       'Руководитель': ['ViewProjectUserActions', 'UpdateTask', 'ReadTask', 'ChangeTaskStatus', 'EditTaskDates', 'ApproveTaskStatus', 'Comment', 'AssignTaskToOthers'],
       'Менеджер': ['ViewProjectUserActions', 'UpdateTask', 'ReadTask', 'ChangeTaskStatus', 'Comment'],
       'Участник': ['ViewProjectUserActions', 'ReadTask', 'Comment'],
       'Гость': [],
     };
-    return rolePermissions[currentUserRole]?.includes(permissionName) || false;
+    return rolePermissions[roleToCheck]?.includes(permissionName) || false;
   };
 
-  const updateAvailableRoles = () => {
+  const updateAvailableRoles = (userRole = null) => {
+    const roleToUse = userRole || currentUserRole;
     const allRoles = ['Создатель', 'Администратор', 'Руководитель', 'Менеджер', 'Участник', 'Гость'];
-    const currentPriority = getRolePriority(currentUserRole);
+    const currentPriority = getRolePriority(roleToUse);
+    
     const filteredRoles = allRoles.filter(role => {
       const rolePriority = getRolePriority(role);
-      return rolePriority > currentPriority || !hasPermission('ManageUsers');
+      return rolePriority > currentPriority;
     }).sort((a, b) => getRolePriority(a) - getRolePriority(b));
+    
     setAvailableRoles(filteredRoles);
   };
 
@@ -97,12 +113,18 @@ const AdministerTeam = () => {
       setErrorMessage('У вас нет прав для изменения ролей.');
       return;
     }
+    
     const targetMember = teamMembers.find(m => m.memberId === memberId);
     const currentPriority = getRolePriority(currentUserRole);
-    const targetPriority = getRolePriority(targetMember.roleName);
+    const targetCurrentPriority = getRolePriority(targetMember.roleName);
     const newPriority = getRolePriority(newRole);
 
-    if (newPriority >= currentPriority) {
+    if (targetCurrentPriority <= currentPriority) {
+      setErrorMessage('Вы не можете изменить роль участника с равной или более высокой ролью.');
+      return;
+    }
+
+    if (newPriority <= currentPriority) {
       setErrorMessage('Вы не можете назначить роль равную или выше вашей.');
       return;
     }
@@ -114,45 +136,83 @@ const AdministerTeam = () => {
           member.memberId === memberId ? { ...member, roleName: newRole } : member
         )
       );
-      updateAvailableRoles(); // Обновляем доступные роли после изменения
+      setErrorMessage('');
     } catch (error) {
       setErrorMessage('Ошибка при изменении роли участника.');
     }
   };
 
-  const handleShowConfirmDelete = (memberId) => {
-    setMemberToDelete(memberId);
-    const memberToDeleteObj = teamMembers.find(member => member.memberId === memberId);
-    const currentPriority = getRolePriority(currentUserRole);
-    const targetPriority = getRolePriority(memberToDeleteObj?.roleName || 'Участник');
+  const canDeleteMember = (targetMemberId, targetRole) => {
+    if (currentUserRole === 'Создатель') {
+      return true;
+    }
+    
+    if (hasPermission('DeleteUsers')) {
+      const currentPriority = getRolePriority(currentUserRole);
+      const targetPriority = getRolePriority(targetRole);
+      return targetPriority > currentPriority;
+    }
+    
+    if (targetMemberId === activeMemberId) {
+      return true;
+    }
+    
+    return false;
+  };
 
-    if (memberId === activeMemberId && currentPriority === 1) {
+  const handleShowConfirmDelete = (memberId) => {
+    const memberToDeleteObj = teamMembers.find(member => member.memberId === memberId);
+    const targetRole = memberToDeleteObj?.roleName || 'Участник';
+    
+    if (!canDeleteMember(memberId, targetRole)) {
+      setErrorMessage('У вас нет прав для удаления этого участника.');
+      return;
+    }
+
+    setMemberToDelete(memberId);
+    
+    if (memberId === activeMemberId && currentUserRole === 'Создатель') {
       setDeleteConfirmationMessage("Вы точно хотите удалить команду? Это затронет всех участников и все имеющиеся процессы");
-    } else if (memberId === activeMemberId && [5, 6].includes(currentPriority)) {
+    } else if (memberId === activeMemberId) {
       setDeleteConfirmationMessage("Вы точно хотите выйти из команды?");
-    } else if (currentPriority < targetPriority && hasPermission('DeleteUsers')) {
-      setDeleteConfirmationMessage("Вы точно хотите удалить этого участника?");
     } else {
-      setDeleteConfirmationMessage("У вас нет прав для удаления этого участника.");
-      return; // Не открываем модальное окно
+      setDeleteConfirmationMessage("Вы точно хотите удалить этого участника?");
     }
 
     setIsConfirmDeleteVisible(true);
   };
 
   const handleDeleteMember = async () => {
+    if (!memberToDelete || !selectedTeam) {
+      setErrorMessage('Ошибка: не выбран участник или команда для удаления.');
+      return;
+    }
+
     const currentTeamId = selectedTeam.teamId;
+    
     try {
       if (currentUserRole === 'Создатель' && memberToDelete === activeMemberId) {
         await removeTeam(currentTeamId);
         setTeamMembers([]);
-      } else if ([5, 6].includes(getRolePriority(currentUserRole)) && memberToDelete === activeMemberId) {
-        await removeTeam(currentTeamId, memberToDelete);
-        setTeamMembers((prev) => prev.filter((member) => member.memberId !== memberToDelete));
+        setSelectedTeam(null);
+        loadUserTeams(activeMemberId);
+      } else {
+        await deleteMember(currentTeamId, memberToDelete);
+        
+        if (memberToDelete === activeMemberId) {
+          setTeamMembers([]);
+          setSelectedTeam(null);
+          loadUserTeams(activeMemberId);
+        } else {
+          setTeamMembers((prev) => prev.filter((member) => member.memberId !== memberToDelete));
+        }
       }
+      
       setIsConfirmDeleteVisible(false);
       setMemberToDelete(null);
+      setErrorMessage('');
     } catch (error) {
+      console.error('Error deleting member:', error);
       setErrorMessage('Ошибка при удалении участника из команды.');
     }
   };
@@ -170,6 +230,7 @@ const AdministerTeam = () => {
 
     setSelectedTeam(team);
     setTeamMembers([]);
+    setErrorMessage('');
     loadTeamMembersWithRoles(team.teamId);
   };
 
@@ -194,31 +255,46 @@ const AdministerTeam = () => {
 
       {selectedTeam && (
         <div>
-          <h4>Состав участников команды "{selectedTeam.teamName}"</h4>
+          <h4>Состав участников команды {selectedTeam.teamName}</h4>
+          <p>Ваша роль: <strong>{currentUserRole}</strong></p>
           <ul className="members-list">
             {teamMembers.length === 0 && <li>Нет участников в команде.</li>}
             {teamMembers.map((member) => {
               const role = member.roleName || 'Участник';
-              const isCurrentUser = member.memberId === localStorage.getItem('memberId');
+              const isCurrentUser = member.memberId === activeMemberId;
+              const canDelete = canDeleteMember(member.memberId, role);
+              const canChangeRole = hasPermission('ManageUsers') && 
+                                   (getRolePriority(role) > getRolePriority(currentUserRole));
+              
               return (
                 <li key={member.memberId} className="team-member">
-                  <span>{member.firstName + " " + member.lastName}</span>
+                  <span>
+                    {member.firstName + " " + member.lastName}
+                    {isCurrentUser && " (вы)"}
+                  </span>
                   <select
                     value={role}
                     onChange={(e) => handleRoleChange(selectedTeam.teamId, member.memberId, e.target.value)}
                     className="list"
-                    disabled={!hasPermission('ManageUsers')}
+                    disabled={!canChangeRole}
                   >
-                    {availableRoles.map((roleOption) => (
-                      <option key={roleOption} value={roleOption}>
-                        {roleOption}
-                      </option>
+                    <option value={role}>{role}</option>
+                    {canChangeRole && availableRoles.map((roleOption) => (
+                      roleOption !== role && (
+                        <option key={roleOption} value={roleOption}>
+                          {roleOption}
+                        </option>
+                      )
                     ))}
                   </select>
                   <button
                     className="Button"
                     onClick={() => handleShowConfirmDelete(member.memberId)}
-                    disabled={!hasPermission('DeleteUsers') || isCurrentUser}
+                    disabled={!canDelete}
+                    title={canDelete ? 
+                      (isCurrentUser ? "Покинуть команду" : "Удалить участника") : 
+                      "Нет прав для удаления"
+                    }
                   >
                     <FaTrashAlt />
                   </button>

@@ -1,15 +1,21 @@
+/* Удаляем старые стили спиннера и добавляем новые */
+.spinner-container {
+  display: flex;
+  justify-content: center;
+  margin-top: 15px;
+}
+
 .spinner {
-    margin-top: 20px;
-    font-size: 1.5rem;
-    color: var(--text-primary);
-    animation: spin 1s linear infinite;
+  font-size: 1.5rem;
+  color: var(--text-primary);
+  animation: spin 1s linear infinite;
 }
 
 @keyframes spin {
-    from {
-        transform: rotate(0deg);
-    }
-    to {
-        transform: rotate(360deg);
-    }
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }

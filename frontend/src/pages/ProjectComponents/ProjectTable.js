@@ -1,5 +1,5 @@
 import React from 'react';
-import '../styles/ProjectTable.css'; // Убедитесь, что этот файл существует
+import '../styles/ProjectTable.css';
 
 const ProjectTable = ({ projects, onRowClick, selectedProject }) => (
   <div>

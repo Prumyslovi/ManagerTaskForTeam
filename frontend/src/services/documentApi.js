@@ -11,7 +11,7 @@ export const fetchDocuments = async (teamId) => {
     },
   });
   return response.data;
-}
+};
 
 export const fetchDocumentContent = async (documentId) => {
   const response = await axios.get(`${API_URL}/Documents/GetDocumentContent/${documentId}`, {
@@ -20,7 +20,7 @@ export const fetchDocumentContent = async (documentId) => {
     },
   });
   return response.data;
-}
+};
 
 export const createDocument = async (documentData) => {
   const response = await axios.post(`${API_URL}/Documents/AddDocument`, documentData, {
@@ -29,7 +29,7 @@ export const createDocument = async (documentData) => {
     },
   });
   return response.data;
-}
+};
 
 export const updateDocument = async (documentId, documentData) => {
   const response = await axios.put(`${API_URL}/Documents/UpdateDocument/${documentId}`, documentData, {
@@ -38,7 +38,7 @@ export const updateDocument = async (documentId, documentData) => {
     },
   });
   return response.data;
-}
+};
 
 export const fetchDocumentChanges = async (documentId) => {
   const response = await axios.get(`${API_URL}/Documents/GetChanges/${documentId}`, {
@@ -47,11 +47,11 @@ export const fetchDocumentChanges = async (documentId) => {
     },
   });
   return response.data;
-}
+};
 
 export const fetchAllDocuments = async (teamId) => {
   const response = await fetch(`http://localhost:5062/api/documents/GetAllDocuments/${teamId}`, {
     credentials: 'include',
   });
   return response.json();
-}
+};

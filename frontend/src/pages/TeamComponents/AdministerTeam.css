@@ -146,6 +146,8 @@
   color: var(--button-text);
   cursor: pointer;
   transition: all 0.3s ease;
+  width: 200px;
+  box-sizing: border-box;
 }
 
 .list:hover {

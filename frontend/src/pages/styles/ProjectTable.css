@@ -6,6 +6,7 @@
 
 .project-table th {
     background-color: var(--bg-secondary);
+    color: var(--table-row-hover-text);
     padding: 12px 15px;
     text-align: left;
     border-bottom: 2px solid var(--border);

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { FaSpinner } from 'react-icons/fa';
 import { addMember } from '../../services/memberApi';
 import { v4 as uuidv4 } from 'uuid';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
@@ -11,7 +12,7 @@ const RegistrationForm = ({ visible, onVisibilityChange, onLogin }) => {
     const [error, setError] = useState(null);
     const [success, setSuccess] = useState(null);
     const [loading, setLoading] = useState(false);
-    
+
     const [formData, setFormData] = useState({
         firstName: '',
         lastName: '',
@@ -103,16 +104,15 @@ const RegistrationForm = ({ visible, onVisibilityChange, onLogin }) => {
         <div className='modalRegForm'>
             <form className='modalContent' onSubmit={handleSubmit}>
                 <h2 align='center'>Регистрация</h2>
-                <button 
-                    className="exitButton" 
-                    type="button" 
+                <button
+                    className="exitButton"
+                    type="button"
                     onClick={() => onVisibilityChange(false)}
                 >
                     ×
                 </button>
                 {error && <p className="restricted-content">{error}</p>}
                 {success && <p className="success">{success}</p>}
-                {loading && <p className="loading-text">Загрузка...</p>}
 
                 <div>
                     <label htmlFor="firstName">Имя:</label>
@@ -203,14 +203,19 @@ const RegistrationForm = ({ visible, onVisibilityChange, onLogin }) => {
                         </button>
                     </div>
                 </div>
-
-                <button type="submit" className='modalButtonReg' disabled={loading}>
-                    {loading ? '' : 'Зарегистрироваться'}
-                </button>
-
-                <button type="button" className='modalButtonClear' onClick={clearForm} disabled={loading}>
-                    Очистить
-                </button>
+                <div className="button-wrapper">
+                    <button type="submit" className="modalButtonReg" disabled={loading}>
+                        Создать
+                    </button>
+                    <button type="button" className="modalButtonClear" onClick={clearForm} disabled={loading}>
+                        Очистить
+                    </button>
+                </div>
+                {loading && (
+                    <div className="spinner-container">
+                        <FaSpinner className="spinner" />
+                    </div>
+                )}
             </form>
         </div>
     );

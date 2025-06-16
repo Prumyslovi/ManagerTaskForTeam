@@ -88,8 +88,15 @@ export const fetchStatus = async (statusId) => {
 };
 
 export const createStatus = async (status) => {
-  const response = await api.post('/Status/AddStatus', status);
-  return response.data;
+    try {
+        console.log('Отправка запроса на создание статуса:', status);
+        const response = await api.post('/Status/AddStatus', status);
+        console.log('Ответ от сервера:', response.data);
+        return response.data;
+    } catch (error) {
+        console.error('Ошибка в createStatus:', error.response?.data || error.message);
+        throw error;
+    }
 };
 
 export const updateStatus = async (statusId, status) => {

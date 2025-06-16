@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import ProjectTable from './ProjectTable';
 import KanbanBoard from './KanbanBoard';
 import GanttChart from './GanttChart';
+import ProjectStatistics from './ProjectStatistics';
 import { fetchTeam } from "../../services/teamApi";
 import { fetchProjectsForUser } from "../../services/projectApi";
 import '../styles/ProjectList.css';
@@ -12,16 +13,12 @@ const ProjectList = ({ memberId }) => {
   const [teams, setTeams] = useState({});
   const [expandedTeams, setExpandedTeams] = useState({});
   const [selectedProject, setSelectedProject] = useState(null);
+  const [selectedTeam, setSelectedTeam] = useState(null);
   const [data, setData] = useState({ lanes: {} });
   const [viewType, setViewType] = useState("kanban");
 
-  const selectedProjectData = projects.find(p => p.projectId === selectedProject);
-
   useEffect(() => {
-    if (!memberId) {
-      console.error('memberId не определен');
-      return;
-    }
+    if (!memberId) return;
     const loadData = async () => {
       try {
         const fetchedProjects = await fetchProjectsForUser(memberId);
@@ -33,8 +30,7 @@ const ProjectList = ({ memberId }) => {
           try {
             const team = await fetchTeam(teamId);
             teamData[teamId] = team;
-          } catch (error) {
-            console.error(`Ошибка при загрузке команды ${teamId}:`, error);
+          } catch {
             teamData[teamId] = { teamId, teamName: `Команда ${teamId}` };
           }
         }
@@ -43,12 +39,12 @@ const ProjectList = ({ memberId }) => {
         console.error('Ошибка при загрузке проектов:', error);
       }
     };
-
     loadData();
   }, [memberId]);
 
-  const handleRowClick = (projectId) => {
+  const handleRowClick = (projectId, teamId) => {
     setSelectedProject(selectedProject === projectId ? null : projectId);
+    setSelectedTeam(selectedProject === projectId ? null : teamId);
   };
 
   const handleViewTypeChange = (type) => {
@@ -58,8 +54,9 @@ const ProjectList = ({ memberId }) => {
   const toggleTeam = (teamId) => {
     setExpandedTeams(prev => {
       const isExpanded = !prev[teamId];
-      if (!isExpanded && selectedProject && projectsByTeam[teamId].some(p => p.projectId === selectedProject)) {
+      if (!isExpanded && selectedTeam === teamId) {
         setSelectedProject(null);
+        setSelectedTeam(null);
       }
       return { ...prev, [teamId]: isExpanded };
     });
@@ -67,9 +64,7 @@ const ProjectList = ({ memberId }) => {
 
   const projectsByTeam = projects.reduce((acc, project) => {
     const teamId = project.teamId;
-    if (!acc[teamId]) {
-      acc[teamId] = [];
-    }
+    if (!acc[teamId]) acc[teamId] = [];
     acc[teamId].push(project);
     return acc;
   }, {});
@@ -83,7 +78,7 @@ const ProjectList = ({ memberId }) => {
             onClick={() => toggleTeam(teamId)}
             style={{ cursor: 'pointer', display: 'flex', alignItems: 'center' }}
           >
-            <span style={{ marginRight: '10px' }}>
+            <span style={{ marginRight: '10px', color: 'var (--table-row-hover-text)' }}>
               {expandedTeams[teamId] ? '▼' : '▶'}
             </span>
             <h4>Команда: {teams[teamId]?.teamName || `Команда ${teamId}`}</h4>
@@ -92,44 +87,45 @@ const ProjectList = ({ memberId }) => {
             <div className="team-projects" style={{ marginLeft: '20px' }}>
               <ProjectTable
                 projects={teamProjects}
-                onRowClick={handleRowClick}
+                onRowClick={(projectId) => handleRowClick(projectId, teamId)}
                 selectedProject={selectedProject}
               />
+              {selectedTeam === teamId && selectedProject && (
+                <div>
+                  <ProjectStatistics projectId={selectedProject} teamId={teamId} />
+                  <div className="toggle-switch">
+                    <span 
+                      className={viewType === "kanban" ? "active" : ""} 
+                      onClick={() => handleViewTypeChange("kanban")}
+                    >
+                      Канбан
+                    </span>
+                    <span 
+                      className={viewType === "gantt" ? "active" : ""} 
+                      onClick={() => handleViewTypeChange("gantt")}
+                    >
+                      Ганта
+                    </span>
+                  </div>
+                  {viewType === "kanban" ? (
+                    <KanbanBoard
+                      projectId={selectedProject}
+                      setData={setData}
+                      teamId={teamId}
+                    />
+                  ) : (
+                    <GanttChart
+                      key={selectedProject}
+                      projectId={selectedProject}
+                      teamId={teamId}
+                    />
+                  )}
+                </div>
+              )}
             </div>
           )}
         </div>
       ))}
-      {selectedProject && selectedProjectData && (
-        <div>
-          <div className="toggle-switch">
-            <span 
-              className={viewType === "kanban" ? "active" : ""} 
-              onClick={() => handleViewTypeChange("kanban")}
-            >
-              Канбан
-            </span>
-            <span 
-              className={viewType === "gantt" ? "active" : ""} 
-              onClick={() => handleViewTypeChange("gantt")}
-            >
-              Гантта
-            </span>
-          </div>
-          {viewType === "kanban" ? (
-            <KanbanBoard
-              projectId={selectedProject}
-              setData={setData}
-              teamId={selectedProjectData.teamId}
-            />
-          ) : (
-            <GanttChart
-              key={selectedProject}
-              projectId={selectedProject}
-              teamId={selectedProjectData.teamId}
-            />
-          )}
-        </div>
-      )}
     </div>
   );
 };

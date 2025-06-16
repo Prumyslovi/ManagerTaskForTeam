@@ -21,7 +21,6 @@ namespace ManagerTaskForTeam.Infrastructure.Repositories
         public async Task<IEnumerable<Project>> GetAllProjectsAsync()
         {
             return await _context.Projects
-                .Include(p => p.Team)
                 .Where(p => !p.IsDeleted)
                 .ToListAsync();
         }
@@ -29,7 +28,6 @@ namespace ManagerTaskForTeam.Infrastructure.Repositories
         public async Task<Project> GetProjectAsync(Guid projectId)
         {
             return await _context.Projects
-                .Include(p => p.Team)
                 .FirstOrDefaultAsync(p => p.ProjectId == projectId && !p.IsDeleted);
         }
 
@@ -78,7 +76,6 @@ namespace ManagerTaskForTeam.Infrastructure.Repositories
         public async Task<IEnumerable<Project>> GetProjectsByTeamIdsAsync(List<Guid> teamIds)
         {
             return await _context.Projects
-                .Include(p => p.Team)
                 .Where(p => teamIds.Contains(p.TeamId) && !p.IsDeleted)
                 .ToListAsync();
         }

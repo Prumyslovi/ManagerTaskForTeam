@@ -33,7 +33,16 @@ const DocumentEditor = ({ teamId, documentId, onClose }) => {
         await connection.start();
         console.log('Connected to SignalR');
         if (connection.state === HubConnectionState.Connected) {
-          await connection.invoke('JoinDocument', documentId);
+          await connection.invoke('JoinDocument', documentId.toString());
+          // Добавляем обработчик для получения обновлений
+          connection.on('ReceiveUpdate', (docId, updatedContent, memberId) => {
+            if (docId.toString() === documentId.toString()) {
+              setContent(updatedContent);
+              if (editorRef.current) {
+                editorRef.current.innerHTML = updatedContent;
+              }
+            }
+          });
         } else {
           console.error('Cannot invoke JoinDocument: Connection is not in Connected state');
         }
@@ -85,7 +94,7 @@ const DocumentEditor = ({ teamId, documentId, onClose }) => {
       document.removeEventListener('selectionchange', updateToolbar);
       if (connectionRef.current) {
         if (connectionRef.current.state === HubConnectionState.Connected) {
-          connectionRef.current.invoke('LeaveDocument', documentId)
+          connectionRef.current.invoke('LeaveDocument', documentId.toString())
             .catch((err) => console.error('Error leaving document:', err));
         }
         connectionRef.current.stop();
@@ -98,14 +107,17 @@ const DocumentEditor = ({ teamId, documentId, onClose }) => {
     setMessage(null);
     const payload = {
       content: editorRef.current.innerHTML,
+      title: title, // Добавляем title
       memberId: localStorage.getItem('userId') || 'B8735544-1DD9-4C71-90C8-FBF8D70D2F01',
-      changeDescription: JSON.stringify({ timestamp: Date.now(), updated: 'content' }),
+      changeDescription: JSON.stringify({ timestamp: Date.now(), updated: 'content and title' }),
     };
     updateDocument(documentId, payload)
       .then(() => {
         setMessage({ type: 'success', text: 'Документ успешно обновлен!' });
         if (connectionRef.current && connectionRef.current.state === HubConnectionState.Connected) {
-          connectionRef.current.invoke('ReceiveUpdate', documentId, payload.content, payload.memberId);
+          // Исправляем вызов метода
+          connectionRef.current.invoke('SendUpdate', documentId.toString(), payload.content, payload.memberId)
+            .catch(err => console.error('SignalR invoke error:', err));
         }
         setTimeout(() => onClose(), 1500);
       })

@@ -43,7 +43,7 @@ const Home = ({ memberId }) => {
       {activeContent === 'home' && (
         <div className="homePage">
           <div className="welcomeSection">
-            <h1>Добро пожаловать в TaskFlow</h1>
+            <h1>Добро пожаловать!</h1>
             <p>Ваш инструмент для управления проектами и командной работы</p>
           </div>
 

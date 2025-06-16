@@ -3,6 +3,7 @@ import { fetchTeamMembers, fetchUserTeams } from '../../services/teamApi';
 import { FaSpinner } from 'react-icons/fa';
 import '../styles/TableStyle.css';
 import '../styles/Spinner.css';
+import '../styles/Message.css';
 import DocumentList from '../Documents/DocumentList';
 
 const TeamList = () => {
@@ -67,15 +68,15 @@ const TeamList = () => {
   };
 
   if (loading) return <div><FaSpinner className="spinner" /></div>;
-  if (error) return <p className="error">{error}</p>;
+  if (error) return <p className="restricted-content">{error}</p>;
 
   return (
     <div className="teams-table">
       <table>
         <thead>
           <tr>
-            <th>Команда</th>
-            <th>Описание</th>
+            <th className="team-row">Команда</th>
+            <th className="team-row">Описание</th>
           </tr>
         </thead>
         <tbody>

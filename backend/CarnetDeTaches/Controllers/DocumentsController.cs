@@ -59,6 +59,7 @@ namespace ManagerTaskForTeam.API.Controllers
         {
             var document = await _documentService.GetDocumentAsync(documentId);
             document.Content = dto.Content;
+            document.Title = dto.Title; // Добавляем обновление title
             document.UpdatedAt = DateTime.UtcNow;
             await _documentService.UpdateDocumentAsync(document, dto.MemberId, dto.ChangeDescription);
             await _hubContext.Clients.Group(documentId.ToString()).SendAsync("ReceiveUpdate", documentId, dto.Content, dto.MemberId);

@@ -1,6 +1,6 @@
 .navbar {
   background-color: var(--nav-bg);
-  padding: 10px 10px;
+  padding: 10px 2px;
   box-shadow: var(--shadow);
   font-family: var(--font-primary);
 }
@@ -16,8 +16,11 @@
 .navbarTitle {
   color: var(--nav-text);
   margin: 0;
-  font-size: 1.5rem;
+  margin-left: 0;
+  padding-left: 5px;
+  font-size: var(--heading-1-size);
   font-family: var(--font-primary);
+  white-space: nowrap;
 }
 
 .navList {
@@ -29,14 +32,18 @@
 }
 
 .navItem {
-  margin: 10px;
+  margin: 5px;
   position: relative;
   cursor: pointer;
   color: var(--nav-text);
   padding: 8px 12px;
   border-radius: 4px;
   transition: background-color 0.3s;
+  font-size: var(--nav-text-size);
   font-family: var(--font-primary);
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
 }
 
 .arrow {
@@ -65,7 +72,7 @@
   border-radius: 4px;
   padding: 10px 0;
   list-style: none;
-  width: 200px;
+  width: 250px;
   z-index: 1000;
   font-family: var(--font-primary);
 }
@@ -78,6 +85,7 @@
   padding: 10px 20px;
   color: var(--nav-text);
   transition: background-color 0.3s;
+  font-size: var(--nav-text-size);
   font-family: var(--font-primary);
 }
 
@@ -89,7 +97,7 @@
 .authButtons {
   display: flex;
   align-items: center;
-  gap: 15px;
+  gap: 10px;
   font-family: var(--font-primary);
 }
 
@@ -110,7 +118,7 @@
   background-color: var(--nav-bg);
   color: var(--nav-text);
   cursor: pointer;
-  font-size: 14px;
+  font-size: var(--button-text-size);
   transition: all 0.2s ease;
   height: 36px;
   font-family: var(--font-primary);

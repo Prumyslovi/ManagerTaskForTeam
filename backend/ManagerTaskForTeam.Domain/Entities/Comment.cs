@@ -27,7 +27,7 @@ namespace ManagerTaskForTeam.Domain.Entities
         [Column("IsDeleted")]
         public bool IsDeleted { get; set; }
 
-        public Member Member { get; set; }
-        public Task Task { get; set; }
+        public Member? Member { get; set; }
+        public Task? Task { get; set; }
     }
 }

@@ -35,8 +35,6 @@ namespace ManagerTaskForTeam.Application.Services
         public async Task<Comment> AddCommentAsync(Comment comment)
         {
             comment.CommentId = Guid.NewGuid();
-            comment.CreatedAt = DateTime.Now;
-            comment.IsDeleted = false;
             return await _commentRepository.AddCommentAsync(comment);
         }
 
